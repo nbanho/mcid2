@@ -1,6 +1,14 @@
+# Data
+data-raw/*
+data-clean/*
+doc/*
+results/*.pdf
+!.gitkeep
+
 # History files
 .Rhistory
 .Rapp.history
+.DS_Store
 
 # Session Data files
 .RData
