@@ -60,7 +60,7 @@
         \vfill
             
         \Large
-        Version number: 0.4 \\
+        Version number: 0.5 \\
         Version date: \today 
 
         \vspace*{1cm}
@@ -80,7 +80,7 @@ This document describes the proposed presentation and analysis for the main pape
     \item \textbf{Epidemiological data}: Daily absences from school.
 \end{enumerate}
  
-Laboratory and molecular analysis will detect which respiratory infections (e.g. SARS-CoV-2 or Influenza virus) were spreading over the study. Molecular data (positive samples), environmental (particle concentrations), and epidemiological data (absences related to respiratory infections) will then be compared between study conditions with and without air cleaners. The aim of the comparison is to assess whether air cleaners reduced the risk of airborne infection. \smallskip
+Laboratory and molecular analysis will detect which respiratory infections (e.g. SARS-CoV-2 or Influenza virus) were spreading over the study. Molecular (positive samples), environmental (particle concentrations), and epidemiological data (absences related to respiratory infections) will then be compared between study conditions with and without air cleaners. The aim of the comparison is to assess whether air cleaners reduced the risk of airborne infection. \smallskip
 
 Any deviations from the statistical analysis plan will be described and justified in the final report. The analysis will be carried out by identified, appropriately qualified, and experienced statisticians, who will ensure the integrity of the data during their processing.
 
@@ -108,7 +108,7 @@ Any deviations from the statistical analysis plan will be described and justifie
     \textbf{Environmental data} \\
     \midrule
     CO$_2$, aerosol/particle concentrations, humidity, temperature & Air quality device: AQ Guard (Palas GmbH, Karlsruhe, Germany) & x & x & daily by minute \\
-    Coughs & Sounds collected via microphones and coughs detected with a Machine Learning model\cite{Bertschinger2023} & x & x & daily by seconds \\
+    Coughs & Sounds collected via microphones and coughs detected with a Machine Learning model \cite{Bertschinger2023CBMS} & x & x & daily by seconds \\
     \midrule
     \textbf{Epidemiological data} \\
     \midrule
@@ -121,12 +121,12 @@ Any deviations from the statistical analysis plan will be described and justifie
 
 \section{Background}
 
-In a previous study, we estimated and compared the transmission of airborne infections with and without air cleaners and mask mandates in five classes of two secondary schools in the Canton of Solothurn, Switzerland, between January and March 2022\cite{Banholzer2023}. Air cleaners (commercially available portable HEPA-filtration devices) were found to reduce particle concentrations, but no association was found with transmission. In the previous study, air cleaners were introduced towards the end of the study when most students were already infected with SARS-CoV-2, thus limiting their potential to reduce transmission. By contrast, in this study, we only assess the effectiveness of air cleaners and used a more efficient cross-over design (\cref{tab:study_design}) to assess whether air cleaners are associated with reduced risk of airborne infection in schools.
+In a previous study, we estimated and compared the transmission of airborne infections with and without air cleaners and mask mandates in five classes of two secondary schools in the Canton of Solothurn, Switzerland, between January and March 2022 \cite{Banholzer2023PLoSMed}. Air cleaners (commercially available portable HEPA-filtration devices) were found to reduce particle concentrations, but no association was found with transmission. In the previous study, air cleaners were introduced towards the end of the study when most students were already infected with SARS-CoV-2, thus limiting their potential to reduce transmission. By contrast, in this study, we only assess the effectiveness of air cleaners and used a more efficient cross-over design (\cref{tab:study_design}) to assess whether air cleaners are associated with reduced risk of airborne infection in schools.
 
 \begin{table}[!htpb]
     \footnotesize
     \centering
-    \caption{\textbf{Study design.} Seven-week study period from January 16 to March 11, 2023, excluding a week of vacation between February 6 and 11. Cross-over design where two portable air cleaners were installed during different time periods in each class (Class A: weeks 1, 2, 6, and 7; Class B: weeks 3, 4, and 5) but not at the same time in both classes.}
+    \caption{\textbf{Study design.} Seven-week study period from January 16 to March 11, 2023, excluding a week of vacation between February 6 and 11. Cross-over design where two portable air cleaners were installed during different time periods in each class (Class A: weeks 1, 2, 6, and 7; Class B: weeks 3, 4, and 5).}
     \begin{tabular}{l l l l l l l l l}
     \toprule
       & \textbf{Week 1} & \textbf{Week 2} & \textbf{Week 3} & Vacation & \textbf{Week 4} & \textbf{Week 5} & \textbf{Week 6} & \textbf{Week 7} \\
@@ -146,7 +146,7 @@ The primary objective of the study is to estimate and compare the risk of airbor
 \begin{enumerate}
     \item \textbf{Molecular data}: Comparison of positive bioaerosol/saliva samples and viral load concentration.
     \item \textbf{Environmental data}: Comparison of aerosol/particle concentrations.
-    \item \textbf{Epidemiological data}: Comparison of the number of infections.  
+    \item \textbf{Epidemiological data}: Comparison of the number of absences related to respiratory infections.  
 \end{enumerate}
 
 \subsection{Definitions}
@@ -216,8 +216,8 @@ The number of respiratory cases (absences related to respiratory infections by d
     \end{enumerate}
     \item Secondary data
     \begin{enumerate}
-        \item Weekly number cases and deaths, laboratory tests and share of positive tests for COVID-19 in the Canton of Solothurn \cite{FOPH2023-cases}
-        \item Weekly number of consultations per 100,000 people due to influenza-like illnesses (ILI) \cite{FOPH2023-consultations}
+        \item Weekly number of cases and deaths, laboratory tests and share of positive tests for COVID-19 in the Canton of Solothurn \cite{FOPH2023Cases}
+        \item Weekly number of consultations per 100,000 people due to influenza-like illnesses (ILI) \cite{FOPH2023Consultations}
     \end{enumerate}
 \end{enumerate}
 
@@ -239,7 +239,7 @@ We will employ descriptive statistics to summarize epidemiological, environmenta
 
 \subsubsection*{Linking observed cases to unobserved infections}
 
-The number of respiratory cases (absences related to respiratory infections by date of symptom onset) will be modeled with a Bayesian latent hierarchical regression model, which is similar to the model used in our previous study \Cref{Banholzer2023}. The model links the unobserved number of new infections to the observed number of new cases. The number of new cases in class $j$ at time $t$ is modeled with a Negative Binomial distribution   
+The number of respiratory cases (absences related to respiratory infections by date of symptom onset) will be modeled with a Bayesian latent hierarchical regression model, which is similar to the model used in our previous study \cite{Banholzer2023PLoSMed}. The model links the unobserved number of new infections to the observed number of new cases. The number of new cases in class $j$ at time $t$ is modeled with a Negative Binomial distribution   
 \begin{align*}
     C_{jt} \sim \text{Negative-Binomial}(\mu_{jt},\phi),
 \end{align*}
@@ -251,15 +251,15 @@ where $p_{\text{IN}}(t-s)$ denotes the probability distribution of the incubatio
 \begin{align*}
     \log I_{jt} &= \log N_{jt} + \beta_0 + \beta_1 \cdot \text{AirCleaner}_{jt} + \beta_2 \cdot \text{Class}_t + \beta_3 \cdot \text{Students}_{jt} + \beta_4 \cdot \text{Ventilation}_{jt} + \beta_5 \cdot \text{CoV}_t + \beta_6 \cdot \text{ILI}_t,
 \end{align*}
-where $N_{jt} = \sum_{s<t} I_{js}$ is the cumulative number of infections (model offset), $\beta_0$ is the rate of new infections without air cleaners (model intercept), and $\beta_1$ is the effect of air cleaners. The effect of air cleaners will be adjusted for class-specific effects, the number of students in school, the ventilation rate (air changes per hour computed from indoor CO$_2$ levels using the transient mass balance method\cite{Battermann2017}), the proportion of positive tests for SARS-CoV-2 in the community (from secondary data), and the number of consultations for influenza-like illnesses in the community (from secondary data). 
+where $N_{jt} = \sum_{s<t} I_{js}$ is the cumulative number of infections (model offset), $\beta_0$ is the rate of new infections without air cleaners (model intercept), and $\beta_1$ is the effect of air cleaners. The effect of air cleaners will be adjusted for class-specific effects, the number of students in school, the ventilation rate (air changes per hour computed from indoor CO$_2$ levels using the transient mass balance method \cite{Batterman2017IJERPH}), the proportion of positive tests for SARS-CoV-2 in the community (from secondary data), and the number of consultations for influenza-like illnesses in the community (from secondary data). 
 
 \subsubsection*{Specifying the distribution of the incubation period}
 
-The pathogen of each respiratory infection cannot be identified from the epidemiological data unless students obtained a laboratory test result. As a consequence, different incubation periods will be considered in $p_{\text{IN}}$, reflecting a combination of the pathogen-specific incubation periods. The combination will be determined based on the proportion of positive bioaerosol/saliva samples for each pathogen found in the molecular analysis. The prior distributions for pathogen-specific incubation periods will be based on published estimates. 
+The pathogen of each respiratory infection cannot be identified from the epidemiological data unless students obtained a laboratory test result. As a consequence, different incubation periods will be considered in $p_{\text{IN}}$, reflecting a combination of the pathogen-specific incubation periods. The combination will be determined based on the proportion of positive bioaerosol/saliva samples for each pathogen found in the molecular analysis. The prior distributions for pathogen-specific incubation periods will be based on estimates published in the literature. 
 
 \subsubsection*{Adjusting for under-reporting of cases on weekends}
 
-Our previous study recorded a higher proportion of cases on Mondays than on weekends, suggesting recall bias and under-reporting of cases on weekends\cite{Banholzer2023}. To consider weekday effects in the reporting of cases, we will re-weight the expected number of cases each week as follows. Let $k \in $(1: Saturday, 2: Sunday, 3: Monday, $\dots$, 7: Friday) denote the weekday with the week starting on Saturday. The re-weighted expected number of cases $\Tilde{\mu}$ (class and day indexes omitted) are computed as
+Despite recording cases by date of symptom onset, our previous study recorded a higher proportion of cases on Mondays than on weekends, suggesting recall bias and under-reporting of cases on weekends \cite{Banholzer2023PLoSMed}. To consider weekday effects in the reporting of cases, we will re-weight the expected number of cases each week as follows. Let $k \in $(1: Saturday, 2: Sunday, 3: Monday, $\dots$, 7: Friday) denote the weekday with the week starting on Saturday. The re-weighted expected number of cases $\Tilde{\mu}$ (class and day indexes omitted) are computed as
 \begin{align*}
     \Tilde{\mu}_{k} &= \mu_k \cdot \nu_k \cdot \left(\frac{\sum_k \mu_k}{\sum_k \nu_k \cdot \mu_k}\right)\\
     \sum_k \nu_k &= 1,
@@ -291,13 +291,13 @@ Cases in the first week of the study could indicate infections before the study 
 
 \subsubsection*{Priors for modeling parameters}
 
-Unless stated otherwise, we will use weakly informative priors for all modeling parameters following recommendations on the choice of priors \cite{Gelman2008-Scaling,Gelman2008-Logistic,Gelman2020,Stan2020,Gabry2023}. The continuous adjustment variables will be standardized to have zero mean and a standard deviation of 0.5. 
+Unless stated otherwise, we will use weakly informative priors for all modeling parameters following recommendations on the choice of priors \cite{Gelman2008StatMed,Gelman2008StatAnnals,Gelman2020RegOther,Stan2020Priors,Gabry2023Priors}. The continuous adjustment variables will be standardized to have zero mean and a standard deviation of 0.5. 
 \begin{align*}
     \alpha &\sim \text{Student-t}_5(0, 10) \\
     \beta_2, \dots, \beta_6 &\sim \text{Student-t}_5(0, 2.5) \\
     \frac{1}{\sqrt{\phi}} &\sim \text{Half-Normal}(0,1),
 \end{align*}
-All priors represent our default but not definitive choices, and changes in the context of the data will be applied if necessary.
+where Student-t$_5$ is a Student-t distribution with 5 degrees of freedom. All priors represent our default but not definitive choices, and changes in the context of the data will be applied if necessary.
 
 
 \subsection{Secondary analyses}
@@ -312,12 +312,13 @@ Molecular analysis will determine whether a bioaerosol or saliva sample is posit
                 0, & \text{if } p=0, \\
                 \beta_{0[p]} + \beta_{1[p]} \cdot \text{AirCleaner} + \beta_2 \cdot \text{Class} + \beta_3 \cdot \text{Susceptibles}_p, & \text{if } p>0.
             \end{cases} \\
-    \beta_0 &\sim \text{Student-t}_5(0, 2.5) \\
-    \beta_1 &\sim \text{Normal}(\kappa, \tau) \\
-    \kappa, \beta_2, \beta_3 &\sim \text{Student-t}_5\left(0, \frac{2.5}{s_{x}}\right) \\
-    \tau &\sim \text{Half-Student-t}_5(0,1),
+    \beta_0 &\sim \text{Normal}(\kappa_0, \tau_0) \\
+    \beta_1 &\sim \text{Normal}(\kappa_1, \tau_1) \\
+    \kappa_0 &\sim \text{Student-t}_5(0, 2.5) \\
+    \kappa_1, \beta_2, \beta_3 &\sim \text{Student-t}_5\left(0, \frac{2.5}{s_{x}}\right) \\
+    \tau_0, \tau_1 &\sim \text{Half-Student-t}_5(0,1),
 \end{align*}
-where $\text{softmax}(\mu) = \exp(\mu)/\sum\exp(\mu)$, Student-t$_5$ is a Student-t distribution with 5 degrees of freedom, and $s_{x}$ is the empirical standard deviation of each input variable.  Negative tests will be set as the reference category and overall variation in positive samples by pathogen will be modeled with $\beta_0$. The effect of air cleaners will be modeled with a hierarchical prior, where $\kappa$ is the average effect of air cleaners across pathogens and $\tau$ is the variation of the effect between pathogens. The effect of air cleaners will be adjusted for class-specific effects and the decreasing number of susceptibles over time (for each pathogen computed as the number of students minus the total number of positive samples). 
+where $\text{softmax}(\mu) = \exp(\mu)/\sum\exp(\mu)$ and $s_{x}$ is the empirical standard deviation of each input variable.  Negative tests will be set as the reference category. Overall variation in positive samples by pathogen will be modeled with $\beta_0$ and the effect of air cleaners will be modeled with $\beta_1$. Both $\beta_0$ and $\beta_1$ will be modeled with a hierarchical prior, where $\kappa$ is the average estimate across pathogens and $\tau$ is the variation of the estimate between pathogens. The effect of air cleaners will be adjusted for class-specific effects and the decreasing number of susceptibles over time (for each pathogen computed as the number of students minus the total number of positive samples). 
 
 \subsubsection{Viral load concentration in positive samples}\label{subsubsec:viral_load}
 
@@ -336,7 +337,7 @@ where $\mu_{y}$ and $s_{y}$ are the empirical mean and standard deviation of the
 
 \subsubsection{Aerosol/particle concentration}\label{subsubsec:aerosol}
 
-We will only analyze particle concentration data of the time periods during which students were in the classroom. Daily particle concentrations will be summarized with the mean and a log transform will be applied. Each log-transformed particle concentration will be analyzed separately with a linear regression model 
+We will only analyze particle concentration data of the time periods during which students were in the classroom. Particle concentrations will be summarized daily with the mean across these time periods and a log transform will be applied. Each log-transformed average particle concentration will be analyzed separately with a linear regression model 
 \begin{align*}
     \log y | \beta_0, \beta_1, \dots, \beta_6 &\sim \text{Normal}(\mu,\sigma) \\
     \mu &= \beta_0 + \beta_1 \cdot \text{AirCleaner} + \beta_2 \cdot \text{Class} + \beta_3 \cdot \text{Weekday} + \beta_4 \cdot \text{Students} + \beta_5 \cdot \text{Ventilation} + \beta_6 \cdot \text{Cases}\\
@@ -344,7 +345,7 @@ We will only analyze particle concentration data of the time periods during whic
     \beta_1, \dots, \beta_6 &\sim \text{Student-t}_5\left(0, 2.5\frac{s_{y}}{s_{x}}\right) \\
     \sigma &\sim \text{Exponential}\left(\frac{1}{s_{y}}\right)~.
 \end{align*}
-The effect of air cleaners will be adjusted for class- and weekday-specific effects, the number of students in school, the ventilation rate (air changes per hour as computed from indoor CO$_2$ levels), and the cumulative number of cases related to respiratory infections. A log transform will be applied to all continuous input variables. 
+The effect of air cleaners will be adjusted for class- and weekday-specific effects, the number of students in school, the ventilation rate (air changes per hour), and the cumulative number of cases related to respiratory infections. A log transform will be applied to all continuous input variables. 
 
 \subsubsection{Number of coughs}
 
@@ -362,22 +363,29 @@ where $T$ is the daily duration that students were in the classroom and $\phi$ i
 
 \subsection{Modeling transmission risks}
 
-We will model transmission risks using the Wells-Riley equation\cite{Wells1963} as modified by Rudnick and Milton\cite{Rudnick2003} 
+We will model transmission risks using the Wells-Riley equation \cite{Riley1978AJE} as modified by Rudnick and Milton \cite{Rudnick2003IndoorAir} 
 \begin{align*}
     P = \frac{D}{S} = 1 - \exp\left(-\frac{fIqt}{n}\right),
 \end{align*}
-where $P$ is the risk of infection, $D$ is the number of disease cases, $S$ is the number of susceptibles, $f$ is the fraction of rebreathed air, $I$, is the number of infectious individuals in space, $n$ is the total number of individuals in space, $q$ is the generation rate of infectious quanta (doses of infectious particles), and $t$ is the duration of exposure. Parameters $D$, $S$, and $I$ can be computed based on epidemiological (or molecular) data. The fraction of rebreathed air can be computed from CO$_2$ levels. The number of individuals in space can be determined based on the number of absences. Exposure times can be determined based on the timetable. Thus, we will first use the Wells-Riley equation to estimate the unknown parameter $q$. The risk of infection will then be modeled using the estimated $q$ for exposure times representing a typical school day or week. These risks will be estimated separately for different pathogens detected over the study.  
+where $P$ is the risk of infection, $D$ is the number of disease cases, $S$ is the number of susceptibles, $f$ is the fraction of rebreathed air, $I$, is the number of infectious individuals in space, $n$ is the total number of individuals in space, $q$ is the generation rate of infectious quanta (doses of infectious particles), and $t$ is the duration of exposure. Parameters $D$, $S$, and $I$ will be computed based on epidemiological (or molecular) data. The fraction of rebreathed air will be computed from CO$_2$ levels. The number of individuals in space will be determined based on the number of absences. Exposure times will be determined based on the students' timetables. 
+
+We will first use the Wells-Riley equation to estimate the unknown parameter $q$. The risk of infection will then be modeled using the estimated $q$ for exposure times representing a typical school day or week. These risks will be estimated separately for different pathogens detected over the study.  
 
 \subsection{Targeted and deep sequencing}
 
-For positive samples (bioaerosol and saliva samples, swabs from HEPA filters), we will perform targeted sequencing and deep sequencing of viral RNA to compare genetic relatedness between viral strains detected in the air and human samples\cite{Goncalves2021}.
+For positive samples (bioaerosol and saliva samples, swabs from HEPA filters), we will perform targeted sequencing and deep sequencing of viral RNA to compare genetic relatedness between viral strains detected in the air and human samples \cite{Goncalves2021Microorganisms}.
 
 \section{Missing data}
 
-We obtained informed consent from all but one student. As the reason for any absence(s) from this student and the symptoms are unclear, we will consider any absence(s) from this student as unrelated to a respiratory infection. Particle concentrations will be summarized with the daily mean of the minutely values in the time periods when students were in the classroom. Missing values during these time periods will be linearly imputed. Missing values in adjustment variables will be imputed with a fully Bayesian approach where missing values are treated as parameters and a prior is assigned. 
+We obtained informed consent from all but one student. As the reason for any absence(s) from this student and the symptoms will be unclear, we will consider any absence(s) from this student as unrelated to a respiratory infection. Particle concentrations will be summarized with the daily mean of the minutely values in the time periods when students were in the classroom. Missing values during these time periods will be linearly imputed. Missing values in adjustment variables will be imputed with a fully Bayesian approach where missing values are treated as parameters and a prior is assigned. 
 
 \section{Statistical software employed}
 
-The statistical software R (version 4.2.1 or later) with RStudio will be used for all statistical analyses. Data preprocessing and comparative analyses will be performed in the \texttt{tidyverse} package (version 1.3.2). Bayesian analyses will be performed with the probabilistic programming language Stan (version 2.21.0), using the R interface provided by the \texttt{rstan} package (version 2.21.7), the \texttt{rstanarm} package (version 2.21.3), or the \texttt{brms} package (version 2.18.0).
+The statistical software R (version 4.2.1 or later) with RStudio will be used for all statistical analyses. Data preprocessing and comparative analyses will be performed in the \texttt{tidyverse} package (version 1.3.2). Bayesian analyses will be performed with the probabilistic programming language Stan (version 2.21.0), using the R interfaces provided by the \texttt{rstan} package (version 2.21.7), the \texttt{rstanarm} package (version 2.21.3), or the \texttt{brms} package (version 2.18.0).
+
+
+\bibliographystyle{vancouver}
+\bibliography{references}
+
 
 \end{document}
