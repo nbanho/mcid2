@@ -166,7 +166,7 @@ The number of respiratory cases (absences related to respiratory infections by d
 
 \begin{enumerate}
     \item The number of positive bioaerosol and saliva samples.
-    \item Viral load concentration in positive bioaerosol and saliva samples.
+    \item Viral load concentration in bioaerosol samples.
     \item The aerosol/particle number, and matter mass concentrations.
     \item The number of coughs.
 \end{enumerate}
@@ -320,9 +320,9 @@ Molecular analysis will determine whether a bioaerosol or saliva sample is posit
 \end{align*}
 where $\text{softmax}(\mu) = \exp(\mu)/\sum\exp(\mu)$ and $s_{x}$ is the empirical standard deviation of each input variable.  Negative tests will be set as the reference category. Overall variation in positive samples by pathogen will be modeled with $\beta_0$ and the effect of air cleaners will be modeled with $\beta_1$. Both $\beta_0$ and $\beta_1$ will be modeled with a hierarchical prior, where $\kappa$ is the average estimate across pathogens and $\tau$ is the variation of the estimate between pathogens. The effect of air cleaners will be adjusted for class-specific effects and the decreasing number of susceptibles over time (for each pathogen computed as the number of students minus the total number of positive samples). 
 
-\subsubsection{Viral load concentration in positive samples}\label{subsubsec:viral_load}
+\subsubsection{Viral load concentration in bioaerosol samples}\label{subsubsec:viral_load}
 
-Molecular analysis will determine the viral load concentration in positive samples. The viral load concentration in positive samples will be analyzed with a hierarchical linear regression model 
+Molecular analysis will determine the viral load concentration in bioaerosol samples, which will be analyzed with a hierarchical linear regression model 
 \begin{align*}
     y | \beta_0, \beta_1 &\sim \text{Normal}(\mu,s_{y}) \\
     \mu &= \beta_{0[p]} + \beta_{1[p]} \cdot \text{AirCleaner} \\
