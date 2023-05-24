@@ -1,14 +1,4 @@
-# require(tikzDevice)
-# 
-# # Settings for tikzdevice
-# if (Sys.info()['sysname'] == 'Darwin') {
-#   options("tikzLatex" = Sys.which("pdflatex"))
-# } else {
-#   options("tikzLatex" = 'C:/texlive/2018/bin/win32/pdflatex')
-# }
-# 
-
-
+require(xtable)
 
 # Round function
 round_k <- function(x, k = 2) {

@@ -1,0 +1,171 @@
+---
+title: "Environmental Data Analysis"
+author: "Nicolas Banholzer"
+date: "2023-05-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Libraries
+
+```{r}
+library(tidyverse)
+library(reshape2)
+library(rstanarm)
+library(tidybayes)
+source("../utils/plotting.r")
+source("../utils/tex.r")
+```
+
+## Data
+
+```{r}
+env_data <- readRDS("../data-clean/environmental.rds")
+epi_data <- readRDS("../data-clean/epidemiological.rds")
+
+env_data <- na.omit(env_data)
+env_epi_data <- left_join(
+  env_data,
+  epi_data %>% 
+    group_by(class) %>%
+    arrange(date) %>%
+    mutate(cases = cumsum(new_cases)) %>%
+    dplyr::select(class, date, weekday, n_present, cases),
+  by = c("class", "date")
+)
+
+vars <- c("CO2", "rH", "Temp", "AER", "Cn", "PM1", "PM25", "PM4", "PM10")
+vars_labels <- c("CO[2]~(ppm)", "Relative~humidity~('%')", "Temperature~(degree*C)", 
+                 "Air~exchange~rate~(changes/h)", "CN~(1/cm^3)", "PM[1]~(mu*gm^{-3})", "PM[2.5]~(mu*gm^{-3})", "PM[4]~(mu*gm^{-3})", "PM[10]~(mu*gm^{-3})")
+names(vars_labels) <- vars
+vars_labels_no_units <- c("CO[2]", "Relative~humidity", "Temperature", "Air~exchange~rate",
+                          "CN", "PM[1]", "PM[2.5]", "PM[4]", "PM[10]")
+names(vars_labels_no_units) <- vars
+```
+
+## Boxplots
+
+```{r}
+# particle concentrations
+boxpl_pc <- env_epi_data %>%
+  dplyr::select(class, date, weekday, aircleaner, Cn, PM1, PM25, PM4, PM10) %>%
+  melt(c("class", "date", "weekday", "aircleaner")) %>%
+  rename(`Air Cleaner` = aircleaner,
+         Class = class) %>%
+  ggplot(aes(x = `Air Cleaner`, color = `Air Cleaner`, y = value)) +
+  facet_wrap(~ variable, scales = "free_y", nrow = 1, dir = "h", labeller = as_labeller(vars_labels, label_parsed)) +
+  geom_boxplot2() +
+  geom_jitter(aes(shape = Class), alpha = .3, width = .2) +
+  scale_color_manual(values = wes_palette("Royal1")) +
+  scale_shape_manual(values = c(2,20)) +
+  labs(title = "a") +
+  theme_custom() +
+  theme(axis.title.y = element_blank(), legend.position = "top",
+        plot.title.position = "plot") +
+  guides(color = "none")
+save_plot(boxpl_pc, pdf_file = "../results/env-data/particles-boxplot.pdf", eps_file = "../results/env-data/particles-boxplot.eps", w = 16, h = 8)
+
+# other variables
+boxpl_oth <- env_epi_data %>%
+  dplyr::select(class, date, weekday, aircleaner, CO2, AER, rH, Temp) %>%
+  melt(c("class", "date", "weekday", "aircleaner")) %>%
+  rename(`Air Cleaner` = aircleaner,
+         Class = class) %>%
+  ggplot(aes(x = `Air Cleaner`, color = `Air Cleaner`, y = value)) +
+  facet_wrap(~ variable, scales = "free_y", nrow = 1, dir = "h", labeller = as_labeller(vars_labels, label_parsed)) +
+  geom_boxplot2() +
+  geom_jitter(aes(shape = Class), alpha = .3, width = .2) +
+  scale_color_manual(values = wes_palette("Royal1")) +
+  scale_shape_manual(values = c(2,20)) +
+  theme_custom() +
+  theme(axis.title.y = element_blank(), legend.position = "top") +
+  guides(color = "none")
+save_plot(boxpl_oth, pdf_file = "../results/env-data/otherVars-boxplot.pdf", w = 16, h = 8)
+```
+
+## Estimated change
+
+```{r}
+# log transform
+env_epi_data_log <- env_epi_data %>%
+  dplyr::select(-CO2, -PMtot, -Temp, -rH) %>%
+  mutate(across(c(Cn, PM1, PM25, PM4, PM25, AER, n_present, cases), log)) 
+
+# Bayesian linear regression model
+seed0 <- 12345
+draws <- list()
+particle_vars <- c("Cn", "PM1", "PM25", "PM4", "PM10")
+for (i in 1:length(particle_vars)) {
+  f <- as.formula(paste0(particle_vars[[i]], "~ class + weekday + aircleaner + n_present + AER + cases"))
+  m <- stan_glm(f, data = env_epi_data_log, seed = seed0)
+  draws[[i]] <- as.data.frame(m)
+}
+
+# collect results
+draws_filt <- lapply(draws, function(D) dplyr::select(D, `aircleanerYes`))
+draws_filt <- do.call(rbind, draws_filt) %>%
+  mutate(outcome = factor(rep(particle_vars, each = nrow(draws[[i]])), levels = rev(particle_vars))) %>%
+  set_names(c("aircleaner", "outcome")) %>%
+  mutate(aircleaner = (-1) * 100 * (exp(aircleaner) - 1))
+
+# create estimation results table
+effects_tbl <- draws_filt %>%
+  mutate(outcome = recode(as.character(outcome), !!! vars_labels_no_units),
+         outcome = factor(outcome, levels = rev(vars_labels_no_units))) %>%
+  group_by(outcome) %>%
+  mean_qi() %>%
+  ungroup() %>%
+  filter(.width == .95) %>%
+  select(outcome, aircleaner, `.lower`, `.upper`) %>%
+  mutate_if(is.numeric, round_k) %>%
+  mutate(across(-outcome, tex_sign)) %>%
+  arrange(-row_number()) %>%
+  mutate(outcome = c("CN", "PM$_{1}$", "PM$_{2.5}$", "PM$_{4}$", "PM$_{10}$"),
+         space = "") %>%
+  as.matrix() %>%
+  xtable() %>%
+  print.xtable(
+    file = "../results/env-data/estimation-results-table.tex",
+    type = "latex",
+    sanitize.text.function = identity,
+    include.colnames = F,
+    include.rownames = F,
+    only.contents = T,
+    hline.after = NULL)
+
+# create estimation results figure
+effects_env_main <- draws_filt %>%
+  mutate(outcome = factor(outcome, levels = (c("Cn", "PM1", "PM25", "PM4", "PM10")))) %>%
+  group_by(outcome) %>%
+  mean_qi(.width = c(0.5, 0.8, 0.95)) %>%
+  ungroup() %>%
+  arrange(desc(.width)) %>%
+  mutate(`.width` = factor(`.width`, levels = rev(c(.5, .8, .95)))) %>%
+  ggplot() +
+  geom_rect(aes(xmin = .lower, xmax = .upper, ymin = 0.75, ymax = 1.25, fill = `.width`)) +
+  geom_segment(aes(x = aircleaner, xend = aircleaner, y = 0.75, yend = 1.25), size = 1.5 / cm(1)) +
+  geom_point(aes(x = aircleaner, y = 1), size = 3, fill = "white", shape = 21) +
+  facet_wrap(~ outcome, nrow = 1, labeller = as_labeller(vars_labels_no_units, label_parsed)) +
+  scale_fill_manual(values = wes_palette("Royal1")[c(3,4,2)]) +
+  scale_y_continuous(expand = expansion(mult = c(0.25, 0.25))) +
+  scale_x_continuous(limits = c(50, 100), expand = expansion(mult = c(0.1, 0.1)), breaks = c(50, 75, 100)) +
+  labs(x = "Estimated reduction (%)", fill = "CrI", title = "b") +
+  theme_custom() +
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        legend.position = "top", legend.direction = "horizontal",
+        legend.key.height = unit(.25, "cm"), legend.key.width = unit(.35, "cm"), 
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        plot.title.position = "plot",
+        panel.spacing = unit(20, units = "pt")) 
+save_plot(effects_env_main, 
+          pdf_file = "../results/env-data/estimation-results-figure.pdf",
+          eps_file = "../results/env-data/estimation-results-figure.eps",
+          w = 16, h = 4)
+```
+
+
