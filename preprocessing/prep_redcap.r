@@ -8,7 +8,7 @@ library(lubridate)
 #### Data ####
 
 df <- read.csv("data-raw/redcap/MCIDSchulenFollowup_DATA_2023-02-09_1356.csv") %>%
-  mutate(class = ifelse(grepl("Kontroll", record_id), "A", "B"),  # A is Kontroll- and B is Studienklasse
+  mutate(class = ifelse(grepl("Kontroll", record_id), "B", "A"),  # A is Studien- and B is Kontrollklasse
          date = as.Date(date, format = "%Y-%m-%d")) 
 
 
@@ -83,19 +83,19 @@ View(cases)
 #' the following students were absent only in the morning (and return in the afternoon)
 #' nevertheless, we consider them as being absent for the whole day, 
 #' thus shifting their date back by one day
-cases$date_back[cases$class == "A" & cases$student_id == 7 & cases$date_back == as.Date("2023-01-19")] <- as.Date("2023-01-19") + days(1)
-cases$date_back[cases$class == "B" & cases$student_id == 6 & cases$date_back == as.Date("2023-01-26")] <- as.Date("2023-01-26") + days(1)
-cases$date_back[cases$class == "B" & cases$student_id == 15 & cases$date_back == as.Date("2023-02-15")] <- as.Date("2023-02-15") + days(1)
-cases$date_back[cases$class == "B" & cases$student_id == 19 & cases$date_back == as.Date("2023-02-23")] <- as.Date("2023-02-23") + days(1)
-cases$date_back[cases$class == "B" & cases$student_id == 12 & cases$date_back == as.Date("2023-03-02")] <- as.Date("2023-03-02") + days(1)
+cases$date_back[cases$class == "B" & cases$student_id == 7 & cases$date_back == as.Date("2023-01-19")] <- as.Date("2023-01-19") + days(1)
+cases$date_back[cases$class == "A" & cases$student_id == 6 & cases$date_back == as.Date("2023-01-26")] <- as.Date("2023-01-26") + days(1)
+cases$date_back[cases$class == "A" & cases$student_id == 15 & cases$date_back == as.Date("2023-02-15")] <- as.Date("2023-02-15") + days(1)
+cases$date_back[cases$class == "A" & cases$student_id == 19 & cases$date_back == as.Date("2023-02-23")] <- as.Date("2023-02-23") + days(1)
+cases$date_back[cases$class == "A" & cases$student_id == 12 & cases$date_back == as.Date("2023-03-02")] <- as.Date("2023-03-02") + days(1)
 
 #' the following students return on the same date of their absence
 #' but in the report the original date written with pencil,
 #' which was one day later, was overwritten with pen
 #' we assume that the more sensible pencil date is the correct one
 
-cases$date_back[cases$class == "A" & cases$student_id == 5 & cases$date_back == as.Date("2023-01-16")] <- as.Date("2023-01-16") + days(1)
-cases$date_back[cases$class == "A" & cases$student_id == 10 & cases$date_back == as.Date("2023-01-17")] <- as.Date("2023-01-17") + days(1)
+cases$date_back[cases$class == "B" & cases$student_id == 5 & cases$date_back == as.Date("2023-01-16")] <- as.Date("2023-01-16") + days(1)
+cases$date_back[cases$class == "B" & cases$student_id == 10 & cases$date_back == as.Date("2023-01-17")] <- as.Date("2023-01-17") + days(1)
 
 #' there is one missing case which will be set to no respiratory infection
 cases$respiratory_infection[cases$reason=="unknown"] <- "no"
@@ -130,18 +130,18 @@ resp_cases <- cases %>%
 
 # full join
 epi_data <- data.frame(date = rep(seq.Date(as.Date("2023-01-16"), as.Date("2023-03-11"), by = "1 day"), 2)) %>%
-  mutate(class = rep(c("A", "B"), each = nrow(.) / 2),
-         n_class = rep(c(20, 17), each = nrow(.) / 2),
+  mutate(class = rep(c("B", "A"), each = nrow(.) / 2),
+         n_class = rep(c(17, 20), each = nrow(.) / 2),
          weekday = weekdays(date),
          weekend = ifelse(weekday %in% c("Saturday", "Sunday"), 1, 0),
          vacation = ifelse(date %in% seq.Date(as.Date("2023-02-06"), as.Date("2023-02-11"), by = "1 day"), 1, 0),
          aircleaner = ifelse(class == "A", 
-                             ifelse(date <= as.Date("2023-01-28"), "yes",
-                                    ifelse(date >= as.Date("2023-02-27"), "yes", "no")),
-                             ifelse(date <= as.Date("2023-01-28"), "no",
-                                    ifelse(date >= as.Date("2023-02-27"), "no", "yes"))),
-         aircleaner = ifelse(weekend + vacation > 0, "no", aircleaner)) %>%
-  mutate(n_class = ifelse(class == "A" & date > as.Date("2023-02-11"), 18, n_class)) %>% # class A was 17 students before and 18 after the vacation
+                             ifelse(date <= as.Date("2023-01-28"), "Yes",
+                                    ifelse(date >= as.Date("2023-02-27"), "Yes", "No")),
+                             ifelse(date <= as.Date("2023-01-28"), "No",
+                                    ifelse(date >= as.Date("2023-02-27"), "No", "Yes"))),
+         aircleaner = ifelse(weekend + vacation > 0, "No", aircleaner)) %>%
+  mutate(n_class = ifelse(class == "B" & date > as.Date("2023-02-11"), 18, n_class)) %>% # class B was 17 students before and 18 after the vacation
   left_join(absences) %>%
   left_join(resp_cases) %>%
   mutate(new_cases = ifelse(is.na(new_cases), 0, new_cases),

@@ -7,10 +7,10 @@ library(lubridate)
 
 #### Data ####
 
-files_A <- list.files("data-raw/palas/E3a_komplett_aqGuard_15988", full.names = T)
-files_B <- list.files("data-raw/palas/E3b_komplett_aqGuard_15973", full.names = T)
-files_A <- files_A[grepl("txt", files_A)]
+files_B <- list.files("data-raw/palas/E3a_komplett_aqGuard_15988", full.names = T)
+files_A <- list.files("data-raw/palas/E3b_komplett_aqGuard_15973", full.names = T)
 files_B <- files_B[grepl("txt", files_B)]
+files_A <- files_A[grepl("txt", files_A)]
 
 read_palas <- function(file) {
   df <- read.table(file, sep ="\t")
@@ -29,8 +29,8 @@ read_palas <- function(file) {
 }
 
 
-df <- rbind(data.frame(class = "A", file = files_A), 
-            data.frame(class = "B", file = files_B)) %>%
+df <- rbind(data.frame(class = "B", file = files_B), 
+            data.frame(class = "A", file = files_A)) %>%
   mutate(data = lapply(file, read_palas)) %>%
   unnest(data)
 
@@ -44,8 +44,8 @@ df <- df %>%
          date >= as.Date("2023-01-16"),
          date <= as.Date("2023-03-11")) 
 
-# move time in class B (E3b) on 2023-01-16 (first weekend, Monday) by one hour backwards (see data-collection-issues.docx)
-df$datetime[df$class=="B"&df$date==as.Date("2023-01-16")] <- df$datetime[df$class=="B"&df$date==as.Date("2023-01-16")] %m-% hours(1)
+# move time in class A (E3b) on 2023-01-16 (first weekend, Monday) by one hour backwards (see data-collection-issues.docx)
+df$datetime[df$class=="A"&df$date==as.Date("2023-01-16")] <- df$datetime[df$class=="A"&df$date==as.Date("2023-01-16")] %m-% hours(1)
 df %>% filter(date == as.Date("2023-01-16")) %>% ggplot(aes(x = datetime, y = CO2, color = class)) + geom_line()
 
 to_hhmm <- function(t) {
@@ -195,10 +195,10 @@ env_dat <- left_join(
 ) %>%
   mutate(AER = ifelse(is.na(CO2), NA, AER),
          aircleaner = ifelse(class == "A", 
-                             ifelse(date <= as.Date("2023-01-28"), "yes",
-                                    ifelse(date >= as.Date("2023-02-27"), "yes", "no")),
-                             ifelse(date <= as.Date("2023-01-28"), "no",
-                                    ifelse(date >= as.Date("2023-02-27"), "no", "yes"))),
+                             ifelse(date <= as.Date("2023-01-28"), "Yes",
+                                    ifelse(date >= as.Date("2023-02-27"), "Yes", "No")),
+                             ifelse(date <= as.Date("2023-01-28"), "No",
+                                    ifelse(date >= as.Date("2023-02-27"), "No", "Yes"))),
          weekday = weekdays(date)) %>%
   dplyr::select(class, date, aircleaner, CO2, AER, Cn, PMtot, PM1, PM25, PM4, PM10, Temp, rH)
   
