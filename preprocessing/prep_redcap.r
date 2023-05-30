@@ -129,7 +129,7 @@ resp_cases <- cases %>%
   rename(date = date_symptom)
 
 # full join
-epi_data <- data.frame(date = rep(seq.Date(as.Date("2023-01-16"), as.Date("2023-03-11"), by = "1 day"), 2)) %>%
+epi_data <- data.frame(date = rep(seq.Date(min(resp_cases$date), as.Date("2023-03-10"), by = "1 day"), 2)) %>%
   mutate(class = rep(c("B", "A"), each = nrow(.) / 2),
          n_class = rep(c(17, 20), each = nrow(.) / 2),
          weekday = weekdays(date),

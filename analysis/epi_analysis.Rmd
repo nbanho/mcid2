@@ -1,0 +1,350 @@
+---
+title: "Epidemiological Data Analysis"
+author: "Nicolas Banholzer"
+date: "2023-05-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Libraries
+
+```{r}
+library(tidyverse)
+library(reshape2)
+library(tidybayes)
+library(lubridate)
+library(rstan)
+source("../utils/epi.r")
+source("../utils/bayes.r")
+source("../utils/plotting.r")
+source("../utils/tex.r")
+```
+
+## Data
+
+```{r}
+epi_data <- readRDS("../data-clean/epidemiological.rds")
+env_data <- readRDS("../data-clean/environmental.rds")
+sec_data <- readRDS("../data-clean/secondary.rds")
+```
+
+## Descriptives
+
+```{r}
+# number of cases by class
+epi_data %>%
+  filter(vacation == 0) %>%
+  group_by(class) %>%
+  summarize(cases = sum(new_cases))
+
+# number of cases by intervention
+epi_data %>%
+  filter(vacation == 0) %>%
+  group_by(aircleaner) %>%
+  summarize(cases = sum(new_cases))
+
+# number of cases by week
+cases_by_week_pl <- epi_data %>%
+  mutate(week = isoweek(date)) %>%
+  filter(week != 6) %>%
+  group_by(class, week) %>%
+  summarize(cases = sum(new_cases),
+            aircleaner = first(aircleaner)) %>%
+  ungroup() %>%
+  ggplot(aes(x = factor(week), y = cases, fill = aircleaner)) +
+  geom_bar_pattern(stat = "identity", aes(pattern_angle = class), pattern = "stripe",
+                   pattern_fill = "white", pattern_color = NA, color = "black", pattern_density = 0.25, pattern_spacing = 0.05) +
+  labs(x = "Study week", y = "Number of cases", fill = "Air cleaner", pattern_angle = "Class", title = "a") +
+  scale_fill_manual(values = wes_palette("Royal1")) +
+  scale_x_discrete(breaks = c(1:5, 7:10)) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
+  scale_pattern_angle_discrete(range = c(-45, 45)) +
+  theme_custom() +
+  theme(legend.position = c(0.13, 0.8),
+        legend.key.width = unit(0.5, "cm"),
+        legend.key.height = unit(0.3, "cm"),
+        plot.title.position = "plot") +
+  guides(fill = guide_legend(nrow = 1),
+         pattern_angle = guide_legend(nrow = 1))
+
+save_plot(cases_by_week_pl,
+          pdf_file = "../results/epi-data/cases_by_week.pdf",
+          eps_file = "../results/epi-data/cases_by_week.eps",
+          w = 12, h = 8) 
+```
+
+## Prepare data
+
+```{r}
+# stan data
+stan_data <- list()
+
+# number of seeding days
+stan_data$S <- ceiling(2 * exp(p_in_mu_m + p_in_sigma_m^2/2))
+
+# number of days from Saturday to study start
+stan_data$SS <- seq(min(epi_data$date) - days(7), min(epi_data$date), by = "1 day")
+stan_data$SS <- abs(as.numeric(stan_data$SS[weekdays(stan_data$SS) == "Saturday"] - min(min(epi_data$date))))
+
+# number of new cases
+stan_data$cases <- epi_data %>%
+  dplyr::select(class, date, new_cases) %>%
+  dcast(date ~ class) %>%
+  arrange(date) %>%
+  dplyr::select(A, B) %>%
+  as.matrix()
+
+# number of classes
+stan_data$C <- ncol(stan_data$cases)
+
+# number of days and weeks
+stan_data$D <- nrow(stan_data$cases)
+stan_data$W <- ceiling(stan_data$D / 7)
+
+# total cases by weekday
+stan_data$totCasesWeekday <- epi_data %>%
+  group_by(weekday) %>%
+  summarize(n = sum(new_cases)) %>%
+  ungroup() %>%
+  mutate(weekday = factor(weekday, levels = c("Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"))) %>%
+  arrange(weekday) %>%
+  dplyr::select(n) %>%
+  unlist()
+
+# weekend
+stan_data$weekend <- epi_data %>%
+  filter(class == "A") %>%
+  dplyr::select(weekend) %>%
+  unlist()
+seeding_weekend <- epi_data$date[epi_data$class=="A"][1] - days(stan_data$S:1)
+seeding_weekend <- ifelse(weekdays(seeding_weekend) %in% c("Saturday", "Sunday"), 1, 0)
+stan_data$weekend <- c(seeding_weekend, stan_data$weekend)
+
+# vacation
+stan_data$vacation <- epi_data %>%
+  filter(class == "A") %>%
+  dplyr::select(vacation) %>%
+  unlist()
+stan_data$vacation <- c(rep(0, stan_data$S), stan_data$vacation)
+
+# aircleaner intervention
+stan_data$airCleaner <- epi_data %>%
+  mutate(aircleaner = ifelse(aircleaner == "Yes", 1, 0)) %>%
+  dplyr::select(class, date, aircleaner) %>%
+  dcast(date ~ class) %>%
+  arrange(date) %>%
+  dplyr::select(A, B) %>%
+  as.matrix()
+seeding_airCleaner <- matrix(0, nrow = stan_data$S, ncol = stan_data$C) 
+stan_data$airCleaner <- rbind(seeding_airCleaner, stan_data$airCleaner)
+
+# proportion of students in class
+stan_data$stud <- epi_data %>%
+  mutate(prop_in_class = n_present / n_class,
+         prop_in_class = (prop_in_class - mean(prop_in_class)) / sd(prop_in_class)) %>%
+  dplyr::select(class, date, prop_in_class) %>%
+  dcast(date ~ class) %>%
+  arrange(date) %>%
+  dplyr::select(A, B) %>%
+  as.matrix()
+
+# air change rate
+stan_data$vent <- epi_data %>%
+  dplyr::select(class, date, vacation, weekend) %>%
+  left_join(env_data %>% dplyr::select(class, date, AER), by = c("class", "date")) %>%
+  mutate(AER = (AER - mean(AER, na.rm = T)) / sd(AER, na.rm = T)) %>%
+  mutate(AER = ifelse(vacation + weekend > 0, -1001, AER),
+         AER = ifelse(is.na(AER), +1001, AER)) %>%
+  dplyr::select(class, date, AER) %>%
+  dcast(date ~ class) %>%
+  arrange(date) %>%
+  dplyr::select(A, B) %>%
+  as.matrix()
+stan_data$missingVent <- apply(stan_data$vent, c(1,2), function(x) ifelse(x == 1001, 1, 0))
+stan_data$Mvent <- sum(stan_data$missingVent)
+stan_data$missingVent <- apply(stan_data$missingVent, 2, function(x) {
+  y <- cumsum(x)
+  dy <- c(0, diff(y))
+  y <- ifelse(dy == 0, 0, y)
+  return(y)
+})
+
+# share of positive covid-19 tests in the community
+stan_data$cov <- sec_data %>%
+  filter(between(date, min(epi_data$date - days(stan_data$S)), max(epi_data$date))) %>%
+  mutate(covid_prop_pos = (covid_prop_pos - mean(covid_prop_pos)) / sd(covid_prop_pos)) %>%
+  dplyr::select(covid_prop_pos) %>%
+  unlist()
+
+# consultations for influenza-like in the community
+stan_data$ili <- sec_data %>%
+  filter(between(date, min(epi_data$date - days(stan_data$S)), max(epi_data$date))) %>%
+  mutate(ili_consult = (ili_consult - mean(ili_consult)) / sd(ili_consult)) %>%
+  dplyr::select(ili_consult) %>%
+  unlist()
+
+# hyperparameters for prior for incubation period distribution
+stan_data$p_in_mu_m <- p_in_mu_m
+stan_data$p_in_mu_s <- p_in_mu_s
+stan_data$p_in_sigma_m <- p_in_sigma_m
+stan_data$p_in_sigma_s <- p_in_sigma_s
+```
+
+## Modeling
+
+```{r}
+# stan model code file
+stan_file <- "../models/latent-infection-model.stan"
+
+# run model
+latInfMod <- stan(stan_file, data = stan_data, seed = 12345, cores = 4)
+
+# quick estimation results
+summary(latInfMod, probs = c(0.025, 0.975), pars = c("phi", "alpha", "omega", "beta", "vega", "ventNa", "mu_p_in", "sigma_p_in", "I0"))$summary %>%
+  data.frame() %>%
+  mutate_all(round, 2)
+mcmc_intervals(latInfMod, pars = "beta[1]")
+```
+
+## Results
+
+### Adjusted Rate Ratio
+
+```{r}
+arr <- spread_draws(latInfMod, `beta[1]`) %>%
+  rename(effect = `beta[1]`) %>%
+  dplyr::select(effect) %>%
+  mean_qi(.width = c(0.5, 0.8, .95)) %>%
+  mutate(across(c(effect, .lower, .upper), exp))
+arr
+```
+
+### Avoided infections
+
+```{r}
+types <- c("Partial instalation of air cleaners (study design)",
+           "No installation of air cleaners (hypothetical)",
+           "Full installation of air cleaners (hypothetical)")
+
+avoid_infections <- spread_draws(latInfMod, mu_cases_ac[day,class,type]) %>%
+  group_by(.draw, type) %>%
+  summarize(infections = sum(mu_cases_ac)) %>%
+  ungroup() %>%
+  group_by(type) %>%
+  mean_qi(.width = c(0.5, 0.8, 0.95)) %>%
+  ungroup() %>%
+  mutate(type = ifelse(type == 1, types[1], ifelse(type == 2, types[2], types[3])),
+         type = factor(type, levels = types[c(2,1,3)])) %>%
+  arrange(desc(.width)) %>%
+  mutate(`.width` = factor(`.width`, levels = rev(c(.5, .8, .95))))
+
+avoid_infections_pl <- avoid_infections  %>%
+  ggplot() +
+  geom_rect(aes(xmin = .lower, xmax = .upper, ymin = 0.75, ymax = 1.25, fill = `.width`)) +
+  geom_segment(aes(x = infections, xend = infections, y = 0.75, yend = 1.25), size = 1.5 / cm(1)) +
+  geom_point(aes(x = infections, y = 1), size = 3, fill = "white", shape = 21) +
+  facet_wrap(~ type, ncol = 1) +
+  scale_fill_manual(values = wes_palette("Royal1")[c(3,4,2)]) +
+  scale_y_continuous(expand = expansion(mult = c(0.25, 0.25))) +
+  scale_x_continuous(limits = c(0, NA), expand = expansion(mult = c(0, 0))) +
+  labs(x = "Estimated average number of infections", fill = "CrI", title = "b") +
+  theme_custom() +
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        legend.position = "top", legend.direction = "horizontal",
+        legend.key.height = unit(.25, "cm"), legend.key.width = unit(.35, "cm"), 
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        plot.title.position = "plot",
+        panel.spacing = unit(20, units = "pt"),
+        strip.text.x = element_text(margin = margin(b = 5))) 
+
+save_plot(avoid_infections_pl, 
+          pdf_file = "../results/epi-data/avoided-infections.pdf",
+          eps_file = "../results/epi-data/avoided_infections.eps",
+          w = 16, h = 8)
+```
+
+### Estimation results
+
+```{r}
+est_res <- summary(latInfMod, probs = c(0.025, 0.975), pars = c("phi", "alpha", "omega", "beta", "vega", "mu_p_in", "sigma_p_in"))$summary %>%
+  data.frame() %>%
+  add_rownames() %>%
+  rename(variable = rowname) %>%
+  mutate(variable = c("$\\phi$",
+                      "$\\alpha_{\\text{A}}$",
+                      "$\\alpha_{\\text{A}}$",
+                      "$\\omega$",
+                      "$\\beta_1$",
+                      "$\\beta_2$",
+                      "$\\beta_3$",
+                      "$\\beta_4$",
+                      "$\\beta_5$",
+                      "$\\beta_6$",
+                      "$\\vega_{\\text{Saturday}}$",
+                      "$\\vega_{\\text{Sunday}}$",
+                      "$\\vega_{\\text{Monday}}$",
+                      "$\\vega_{\\text{Tuesday}}$",
+                      "$\\vega_{\\text{Wednesday}}$",
+                      "$\\vega_{\\text{Thursday}}$",
+                      "$\\vega_{\\text{Friday}}$",
+                      "$\\mu_{p_{\\text{IN}}}",
+                      "$\\sigma_{p_{\\text{IN}}}")) %>%
+  dplyr::select(variable, mean, `X2.5.`, `X97.5.`, n_eff, Rhat) %>%
+  mutate(across(c(mean, `X2.5.`, `X97.5.`), function(x) tex_sign(round_k(x)))) %>%
+  as.matrix()
+
+print.xtable(xtable(est_res),
+             type = "latex",
+             file = "../results/epi-data/estimation-results.tex",
+             sanitize.text.function = identity,
+             include.colnames = F,
+             include.rownames = F,
+             only.contents = T,
+             hline.after = NULL)
+```
+
+
+### Model fit
+
+```{r}
+fitted_cases <- spread_draws(latInfMod, muCases[day,class]) %>%
+  mutate(class = ifelse(class == 1, "A", "B")) %>%
+  filter(day > stan_data$SS) %>%
+  mutate(day = day - stan_data$SS) %>%
+  left_join(epi_data %>%
+              dplyr::select(class, date, new_cases) %>%
+              group_by(class) %>%
+              arrange(date) %>%
+              mutate(day = 1:n()) %>%
+              ungroup(),
+            by = c("class", "day")) %>%
+  mutate(week = isoweek(date)) %>%
+  filter(week != 6) %>%
+  group_by(week, .draw) %>%
+  summarise(estimated_cases = sum(muCases),
+            true_cases = sum(new_cases)) %>%
+  ungroup()
+
+fitted_cases_pl <- ggplot(mapping = aes(x = week)) +
+  stat_lineribbon(data = fitted_cases,
+                  mapping = aes(y = estimated_cases),
+                  .width = c(0.5, 0.8, 0.95), color = "brown") +
+  geom_line(data = fitted_cases %>% group_by(week) %>% slice(1),
+            mapping = aes(y = true_cases, color = "Observed"), size = 1.5) +
+  scale_fill_manual(values = wes_palette("Royal1")[c(3,4,2)]) +
+  scale_x_continuous(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  scale_color_manual(values = "black") +
+  labs(y = "Number of new infections", x = "Study week", fill = "Estimated (CrI)") +
+  theme_custom() +
+  theme(legend.position = "top") +
+  guides(color = guide_legend(title = element_blank()))
+
+save_plot(fitted_cases_pl, pdf_file = "../results/epi-data/model-fit.pdf",
+          w = 12, h = 10)
+```

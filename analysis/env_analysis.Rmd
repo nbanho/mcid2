@@ -39,7 +39,7 @@ env_epi_data <- left_join(
 
 vars <- c("CO2", "rH", "Temp", "AER", "Cn", "PM1", "PM25", "PM4", "PM10")
 vars_labels <- c("CO[2]~(ppm)", "Relative~humidity~('%')", "Temperature~(degree*C)", 
-                 "Air~exchange~rate~(changes/h)", "CN~(1/cm^3)", "PM[1]~(mu*gm^{-3})", "PM[2.5]~(mu*gm^{-3})", "PM[4]~(mu*gm^{-3})", "PM[10]~(mu*gm^{-3})")
+                 "AER~(air~changes/h)", "CN~(1/cm^3)", "PM[1]~(mu*gm^{-3})", "PM[2.5]~(mu*gm^{-3})", "PM[4]~(mu*gm^{-3})", "PM[10]~(mu*gm^{-3})")
 names(vars_labels) <- vars
 vars_labels_no_units <- c("CO[2]", "Relative~humidity", "Temperature", "Air~exchange~rate",
                           "CN", "PM[1]", "PM[2.5]", "PM[4]", "PM[10]")

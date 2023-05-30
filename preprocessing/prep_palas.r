@@ -42,7 +42,7 @@ df <- df %>%
   filter(!(weekdays(date) %in% c("Saturday", "Sunday")),
          !(date %in% seq.Date(as.Date("2023-02-06"), as.Date("2023-02-11"), by = "1 day")),
          date >= as.Date("2023-01-16"),
-         date <= as.Date("2023-03-11")) 
+         date <= as.Date("2023-03-10")) 
 
 # move time in class A (E3b) on 2023-01-16 (first weekend, Monday) by one hour backwards (see data-collection-issues.docx)
 df$datetime[df$class=="A"&df$date==as.Date("2023-01-16")] <- df$datetime[df$class=="A"&df$date==as.Date("2023-01-16")] %m-% hours(1)
