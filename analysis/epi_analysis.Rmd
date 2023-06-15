@@ -28,6 +28,7 @@ source("../utils/tex.r")
 ```{r}
 epi_data <- readRDS("../data-clean/epidemiological.rds")
 env_data <- readRDS("../data-clean/environmental.rds")
+mol_data <- readRDS("../data-clean/molecular.rds") 
 sec_data <- readRDS("../data-clean/secondary.rds")
 ```
 
@@ -78,12 +79,96 @@ save_plot(cases_by_week_pl,
 
 ## Prepare data
 
+### Assumptions
+
+* Incubation periods are informed by https://www.sciencedirect.com/science/article/pii/S1473309909700696?casa_token=MSYyhmCLcLAAAAAA:10ooZqTNmMMfk6sIB1idSETWMusOs3Y-tKWPqGUXOFiD0PPFB0edT3W5OZyDO13S6kWPTv8NDOU and for SARS-CoV-2 from https://bmjopen.bmj.com/content/bmjopen/10/8/e039652.full.pdf.
+* We assume a lognormal distribution and use the median and dispersion estimate
+* We weight the incubation period distributions each week according to the proportion of positive samples for each virus --> effective incubation period.
+* For Metapneumovirus, there was insufficient data. Here we take the mean of the parameters of the other viruses.
+
+```{r}
+# mean estimate
+p_in_mean_m <- c(
+  5.6, # AdV
+  0.6, # Flu B
+  2.6, # PIV
+  1.9 # HRV
+)
+
+# 95% limits of estimate
+p_in_mean_ul <- matrix(c(
+  6.3, 4.8,
+  0.6, 0.5,
+  3.1, 2.1,
+  2.4, 1.4
+), ncol = 2, byrow = T)
+
+# mean dispersion
+p_in_sd_m <- c(
+  1.26,
+  1.51,
+  1.35,
+  1.68
+)
+
+# upper and lower limit of SD
+p_in_sd_ul <- matrix(c(
+  1.38, 1.13,
+  1.64, 1.37,
+  1.55, 1.16,
+  2.01, 1.16
+), ncol = 2, byrow = T)
+
+
+# Convert to lognormal distr parameters
+p_in_mu_m <- c(log(p_in_mean_m), 1.63) # the last value is for SARS-CoV-2
+p_in_mu_s <- c(log(p_in_mean_ul[,1] / p_in_mean_ul[,2]), (1.75 - 1.51)) / (2 * qnorm(.975))
+p_in_sigma_m <- c(log(p_in_sd_m), 0.5)
+p_in_sigma_s <- c(log(p_in_sd_ul[,1] / p_in_sd_ul[,2]), (0.55 - 0.46)) / (2 * qnorm(.975))
+
+# visualize
+set.seed(12345)
+
+prior_pin_par <- data.frame(
+  virus = c("AdV", "Flu B", "PIV", "HRV", "CoV", "MPV"),
+  mum = c(p_in_mu_m, mean(p_in_mu_m)), 
+  mus = c(p_in_mu_s, mean(p_in_mu_s)),
+  sim = c(p_in_sigma_m, mean(p_in_sigma_m)),
+  sis = c(p_in_sigma_s, mean(p_in_sigma_s))
+) %>%
+  mutate(virus = factor(virus, levels = c("Flu B", "HRV", "AdV", "CoV", "MPV", "PIV"))) %>%
+  arrange(virus)
+
+prior_pin <- prior_pin_par %>%
+  mutate(mu = map2(mum, mus, function(m, s) rnorm(n = 4e3, mean = m, sd = s)),
+         sigma = map2(sim, sis, function(m, s) rtrunc(n = 4e3, spec = "norm", a = 0, b = Inf, mean = m, sd = s))) %>%
+  unnest() %>%
+  mutate(pin = map2(mu, sigma, function(log_mu, log_sigma) data.frame(x = 0:10, y = vp(10, T, p_in, log_mu, log_sigma)))) %>%
+  unnest() 
+
+prior_pin_pl <- prior_pin %>%
+  ggplot(aes(x = x, y = y)) +
+  stat_lineribbon(point_interval = "mean_qi") +
+  scale_fill_brewer() + 
+  facet_wrap(~ virus) +
+  labs(x = "s (delay in days)", y = expression(p[IN]*" (%)")) +
+  scale_x_continuous(expand = c(0,0), breaks = seq(0, 10, 2)) +
+  scale_y_continuous(expand = expansion(mult = c(0,0.05))) +
+  theme_bw2() +
+  theme(plot.title = element_text(hjust = 0), legend.position = "none")
+prior_pin_pl
+
+save_plot(prior_pin_pl, pdf_file = "../results/epi-data/incubation-periods.pdf", w = 16, h = 10)
+```
+
+### Stan data
+
 ```{r}
 # stan data
 stan_data <- list()
 
 # number of seeding days
-stan_data$S <- ceiling(2 * exp(p_in_mu_m + p_in_sigma_m^2/2))
+stan_data$S <- ceiling(2 * exp(max(p_in_mu_m) + max(p_in_sigma_m)^2/2))
 
 # number of days from Saturday to study start
 stan_data$SS <- seq(min(epi_data$date) - days(7), min(epi_data$date), by = "1 day")
@@ -186,11 +271,39 @@ stan_data$ili <- sec_data %>%
   dplyr::select(ili_consult) %>%
   unlist()
 
-# hyperparameters for prior for incubation period distribution
-stan_data$p_in_mu_m <- p_in_mu_m
-stan_data$p_in_mu_s <- p_in_mu_s
-stan_data$p_in_sigma_m <- p_in_sigma_m
-stan_data$p_in_sigma_s <- p_in_sigma_s
+# number of viruses
+stan_data$K <- 6
+
+# positive molecular samples by week and class 
+mol_class_week <- mol_data %>%
+  mutate(week = week(date),
+         week = week - min(week) + 1,
+         week = ifelse(week > 4, week - 1, week))  %>%
+  dplyr::select(week, class, AdV, `Flu B`, HRV, MPV, PIV, `SARS-CoV-2`) %>%
+  melt(c("week", "class")) %>%
+  group_by(class, week, variable) %>%
+  summarize(n = sum(value)) %>%
+  ungroup() %>%
+  mutate(variable = as.character(variable), 
+         variable = ifelse(variable == "SARS-CoV-2", "CoV", variable),
+         variable = factor(variable, levels = c("Flu B", "HRV", "AdV", "CoV", "MPV", "PIV")))
+mol_class_week_extend <- epi_data %>%
+  dplyr::select(class, date) %>%
+  mutate(week = week(date),
+         week = week - min(week) + 1,
+         week = ifelse(week > 4, week - 1, week))  %>%
+  left_join(mol_class_week) %>%
+  arrange(class, date) %>%
+  dplyr::select(class, date, variable, n) %>%
+  dcast(class + date ~ variable)
+stan_data$pos_samples <- simplify2array(by(mol_class_week_extend, mol_class_week_extend$class, as.matrix))
+stan_data$pos_samples <- apply(stan_data$pos_samples[,-c(1,2),], c(1,2,3), as.integer)
+
+# hyperparameters for prior for incubation period distributions
+stan_data$p_in_mu_m <- prior_pin_par$mum
+stan_data$p_in_mu_s <- prior_pin_par$mus
+stan_data$p_in_sigma_m <- prior_pin_par$sim
+stan_data$p_in_sigma_s <- prior_pin_par$sis
 ```
 
 ## Modeling
@@ -203,10 +316,9 @@ stan_file <- "../models/latent-infection-model.stan"
 latInfMod <- stan(stan_file, data = stan_data, seed = 12345, cores = 4)
 
 # quick estimation results
-summary(latInfMod, probs = c(0.025, 0.975), pars = c("phi", "alpha", "omega", "beta", "vega", "ventNa", "mu_p_in", "sigma_p_in", "I0"))$summary %>%
+summary(latInfMod, probs = c(0.025, 0.5, 0.975), pars = c("phi", "alpha", "omega", "beta", "vega", "mu_p_in", "sigma_p_in", "I0"))$summary %>%
   data.frame() %>%
   mutate_all(round, 2)
-mcmc_intervals(latInfMod, pars = "beta[1]")
 ```
 
 ## Results
@@ -225,9 +337,9 @@ arr
 ### Avoided infections
 
 ```{r}
-types <- c("Partial instalation of air cleaners (study design)",
-           "No installation of air cleaners (hypothetical)",
-           "Full installation of air cleaners (hypothetical)")
+types <- c("Air cleaners partially installed",
+           "Air cleaners never installed",
+           "Air cleaners always installed")
 
 avoid_infections <- spread_draws(latInfMod, mu_cases_ac[day,class,type]) %>%
   group_by(.draw, type) %>%
@@ -237,9 +349,10 @@ avoid_infections <- spread_draws(latInfMod, mu_cases_ac[day,class,type]) %>%
   mean_qi(.width = c(0.5, 0.8, 0.95)) %>%
   ungroup() %>%
   mutate(type = ifelse(type == 1, types[1], ifelse(type == 2, types[2], types[3])),
-         type = factor(type, levels = types[c(2,1,3)])) %>%
+         type = factor(type, levels = types[c(3,1,2)])) %>%
   arrange(desc(.width)) %>%
-  mutate(`.width` = factor(`.width`, levels = rev(c(.5, .8, .95))))
+  mutate(`.width` = factor(`.width`, levels = rev(c(.5, .8, .95)))) %>%
+  filter(type != types[1])
 
 avoid_infections_pl <- avoid_infections  %>%
   ggplot() +
@@ -250,7 +363,7 @@ avoid_infections_pl <- avoid_infections  %>%
   scale_fill_manual(values = wes_palette("Royal1")[c(3,4,2)]) +
   scale_y_continuous(expand = expansion(mult = c(0.25, 0.25))) +
   scale_x_continuous(limits = c(0, NA), expand = expansion(mult = c(0, 0))) +
-  labs(x = "Estimated average number of infections", fill = "CrI", title = "b") +
+  labs(x = "Estimated number of infections", fill = "CrI", title = "b") +
   theme_custom() +
   theme(axis.title.y = element_blank(),
         axis.text.y = element_blank(),
@@ -268,6 +381,25 @@ save_plot(avoid_infections_pl,
           w = 16, h = 8)
 ```
 
+```{r}
+barplot_mol <- readRDS("../results/mol-data/descriptives-cond.rds") + 
+  coord_flip() +
+  guides(fill = guide_legend(reverse = TRUE, nrow = 1)) +
+  theme(legend.position = "bottom", legend.key.height = unit(.1, "cm"), legend.key.width = unit(.5, "cm"), plot.title.position = "plot") +
+  ggtitle("a | Number of positive saliva samples by study condition.",
+          subtitle = "Influenza B (Flu B), rhinovirus (HRV), adenovirus (AdV), SARS-CoV-2 (CoV), metapneumovirus (MPV), parainfluenza (PIV).")
+boxplot_env <- readRDS("../results/env-data/particles-boxplot.rds") +
+  ggtitle("b | Aerosol number (CN) and particle matter (PM) concentrations by study condition.",
+          subtitle = expression("Particle diameter between 175nm and 20"*mu*"m. PM for sizes <1 to <10"*mu*"m."))
+avoid_infections_pl <- avoid_infections_pl +
+  ggtitle("c | Estimated number of infections with and without air cleaners. ",
+          subtitle = "Counterfactual scenarios with air cleaners always (never) installed, based on the model-estimated effect of air cleaners.")
+env_epi_comb_pl <- grid.arrange(barplot_mol, 
+                                grid.arrange(boxplot_env, avoid_infections_pl, nrow = 2, heights = c(8, 8), widths = 16),
+                                nrow = 2, heights = c(6, 16), widths = 16)
+ggsave(plot = env_epi_comb_pl, "../doc/Epidemics2023/figure.png", width = 16 / cm(1), height = 22 / cm(1))
+```
+
 ### Estimation results
 
 ```{r}
@@ -276,8 +408,7 @@ est_res <- summary(latInfMod, probs = c(0.025, 0.975), pars = c("phi", "alpha", 
   add_rownames() %>%
   rename(variable = rowname) %>%
   mutate(variable = c("$\\phi$",
-                      "$\\alpha_{\\text{A}}$",
-                      "$\\alpha_{\\text{A}}$",
+                      "$\\alpha$",
                       "$\\omega$",
                       "$\\beta_1$",
                       "$\\beta_2$",
@@ -292,8 +423,18 @@ est_res <- summary(latInfMod, probs = c(0.025, 0.975), pars = c("phi", "alpha", 
                       "$\\vega_{\\text{Wednesday}}$",
                       "$\\vega_{\\text{Thursday}}$",
                       "$\\vega_{\\text{Friday}}$",
-                      "$\\mu_{p_{\\text{IN}}}",
-                      "$\\sigma_{p_{\\text{IN}}}")) %>%
+                      "$\\mu_{p_{\\text{IN}}^{\\text{Flu B}}}",
+                      "$\\mu_{p_{\\text{IN}}^{\\text{HRV}}}",
+                      "$\\mu_{p_{\\text{IN}}^{\\text{AdV}}}",
+                      "$\\mu_{p_{\\text{IN}}^{\\text{CoV}}}",
+                      "$\\mu_{p_{\\text{IN}}^{\\text{MPV}}}",
+                      "$\\mu_{p_{\\text{IN}}^{\\text{PIV}}}",
+                      "$\\sigma_{p_{\\text{IN}}^{\\text{Flu B}}}",
+                      "$\\sigma_{p_{\\text{IN}}^{\\text{HRV}}}",
+                      "$\\sigma_{p_{\\text{IN}}^{\\text{AdV}}}",
+                      "$\\sigma_{p_{\\text{IN}}^{\\text{CoV}}}",
+                      "$\\sigma_{p_{\\text{IN}}^{\\text{MPV}}}",
+                      "$\\sigma_{p_{\\text{IN}}^{\\text{PIV}}}")) %>%
   dplyr::select(variable, mean, `X2.5.`, `X97.5.`, n_eff, Rhat) %>%
   mutate(across(c(mean, `X2.5.`, `X97.5.`), function(x) tex_sign(round_k(x)))) %>%
   as.matrix()
@@ -344,6 +485,7 @@ fitted_cases_pl <- ggplot(mapping = aes(x = week)) +
   theme_custom() +
   theme(legend.position = "top") +
   guides(color = guide_legend(title = element_blank()))
+fitted_cases_pl
 
 save_plot(fitted_cases_pl, pdf_file = "../results/epi-data/model-fit.pdf",
           w = 12, h = 10)

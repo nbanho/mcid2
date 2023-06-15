@@ -67,6 +67,7 @@ boxpl_pc <- env_epi_data %>%
         plot.title.position = "plot") +
   guides(color = "none")
 save_plot(boxpl_pc, pdf_file = "../results/env-data/particles-boxplot.pdf", eps_file = "../results/env-data/particles-boxplot.eps", w = 16, h = 8)
+saveRDS(boxpl_pc, file = "../results/env-data/particles-boxplot.rds")
 
 # other variables
 boxpl_oth <- env_epi_data %>%

@@ -8,7 +8,7 @@ library(lubridate)
 #### Data ####
 
 df <- read.csv("data-raw/redcap/MCIDSchulenFollowup_DATA_2023-02-09_1356.csv") %>%
-  mutate(class = ifelse(grepl("Kontroll", record_id), "B", "A"),  # A is Studien- and B is Kontrollklasse
+  mutate(class = ifelse(grepl("Kontroll", record_id), "B", "A"),  # We set A as the "Studienklasse" and B as the "Kontrollklasse"
          date = as.Date(date, format = "%Y-%m-%d")) 
 
 

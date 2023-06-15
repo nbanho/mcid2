@@ -10,7 +10,7 @@
 p_in_mu_m <- 1.63
 p_in_mu_s <- (1.75 - 1.51) / (2 * qnorm(0.975))
 p_in_sigma_m <- 0.50
-p_in_sigma_s <- (0.55 - 0.45) / qnorm(0.975)
+p_in_sigma_s <- (0.55 - 0.46) / (2 * qnorm(0.975))
 
 p_in <- function(x, log_mu = 1.63, log_sigma = 0.50) { 
   plnorm(x, log_mu, log_sigma)

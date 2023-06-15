@@ -1,3 +1,4 @@
+require(patchwork)
 require(ggpattern)
 require(gridExtra)
 require(GGally)

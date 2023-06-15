@@ -26,6 +26,7 @@ data {
   int<lower=1> SS; // number of days from last Saturday to study start
   int<lower=1> W; // number of weeks
   int<lower=1> C; // number of classes
+  int<lower=1> K; // number of viruses
   int cases[D,C]; // number of new cases per class
   vector<lower=0>[7] totCasesWeekday; // number of cases by weekday
   int<lower=0,upper=1> weekend[D+S]; // weekend indicator
@@ -37,17 +38,26 @@ data {
   int<lower=0,upper=Mvent> missingVent[D,C]; // missing aer change rates indicator per class
   vector[D+S] cov; // proportion of positive covid-19 tests in Solothurn
   vector[D+S] ili; // number of consultations regarding influenza-like illnesses in Solothurn
-  real p_in_mu_m; // prior: location hyperparameter m in mu^p_IN ~ Normal(m, s)
-  real p_in_mu_s; // prior: scale hyperparameter s in mu^p_IN ~ Normal(m, s)
-  real p_in_sigma_m; // prior: location hyperparameter m in sigma^p_IN ~ Normal(m, s)
-  real p_in_sigma_s; /// prior: scale hyperparameter m in sigma^p_IN ~ Normal(m, s)
+  real p_in_mu_m[K]; // prior: location hyperparameter m in mu^p_IN ~ Normal(m, s)
+  real pos_samples[D,K,C]; // weekly number of positive samples by virus
+  real p_in_mu_s[K]; // prior: scale hyperparameter s in mu^p_IN ~ Normal(m, s)
+  real p_in_sigma_m[K]; // prior: location hyperparameter m in sigma^p_IN ~ Normal(m, s)
+  real p_in_sigma_s[K]; /// prior: scale hyperparameter m in sigma^p_IN ~ Normal(m, s)
 }
 
 transformed data {
   int week_index[W,2];
+  real p_weights[D,K,C];
   for (w in 1:W) {
     week_index[w,1] = (w - 1) * 7 + 1;
     week_index[w,2] = w * 7;
+  }
+  for (c in 1:C) {
+    for (d in 1:D) {
+      for (k in 1:K) {
+        p_weights[d,k,c] = pos_samples[d,k,c] / sum(pos_samples[d,,c]);
+      }
+    }
   }
 }
 
@@ -55,12 +65,12 @@ transformed data {
 parameters {
   simplex[7] vega; // weights of weekday cases
   real<lower=0> invphi;
-  vector[C] alpha; // model intercept
+  real alpha; // model intercept
   real omega; // weekend effect
   vector[6] beta; // aircleaner effect
   vector[Mvent] ventNa; // estimates for missing aer
-  real mu_p_in; // log mean in p_IN ~ Lognormal(mu, sigma)
-  real<lower=0> sigma_p_in; // log standard deviation in p_IN ~ Lognormal(mu, sigma)
+  vector[K] mu_p_in; // log mean in p_IN ~ Lognormal(mu, sigma)
+  vector<lower=0>[K] sigma_p_in; // log standard deviation in p_IN ~ Lognormal(mu, sigma)
   vector<lower=0>[C] I0; // number of infections at the first seeding day
 }
 
@@ -72,11 +82,13 @@ transformed parameters {
   matrix<lower=0>[D+S,C] infections; // log of the expected number of new infections
   matrix<lower=0>[D+S,C] cumInfections; // cumulative number of infections
   matrix<lower=0>[D+S,C] contagious; // number of contagious/infectious students
-  vector<lower=0>[D+S] p_in; // probability distribution for incubation period
+  matrix<lower=0>[D+S,K] p_in; // probability distribution for incubation periods
   
-  // Compute discretized p_IN distribution
-  for (k in 1:(D+S)) { 
-    p_in[k] = diff_lnorm(D+S-k, mu_p_in, sigma_p_in);
+  // compute discretized p_IN distributions
+  for (k in 1:K) {
+    for (d in 1:(D+S)) { 
+      p_in[d,k] = diff_lnorm(D+S-d, mu_p_in[k], sigma_p_in[k]);
+    }
   }
   
   for (c in 1:C) {
@@ -92,14 +104,14 @@ transformed parameters {
       // compute cumulative infections
       cumInfections[d,c] = sum(infections[1:(d-1),c]);
       // estimate log number of infections
-      logInfections[d,c] = log(contagious[d,c] / cumInfections[d,c]) + alpha[c] + omega * fmax(weekend[d], vacation[d]) + beta[2] * c + beta[5] * cov[d] +  beta[6] * ili[d];
+      logInfections[d,c] = log(contagious[d,c] / cumInfections[d,c]) + alpha + omega * fmax(weekend[d], vacation[d]) + beta[2] * (c-1) + beta[5] * cov[d] +  beta[6] * ili[d];
       // ccompute number of infections
       infections[d,c] = exp(logInfections[d,c]);
     }
     
     // expected number of cases SS days before study start
     for (d in 1:SS) {
-      muCases[d,c] = dot_product(infections[1:(S-SS+d),c], tail(p_in, S-SS+d));
+      muCases[d,c] = dot_product(infections[1:(S-SS+d),c], block(p_in, D+SS-d+1, 1, S+d-2, K) * rep_vector(1. / (1. * K), K));
     }
   
     // compute infections and expected number of cases
@@ -109,7 +121,7 @@ transformed parameters {
       // compute cumulative infections
       cumInfections[d,c] = sum(infections[1:(d-1),c]);
       // estimate log number of infections on every day
-      logInfections[d,c] = log(contagious[d,c] / cumInfections[d,c]) + alpha[c] + omega * fmax(weekend[d], vacation[d]) + beta[2] * c + beta[5] * cov[d] +  beta[6] * ili[d];
+      logInfections[d,c] = log(contagious[d,c] / cumInfections[d,c]) + alpha + omega * fmax(weekend[d], vacation[d]) + beta[2] * (c-1) + beta[5] * cov[d] +  beta[6] * ili[d];
       // log number of infections during school days
       if (fmax(weekend[d], vacation[d]) == 0) {
         // considering missing data points in vent
@@ -121,7 +133,7 @@ transformed parameters {
       }
       // compute expected number of new cases
       infections[d,c] = exp(logInfections[d,c]);
-      muCases[d-S+SS,c] = dot_product(infections[1:d,c], tail(p_in, d));
+      muCases[d-S+SS,c] = dot_product(infections[1:d,c], block(p_in, S+D-d+1, 1, d, K) * to_vector(p_weights[d-S,,c]));
     }
   
     // re-weight expected cases to consider weekday effects
@@ -137,11 +149,11 @@ model {
   // priors
   vega ~ dirichlet(totCasesWeekday);
   invphi ~ normal(0., 1.);
-  alpha ~ normal(0., 10.);
+  alpha ~ student_t(5., 0., 10.);
   omega ~ normal(log(1.1), .05);
   mu_p_in ~ normal(p_in_mu_m, p_in_mu_s);
   sigma_p_in ~ normal(p_in_sigma_m, p_in_sigma_s);
-  beta ~ normal(0., 1);
+  beta ~ student_t(5., 0., 2.5);
   ventNa ~ normal(0., 1.);
   I0 ~ exponential(1.);
   
@@ -177,14 +189,14 @@ generated quantities {
         // compute cumulative infections
         cum_infections_ac[d,c,a] = sum(infections_ac[1:(d-1),c,a]);
         // estimate log number of infections
-        log_infections_ac[d,c,a] = log(contagious_ac[d,c,a] / cum_infections_ac[d,c,a]) + alpha[c] + omega * fmax(weekend[d], vacation[d]) + beta[2] * c + beta[5] * cov[d] +  beta[6] * ili[d];
+        log_infections_ac[d,c,a] = log(contagious_ac[d,c,a] / cum_infections_ac[d,c,a]) + alpha + omega * fmax(weekend[d], vacation[d]) + beta[2] * (c-1) + beta[5] * cov[d] +  beta[6] * ili[d];
         // ccompute number of infections
         infections_ac[d,c,a] = exp(log_infections_ac[d,c,a]);
       }
 
       // expected number of cases SS days before study start
       for (d in 1:SS) {
-        mu_cases_ac[d,c,a] = dot_product(to_vector(infections_ac[1:(S-SS+d),c,a]), tail(p_in, S-SS+d));
+        mu_cases_ac[d,c,a] = dot_product(to_vector(infections_ac[1:(S-SS+d),c,a]), block(p_in, D+SS-d+1, 1, S+d-2, K) * rep_vector(1. / (1. * K), K));//tail(to_vector(p_in_eff[d,,c]), S-SS+d));
       }
 
       // compute infections and expected number of cases
@@ -193,7 +205,7 @@ generated quantities {
         // compute cumulative infections
         cum_infections_ac[d,c,a] = sum(infections_ac[1:(d-1),c,a]);
         // estimate log number of infections on every day
-        log_infections_ac[d,c,a] = log(contagious_ac[d,c,a] / cum_infections_ac[d,c,a]) + alpha[c] + omega * fmax(weekend[d], vacation[d]) + beta[2] * c + beta[5] * cov[d] +  beta[6] * ili[d];
+        log_infections_ac[d,c,a] = log(contagious_ac[d,c,a] / cum_infections_ac[d,c,a]) + alpha + omega * fmax(weekend[d], vacation[d]) + beta[2] * (c-1) + beta[5] * cov[d] +  beta[6] * ili[d];
         // log number of infections during school days
         if (fmax(weekend[d], vacation[d]) == 0) {
           if (a == 1) { // air cleaners installed according to study design
@@ -210,7 +222,7 @@ generated quantities {
         }
         // compute expected number of new cases
         infections_ac[d,c,a] = exp(log_infections_ac[d,c,a]);
-        mu_cases_ac[d-S+SS,c,a] = dot_product(to_vector(infections_ac[1:d,c,a]), tail(p_in, d));
+        mu_cases_ac[d-S+SS,c,a] = dot_product(to_vector(infections_ac[1:d,c,a]), block(p_in, S+D-d+1, 1, d, K) * to_vector(p_weights[d-S,,c]));//tail(to_vector(p_in_eff[d,,c]), d));
       }
 
       // re-weight expected cases to consider weekday effects

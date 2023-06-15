@@ -1,0 +1,246 @@
+---
+title: "Molecular Analysis"
+author: "Nicolas Banholzer"
+date: "2023-06-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Libraries 
+
+```{r}
+library(tidyverse)
+library(reshape2)
+library(tidybayes)
+library(lubridate)
+library(rstan)
+source("../utils/epi.r")
+source("../utils/bayes.r")
+source("../utils/plotting.r")
+source("../utils/tex.r")
+```
+
+## Data 
+
+```{r}
+df <- readRDS("../data-clean/molecular.rds")
+```
+
+## Descriptives
+
+```{r}
+# positive samples by study condition and week
+df_pos <- df %>%
+  mutate(week = week(date),
+         week = week - min(week) + 1,
+         week = ifelse(week > 4, week - 1, week)) %>%
+  dplyr::select(aircleaner, week, class, AdV, `Flu B`, HRV, MPV, PIV, `SARS-CoV-2`) %>%
+  melt(c("aircleaner", "week", "class")) %>%
+  group_by(aircleaner, class, week, variable) %>%
+  summarize(n = sum(value)) %>%
+  ungroup() %>%
+  mutate(variable = as.character(variable), 
+         variable = ifelse(variable == "SARS-CoV-2", "CoV", variable),
+         variable = factor(variable, levels = c("Flu B", "HRV", "AdV", "CoV", "MPV", "PIV")))
+
+pos_week_pl <- ggplot(mapping = aes(x = week, y = n, fill = variable)) +
+  geom_bar(data = df_pos, stat = "identity") +
+  geom_text(data = subset(df_pos, n > 0), mapping = aes(label = n), 
+            size = 8 / cm(1), position = position_stack(vjust = 0.5), color = "white") +
+  facet_wrap(~ class) +
+  scale_fill_manual(values = wes_palette("IsleofDogs1")) +
+  scale_y_continuous(expand = expansion(add = c(0,1))) +
+  scale_x_continuous(breaks = seq(1, 7, 1)) +
+  labs(y = "Number of positive samples", x = "Study week", fill = "Virus", title = "c") +
+  theme_custom() +
+  theme(panel.grid = element_blank(),
+        legend.position = "none") +
+  guides(fill = guide_legend(nrow = 1))
+pos_week_pl
+```
+
+```{r}
+# positive samples by study condition
+df_pos_stud <- df_pos %>%
+  group_by(aircleaner, variable) %>%
+  summarize(n = sum(n)) %>%
+  ungroup()
+pos_cond_pl <- ggplot(mapping = aes(x = aircleaner, y = n, fill = variable)) +
+  geom_bar(data = df_pos_stud, stat = "identity", position = "stack") +
+  geom_text(data = subset(df_pos_stud, n != 0), mapping = aes(label = n), 
+            size = 8 / cm(1), position = position_stack(vjust = 0.5), color = "white") +
+  scale_fill_manual(values = wes_palette("IsleofDogs1")) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(y = "Number of positive samples", x = "Air cleaner", fill = "Virus", title = "b") +
+  theme_custom() +
+  theme(panel.grid = element_blank(),
+        legend.position = "bottom") +
+  guides(fill = guide_legend(nrow = 1))
+pos_cond_pl
+```
+
+```{r}
+# Total counts by virus
+df_pos_tot <- df_pos %>%
+  group_by(variable) %>%
+  summarize(n = sum(n)) %>%
+  ungroup()
+
+pos_tot_pl <- df_pos_tot %>%
+  ggplot(aes(x = variable, y = n, fill = variable)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = n, y = n + 1), size = 8 / cm(1)) +
+  scale_fill_manual(values = wes_palette("IsleofDogs1")) +
+  scale_y_continuous(expand = expansion(add = c(0,1))) +
+  labs(y = "Number of positive samples", x = "Air cleaner", fill = "Virus", title = "a") +
+  theme_custom() +
+  theme(panel.grid = element_blank(),
+        legend.position = "bottom") +
+  guides(fill = guide_legend(nrow = 1))
+pos_tot_pl
+```
+
+
+```{r}
+# combine
+descr <- pos_tot_pl + pos_cond_pl & theme(legend.position = "bottom", legend.key.height = unit(.1, "cm"),
+                                          legend.key.width = unit(.3, "cm"))
+descr <- descr + plot_layout(guides = "collect", widths = c(10, 6), ncol = 2) 
+descr <- descr + pos_week_pl 
+descr <- descr + plot_layout(nrow = 2, heights = c(8, 8), design = 'AB
+                             CC')
+save_plot(descr, pdf_file = "../results/mol-data/descriptives.pdf", eps_file = "../results/mol-data/descriptives.eps", h = 16, w = 16)
+saveRDS(pos_tot_pl + ggtitle(""), file = "../results/mol-data/descriptives-total.rds")
+saveRDS(pos_cond_pl + ggtitle(""), file = "../results/mol-data/descriptives-cond.rds")
+saveRDS(pos_week_pl + ggtitle(""), file = "../results/mol-data/descriptives-week.rds")
+```
+
+## Prepare data
+
+```{r}
+create.stan_data <- function(dat) {
+  
+  # stan data list
+  stan_data <- list()
+
+  # dimensions
+  stan_data$N <- nrow(dat) / 2
+  stan_data$K <- 6 + 1
+  stan_data$C <- 2
+
+  # outcome
+  stan_data$samples <- dat %>%
+    arrange(class, date) %>%
+    dplyr::select(Neg, AdV, `Flu B`, HRV, MPV, PIV, `SARS-CoV-2`) %>%
+    as.matrix()
+
+  # air cleaner indicator
+  stan_data$aircleaner <- dat %>%
+    arrange(class, date) %>%
+    mutate(aircleaner = ifelse(aircleaner == "Yes", 1, 0)) %>%
+    dplyr::select(aircleaner) %>%
+    unlist()
+
+  # class
+  stan_data$schoolclass <- dat %>%
+    arrange(class, date) %>%
+    mutate(class = ifelse(class == "A", 0, 1)) %>%
+    dplyr::select(class) %>%
+    unlist()
+
+  # susceptibles 
+  stan_data$susceptibles <- dat %>%
+    group_by(class) %>%
+    arrange(date) %>%
+    mutate(across(c(AdV, `Flu B`, HRV, MPV, PIV, `SARS-CoV-2`), ~ n_class - cumsum(.x)),
+           across(c(AdV, `Flu B`, HRV, MPV, PIV, `SARS-CoV-2`), ~ (.x - mean(.x)) / sd(.x)),
+           PIV = 0) %>% # no variation in PIV
+    ungroup() %>%
+    arrange(class, date) %>%
+    dplyr::select(AdV, `Flu B`, HRV, MPV, PIV, `SARS-CoV-2`)
+
+  return(stan_data)
+}
+
+stan_data <- create.stan_data(df)
+```
+
+## Modeling 
+
+### Main model
+
+```{r}
+# stan model code file
+stan_file <- "../models/multinomial-logit-model.stan"
+
+# run model
+multLogitMod <- stan(stan_file, data = stan_data, seed = 12345, cores = 4)
+
+# quick estimation results
+summary(multLogitMod, probs = c(0.025, 0.975), pars = c("beta0", "beta1", "beta2", "beta3"))$summary %>%
+  data.frame() %>%
+  mutate_all(round, 2)
+```
+
+
+### Sensitivity 
+
+```{r}
+# lag data by one test date and one week
+df_l1d <- df %>%
+  group_by(class) %>%
+  mutate(aircleaner = lag(aircleaner),
+         aircleaner = ifelse(is.na(aircleaner), "No", aircleaner)) %>%
+  ungroup()
+
+df_l1w <- df %>%
+  group_by(class) %>%
+  mutate(aircleaner = lag(aircleaner, 2),
+         aircleaner = ifelse(is.na(aircleaner), "No", aircleaner)) %>%
+  ungroup()
+
+# stan data list
+stan_data_l1d <- create.stan_data(df_l1d)
+stan_data_l1w <- create.stan_data(df_l1w)
+
+# model
+multLogitMod_l1d <- stan(stan_file, data = stan_data_l1d, seed = 12345, cores = 4)
+multLogitMod_l1w <- stan(stan_file, data = stan_data_l1w, seed = 12345, cores = 4)
+```
+
+## Results
+
+```{r}
+# lag types
+lag_types <- c("None",
+               "1 test date",
+               "1 week")
+
+# collect draws
+main_res <- spread_draws(multLogitMod, beta1)
+sens_res_l1d <- spread_draws(multLogitMod_l1d, beta1)
+sens_res_l1w <- spread_draws(multLogitMod_l1w, beta1)
+res <- rbind(
+  main_res %>% mutate(lag = lag_types[1]),
+  sens_res_l1d %>% mutate(lag = lag_types[2]),
+  sens_res_l1w %>% mutate(lag = lag_types[3])
+) %>%
+  mutate(beta1 = exp(beta1)) 
+
+# plot
+res_pl <- res  %>%
+  ggplot() +
+  stat_pointinterval(aes(x = beta1, y = lag), point_fill = "white", shape = 21, point_size = 3, .width = c(0.5, 0.8, 0.95)) +
+  geom_vline(aes(xintercept = 1), linetype = "dashed") +
+  scale_x_continuous(limits = c(0, NA), expand = expansion(mult = c(0, 0)), breaks = seq(0, 2, .25)) +
+  scale_size_continuous(range = c(1, 9)) +
+  labs(x = "Relative risk ratio", y = "Lag of sampling results", fill = "CrI") +
+  theme_custom() +
+  theme(legend.position = "top", legend.direction = "horizontal",
+        legend.key.height = unit(.25, "cm"), legend.key.width = unit(.35, "cm"))
+res_pl
+save_plot(res_pl, pdf_file = "../results/mol-data/model-results.pdf", w = 10, h = 6)
+```
