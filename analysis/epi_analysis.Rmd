@@ -41,6 +41,7 @@ sec_data <- readRDS("../data-clean/secondary.rds")
 line_list_dat <- epi_data_ll %>%
   filter(respiratory_infection == "yes") %>%
   dplyr::select(class, date_symptom, date_absent, date_back) %>%
+  arrange(class, date_absent) %>%
   as.matrix() %>%
   xtable::xtable()
 

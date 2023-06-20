@@ -36,6 +36,8 @@ df_ll <- readRDS("../data-clean/molecular-long.rds")
 
 ```{r}
 line_list_dat <- df_ll %>%
+  mutate(weekday = weekdays(date)) %>%
+  dplyr::select(class, date, weekday, result, virus) %>%
   as.matrix() %>%
   xtable::xtable()
 
