@@ -458,8 +458,9 @@ est_res <- summary(latInfMod, probs = c(0.025, 0.975), pars = c("phi", "alpha", 
                       "$\\sigma_{p_{\\text{IN}}^{\\text{CoV}}}",
                       "$\\sigma_{p_{\\text{IN}}^{\\text{MPV}}}",
                       "$\\sigma_{p_{\\text{IN}}^{\\text{PIV}}}")) %>%
-  dplyr::select(variable, mean, `X2.5.`, `X97.5.`, n_eff, Rhat) %>%
-  mutate(across(c(mean, `X2.5.`, `X97.5.`), function(x) tex_sign(round_k(x)))) %>%
+  dplyr::select(variable, mean, `X2.5.`, `X97.5.`, Rhat, `n_eff`) %>%
+  mutate(across(c(mean, `X2.5.`, `X97.5.`, Rhat), function(x) tex_sign(round_k(x))),
+         `n_eff` = round(`n_eff`)) %>%
   as.matrix()
 
 print.xtable(xtable(est_res),

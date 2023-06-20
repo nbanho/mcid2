@@ -245,7 +245,7 @@ multLogitMod_l1w <- stan(stan_file, data = stan_data_l1w, seed = 12345, cores = 
 # lag types
 lag_types <- c("None",
                "1 test date",
-               "1 week")
+               "1 test week")
 
 # collect draws
 main_res <- spread_draws(multLogitMod, beta1)
