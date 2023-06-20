@@ -16,6 +16,17 @@ df <- read_xlsx("data-raw/molecular/ZF Resultate Airchecker 2023.xlsx", sheet = 
   mutate(class = ifelse(class == "3a", "B", "A"),
          date = as.Date(gsub("2022", "2023", as.character(date))))
 
+# line list
+
+long_list <- df %>%
+  mutate(result = ifelse(virus == "-", "Negative", "Positive"),
+         virus = ifelse(virus == "SARS-CoV-2", "CoV", virus)) %>%
+  dplyr::select(class, date, result, virus) %>%
+  arrange(class, virus) %>%
+  ungroup()
+
+saveRDS(long_list, file = "data-clean/molecular-long.rds")
+
 
 #### Preprocessing ####
 

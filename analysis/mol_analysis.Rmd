@@ -27,9 +27,29 @@ source("../utils/tex.r")
 
 ```{r}
 df <- readRDS("../data-clean/molecular.rds")
+df_ll <- readRDS("../data-clean/molecular-long.rds")
 ```
 
 ## Descriptives
+
+### Line list
+
+```{r}
+line_list_dat <- df_ll %>%
+  as.matrix() %>%
+  xtable::xtable()
+
+print.xtable(line_list_dat,
+             type = "latex",
+             file = "../results/mol-data/line-list-data.tex",
+             sanitize.text.function = identity,
+             include.colnames = F,
+             include.rownames = F,
+             only.contents = T,
+             hline.after = NULL)
+```
+
+### Number of positive samples
 
 ```{r}
 # positive samples by study condition and week
@@ -183,6 +203,11 @@ multLogitMod <- stan(stan_file, data = stan_data, seed = 12345, cores = 4)
 summary(multLogitMod, probs = c(0.025, 0.975), pars = c("beta0", "beta1", "beta2", "beta3"))$summary %>%
   data.frame() %>%
   mutate_all(round, 2)
+
+# estimated effect of air cleaners
+spread_draws(multLogitMod, beta1) %>%
+  mutate(beta1 = exp(beta1)) %>%
+  mean_qi()
 ```
 
 

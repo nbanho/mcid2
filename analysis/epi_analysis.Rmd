@@ -27,12 +27,34 @@ source("../utils/tex.r")
 
 ```{r}
 epi_data <- readRDS("../data-clean/epidemiological.rds")
+epi_data_ll <- readRDS("../data-clean/redcap-long.rds")
 env_data <- readRDS("../data-clean/environmental.rds")
 mol_data <- readRDS("../data-clean/molecular.rds") 
 sec_data <- readRDS("../data-clean/secondary.rds")
 ```
 
 ## Descriptives
+
+### Line List
+
+```{r}
+line_list_dat <- epi_data_ll %>%
+  filter(respiratory_infection == "yes") %>%
+  dplyr::select(class, date_symptom, date_absent, date_back) %>%
+  as.matrix() %>%
+  xtable::xtable()
+
+print.xtable(line_list_dat,
+             type = "latex",
+             file = "../results/epi-data/line-list-data.tex",
+             sanitize.text.function = identity,
+             include.colnames = F,
+             include.rownames = F,
+             only.contents = T,
+             hline.after = NULL)
+```
+
+### Number of cases
 
 ```{r}
 # number of cases by class
