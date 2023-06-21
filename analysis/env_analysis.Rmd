@@ -135,8 +135,7 @@ effects_tbl <- draws_filt %>%
   mutate_if(is.numeric, round_k) %>%
   mutate(across(-outcome, tex_sign)) %>%
   arrange(-row_number()) %>%
-  mutate(outcome = c("CN", "PM$_{1}$", "PM$_{2.5}$", "PM$_{4}$", "PM$_{10}$"),
-         space = "") %>%
+  mutate(outcome = c("CN", "PM$_{1}$", "PM$_{2.5}$", "PM$_{4}$", "PM$_{10}$")) %>%
   as.matrix() %>%
   xtable() %>%
   print.xtable(
