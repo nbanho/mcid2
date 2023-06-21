@@ -308,8 +308,10 @@ Table~\ref{tab:epi-data-line-list} shows the line list data for respiratory case
     \bottomrule
 \end{longtable}}
 
+\clearpage
+
 {\footnotesize\begin{longtable}{l l l l l}
-    \caption[Line list of molecular test results over the study period]{Line list of respiratory cases over the study period.}\label{tab:mol-data-line-list} \\
+    \caption[Line list of molecular test results over the study period]{Line list of respiratory cases over the study period. Pathogens: Influenza B (Flu B), rhinovirus (HRV), adenovirus (AdV), SARS-CoV-2 (CoV), metapneumovirus (MPV), parainfluenza virus (PIV).}\label{tab:mol-data-line-list} \\
     \toprule
     Class & Date of test & Weekday & Test result & Pathogen \\
     \midrule
@@ -325,7 +327,7 @@ Table~\ref{tab:mol-data-line-list} shows the line list data for the laboratory t
 
 \clearpage
 
-\section{Modeling relative risk of respiratory infections}\label{sec:transmission-model}
+\section{Modeling relative risk of infection}\label{sec:transmission-model}
 
 \subsection{Overall approach}
 
@@ -535,7 +537,7 @@ Our model accounts for the delay from infection to case confirmation and allows 
 
 \begin{figure}[!htb]
 \centering
-    \includegraphics[width=\linewidth]{../../results/mol-data/model-results.pdf}
+    \includegraphics[width=10cm]{../../results/mol-data/model-results.pdf}
     \caption[Boxplot of environmental variables by school and study condition]{Boxplot for the daily average values of each environmental variable by school and study condition.}
     \label{fig:mol-estimation-results-sensitivity}
 \end{figure}
@@ -548,7 +550,7 @@ In the main paper, we showed results for changes in particle concentrations by s
 
 \begin{figure}[!htb]
 \centering
-    \includegraphics[width=\linewidth]{../../results/env-data/othVars-boxplot.pdf}
+    \includegraphics[width=\linewidth]{../../results/env-data/otherVars-boxplot.pdf}
     \caption[Boxplot of environmental variables by school and study condition]{Boxplot for the daily average values of each environmental variable by school and study condition.}
     \label{fig:env-descriptives-other-vars}
 \end{figure}
@@ -558,10 +560,9 @@ In the main paper, we showed results for changes in particle concentrations by s
     \label{tab:palas-est-results}
     \centering
     \footnotesize
-    \begin{tabular}{l r r r c r r r }
+    \begin{tabular}{l r r r}
     \toprule
-    & \multicolumn{3}{c}{Mask mandate} & & \multicolumn{3}{c}{Air cleaner} \\ \cline{2-4} \cline{6-8}
-    Variable & Mean & Lower & Upper & & Mean & Lower & Upper \\
+    Variable & Mean & Lower & Upper \\
     \midrule
     \input ../../results/env-data/estimation-results-table.tex
     \bottomrule
