@@ -388,13 +388,13 @@ We estimate the pathogen-specific distributions from our data as part of fitting
 
 Despite recording cases by date of symptom onset, we recorded a higher proportion of cases on Mondays than on weekends, suggesting recall bias and under-reporting of cases on weekends. To consider weekday effects in the reporting of cases, we re-weight the expected number of cases each week as follows. Let $k \in $(1: Saturday, 2: Sunday, 3: Monday, $\dots$, 7: Friday) denote the weekday with the week starting on Saturday. The re-weighted expected number of cases $\Tilde{\mu}$ (class and day indexes omitted) are computed as
 \begin{align*}
-    \Tilde{\mu}_{k} &= \mu_k \cdot \nu_k \cdot \left(\frac{\sum_k \mu_k}{\sum_k \nu_k \cdot \mu_k}\right)\\
-    \sum_k \nu_k &= 1,
+    \Tilde{\mu}_{k} &= \mu_k \cdot \vartheta_k \cdot \left(\frac{\sum_k \mu_k}{\sum_k \nu_k \cdot \mu_k}\right)\\
+    \sum_k \vartheta_k &= 1,
 \end{align*}
 where $\nu_k$ is the weight for weekday $k$. These weights are modeled with a Dirichlet prior
 \begin{align*}
-    \nu &\sim \text{Dirichlet}(c) \\
-    c_k &= \sum_j \sum_t C_{jt} \mathbb{I}_{\text{Weekday}(t)=k}
+    \vartheta &\sim \text{Dirichlet}(c) \\
+    c_k &= \sum_j \sum_t C_{jt} \mathbb{I}_{\text{Weekday}(t)=k} \quad \forall k
 \end{align*}
 where $c_k$ is the total number of cases reported for weekday $k$ and $\mathbb{I}$ is a binary indicator. 
 
