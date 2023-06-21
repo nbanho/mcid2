@@ -297,7 +297,7 @@ Transmission of airborne respiratory infections with and without air cleaners in
 
 \section{Epidemiological line list data}\label{sec:case-data}
 
-Table~\ref{tab:epi-data-line-list} shows the line list data for respiratory cases based on epidemiological data.
+Table~\ref{tab:epi-data-line-list} shows the line list data for respiratory cases based on epidemiological data. For each class and case, it shows the date when the student was absent, s/he reported symptoms, and returned to school. Recall that a case of respiratory infection was defined as an absence where the student reported a sickness with at least one of the following symptoms: fever, coughing, tiredness, loss of test or smell, sore throat, headache, aches and pains, diarrhea, difficulty breathing or shortness of breath, stomach.
 
 {\footnotesize\begin{longtable}{l l l l}
     \caption[Line list of respiratory cases over the study period]{Line list of respiratory cases over the study period.}\label{tab:epi-data-line-list} \\
@@ -310,6 +310,10 @@ Table~\ref{tab:epi-data-line-list} shows the line list data for respiratory case
 
 \clearpage
 
+\section{Molecular line list data}\label{sec:mol-data}
+
+Table~\ref{tab:mol-data-line-list} shows the line list data for the laboratory test results from human saliva samples. For each class and test, it shows the date when the test was taken, the test result and (if positive) the pathogen that was detected. Recall that all students in class were sampled twice per week every Tuesday and Thursday. 
+
 {\footnotesize\begin{longtable}{l l l l l}
     \caption[Line list of molecular test results over the study period]{Line list of respiratory cases over the study period. Pathogens: Influenza B (Flu B), rhinovirus (HRV), adenovirus (AdV), SARS-CoV-2 (CoV), metapneumovirus (MPV), parainfluenza virus (PIV).}\label{tab:mol-data-line-list} \\
     \toprule
@@ -321,164 +325,112 @@ Table~\ref{tab:epi-data-line-list} shows the line list data for respiratory case
 
 \clearpage
 
-\section{Molecular line list data}\label{sec:mol-data}
-
-Table~\ref{tab:mol-data-line-list} shows the line list data for the laboratory test results from human saliva samples.
-
-\clearpage
-
 \section{Modeling relative risk of infection}\label{sec:transmission-model}
 
 \subsection{Overall approach}
 
-The aim is to estimate transmission of SARS-CoV-2 and the effects of infection control measures (mask mandates and air cleaners) on the number of new infections with COVID-19. To estimate transmission, our model links two unobserved quantities (the number of new infections and susceptible students) with one observed quantity (the number of new cases among students). Specifically, we link the number of new cases to the number of new infections in the previous days. We then formulate the daily proportion of susceptible students getting infected as a function of the interventions in place. The effects of interventions are estimated with a Bayesian approach, which requires the specification of prior distributions for all model parameters.
+The overall aim is to estimate the effects of air cleaners on the daily number of respiratory infections. The latter is unobserved/latent and inferred from the daily number of respiratory cases (absences related to respiratory infections by date of symptom onset), considering the delay from infection to symptom onset (\ie the incubation period). The effect of air cleaners is estimated with a Bayesian approach, which requires the specification of prior distributions for all model parameters.
+
 
 \subsection{Notation}
 
 \begin{tabular}{ll} 
 $j$  & class \\
 $t$ & days since start of study period \\
-$Y_{j}$  & total number of students in class $j$ (unobserved)  \\
-$N_{jt}$  & number of  new cases among students in class $j$ at day $t$ (observed) \\
+$C_{jt}$  & number of  new cases among students in class $j$ at day $t$ (observed) \\
 $I_{jt}$  & number of new infections in class $j$ at day $t$ (unobserved)  \\
-$S_{jt}$  & number of susceptibles in class $j$ at day $t$ (unobserved)  \\
+$F_{jt}$  & number of new infections in class $j$ before day $t$ (unobserved)  \\
+$N_{jt}$  & cumulative number of infections in class $j$ until day $t$ (unobserved)  \\
 \end{tabular}  
 
+\subsection{Relating the number of respiratory cases to the number of infections}
 
-\subsection{Relating the number of new infections to the number of susceptibles and the presence of interventions}
+The number of respiratory cases $C$ in class $j$ at time $t$ is modeled with a Negative Binomial distribution   
+\begin{align*}
+    C_{jt} \sim \text{Negative-Binomial}(\mu_{jt},\phi),
+\end{align*}
+where $\mu_{jt}$ is the expected number of new cases and $\phi$ is the parameter modeling over-dispersion. The expected number of new cases is the weighted sum of the number of new infections $I_{jt}$ in the  previous days
+\begin{align*}
+    \mu_{jt} = \sum_{s<t}I_{js} \cdot p_{\text{IN}}(t-s),
+\end{align*}
+where $p_{\text{IN}}(t-s)$ denotes the probability distribution of the incubation period. 
 
-A proportion of the susceptible students $P_{jt}$ gets infected in class $j = 1,\dots,J$ at each day $t = 1,\dots,T$
+\subsection{Relating the number of new infections to the presence of interventions}
+
+The  number of new infections is related to the presence of air cleaners using a log-link
+\begin{align*}
+    \log I_{jt} &= \log F_{jt} - \log N_{jt} + \beta_0 + \beta_1 \cdot \text{AirCleaner}_{jt} + \beta_2 \cdot \text{Class}_t + \beta_3 \cdot \text{Students}_{jt} \\
+    &\hphantom{= }+ \beta_4 \cdot \text{Ventilation}_{jt} + \beta_5 \cdot \text{CoV}_t + \beta_6 \cdot \text{ILI}_t,
+\end{align*}
+where $F_{jt} = \sum_{t-7}^{t-1} I_{js}$ is the number of infections in the previous seven days (first model offset; a proxy for the number of contagious students), $N_{jt} = \sum_{s<t} I_{js}$ is the cumulative number of infections (second model offset; the inverse is a proxy for the number of susceptible students), $\beta_0$ is the rate of new infections without air cleaners (model intercept), and $\beta_1$ is the effect of air cleaners. The effect of air cleaners is adjusted for class-specific effects, the number of students in school, the air change rate, the proportion of positive tests for SARS-CoV-2 in the community, and the number of consultations for influenza-like illnesses in the community. 
+
+Note that we deviated from the statistical analysis plan by using as model offset $\log F_{jt} - \log N_{jt}$ instead of just $\log N_{jt}$. This change improved the fit of our model. The reason is that the ratio $\log (F_{jt} / N_{jt})$ incorporates both ways by which new infections can naturally decrease over time, \ie a decrease in contagious students ($F_{jt}$) or a decrease in susceptible students ($1 / N_{jt}$).
+
+\subsection{Specifying the distribution of the incubation period}
+
+The pathogen of each respiratory infection could not be identified from the epidemiological data because the students never obtained a laboratory test result. As a consequence, different incubation periods need to be considered in $p_{\text{IN}}$, reflecting a combination of the pathogen-specific incubation periods. The combination is determined based on the weekly proportion of positive saliva samples for each pathogen found in the molecular analysis. Formally, let $p_{\text{IN}}^{v}$ be the distribution for the incubation period of respiratory virus $v$ and let $pp_{vw}$ be the proportion of positive saliva samples in study week $w$, then each week the combined incubation period is computed as the weighted sum of the pathogen-specific incubation periods
 \begin{align}
-    I_{jt} = S_{jt} P_{jt} ~.
+    p_{\text{IN}}^w(s) = \sum_{v} p_{\text{IN}}^{v}(s) \cdot pp_{vw} \quad \forall s.
 \end{align}
-This proportion (or probability) can be estimated using a logit link function
-\begin{align}
-    \Phi_{jt} &= \log\left(\frac{P_{jt}}{1-P_{jt}}\right) \\
-    \textrm{logit}^{-1}(\Phi_{jt}) &= \frac{\exp{(\Phi_{jt})}}{1 + \exp{(\Phi_{jt})}} = P_{jt} ~.
-\end{align}
 
-In the absence of interventions, the probability of getting infected is constant, \ie $\Phi_{jt} = \beta_j$. It can only change at times when interventions are in place. Let $\theta_{j}^M$ be the effect of mask mandates and let $\theta_{j}^A$ be the effect of air cleaners in class $j$, then
-\begin{align}
-    \Phi_{jt} = \beta_j + \theta_{j}^M\,{M}_{jt}
-    + \theta_{j}^A\,{A}_{jt},
-\end{align}
-where ${M}_{jt}$ and ${A}_{jt}$ are binary variables indicating whether mask mandates and air cleaners are in place in class $j$ at day $t$.
+The prior distributions for the pathogen-specific incubation periods are based on estimates published in the literature\cite{McAloon2020,Lessler2009LancetID}. The distributions are shown in \Cref{fig:prior-pin}. Since we could not obtain prior estimates for the incubation period of metapneumovirus (MPV) from the literature, we instead formed a distribution by using the equally weighted average of the parameters from the other distributions. 
 
-\subsection{Relating the number susceptibles to the number of infections}
-
-The daily number of susceptibles $S_{jt}$ are computed as the difference between the total number of students $Y_j$ and the cumulative number of infections $C_{jt}$ in the previous days
-\begin{align}
-    S_{jt} = Y_j - C_{jt} = Y_j - \sum_{s < t} I_{js}~.
-\end{align}
-We assume that all students are susceptible at the beginning of the study period, despite the fact that some students were vaccinated or already infected with COVID-19 prior to the beginning of our study. Note that varying susceptibility before study onset can be subsumed in the class-specific transmission rate without interventions $\beta_j$.
-
-\subsection{Relating the number new observed cases to the number of new infections}
-
-The expected number $\mu$ of new cases $N_{jt}$ in country $j$ at day $t$ can be derived from the number of new infections in the previous days as 
-\begin{equation}
-\mu^{N_{jt}} = \sum_{s < t} I_{js} \cdot p_\text{IN}(t-s) ~, 
-\end{equation}
-where $p_\text{IN}(t)$ denotes the probability distribution of the incubation period, \ie the probability that a new infected subject reports symptoms at day $t$ after the infection. This distribution is estimated from our data as part of fitting the overall model using an informative prior (Section~\ref{subsec:prior-incubation-period}).
-
-The observed number of new cases are modeled to follow a negative binomial distribution, \ie 
-\begin{equation}
-N_{jt}  \sim  \textrm{NegBinom}\left(\mu^{N_{jt}}, \sigma^{N_{jt}}\right) \label{eq:N} 
-\end{equation}
-with mean $\mu^{N_{jt}}$, standard deviation $\sigma^{N_{jt}} = \sqrt{\mu^{N_{jt}} \, \left(1 + \frac{\mu^{N_{jt}}}{\phi^N}\right)}$, and an overdispersion parameter $\phi^N$. 
-
-
-\subsection{Taking into account transmission outside school days}\label{subsec:consider-weekends}
-
-Absences were reported on school days but symptom onset could have occurred on the weekend, \eg a student absent on Monday due to COVID-19 may report Saturday as the day of symptom onset. Some cases may still have gone unreported because the date of absence was the same as the date of symptom onset for the majority of cases (see Fig.~\ref{fig:delay-weights}). Therefore, we distinguish between the transmission rate during and outside schools days, \ie 
-\begin{align}
-    \beta_j = \alpha_j + \omega, 
-\end{align}
-where $\alpha_j$ and $\alpha_j + \omega$ are the logit of the probability of getting infected without interventions during and outside school days, respectively. We estimate $\alpha_j$ and $\omega$ from data using informative priors (Section~\ref{subsec:prior-alpha}). We further assume that transmission outside school days is the same regardless of whether they are weekend or vacation days, but we do not incorporate vacation days into the model likelihood. That is, during vacation, the modeling of $N_{jt}$ is ignored but $I_{jt}$ and $S_{jt}$ are still computed.  
-
-
-\subsection{Seeding phase}
-
-A few cases were reported in the first days of the study period, indicating that the corresponding infections could have occurred before the start of the study. Therefore, we seed the number of new infections and cases before the study period by initiating our model 12~days (double the average incubation period) prior to the start of the study. Before this day, we assume there have been no infections and all students are susceptible.
-
-
-\subsection{Adjusting for absences and community transmission}
-
-The probability of getting infected may be influenced by factors other than interventions. We account for two such factors. First, we adjust our estimates for the daily proportion of students absent from class. We expect this proportion to decrease the probability of getting infected because absent students cannot infect classmates and, if staying home, they are also less likely to get infected themselves (if not already infected). Second, we adjust our estimates for the risk of community transmission, which we proxy with the average of the median effective reproduction number for the canton of Solothurn, Switzerland\cite{Scire2022}. We expect higher community transmission to increase the probability of getting infected. The modeling parameters of these factors are denoted by $\bm{\gamma}$.
-
-
-\subsection{Choice of priors for the probability of getting infected without interventions}\label{subsec:prior-alpha}
-
-We choose informative priors for the logit of the daily probability of getting infected in the absence of interventions $\beta_j = \alpha_j + \omega$. First, our prior for $\alpha_j$ is derived from the share of susceptibles by the end of the study period $S_{jT} / Y_j$, \ie 
-\begin{align}
-    S_{jT} / Y_j = (1 - \textrm{logit}^{-1}(\alpha_j))^{T_{\mathrm{school}}},
-\end{align}
-where $T_{\mathrm{school}}$ is the number of school days (excluding weekends and vacation), and solving for $\alpha_j$
-\begin{align}
-    \textrm{logit}^{-1}(\alpha_j) = 1 - \exp\left(\frac{\log(S_{jT} / Y_j)}{T_{\mathrm{school}}}\right) ~.
-\end{align} 
-Note that $S_{jT} / Y_j$ and correspondingly $\textrm{logit}^{-1}(\alpha_j)$ will be different for each of our probabilistically generated datasets. Fig.~\ref{fig:prior-alpha}a shows the daily proportion of susceptibles getting infected based on the distributions for the proportion of suspected cases being actual cases of COVID-19 (see Fig.~\ref{fig:prior-proportion}). The corresponding distribution for $\alpha_j$ is shown in Fig.~\ref{fig:prior-alpha}b. We choose a prior for $\alpha_j \sim \textrm{Student-t}(\nu = 3, \mu = -4.1, \sigma = 1.6)$ with wider tails than the empirical distribution to accommodate the fact that $\alpha_j$ may be smaller or larger depending on the effects of interventions and adjustment variables.
-
-\begin{figure}[!htpb]
-    \centering
-    \includegraphics{figures/redcap-supp-prior-alpha.pdf}
-    \caption[Prior for the probability of getting infected without interventions]{Prior for the probability of getting infected without interventions. \textbf{(a)}~Empirical distribution for the daily proportion of susceptibles getting infected across classes. The dotted blue line indicates the mean. \textbf{(b)}~Empirical distribution for the logit of the daily proportion of susceptibles getting infected. The dotted blue line indicates the empirical mean. The corresponding choice of prior for the probability of getting infected without interventions $\alpha$ is hown in red. }
-    \label{fig:prior-alpha}
-\end{figure}
-
-Second, we choose a prior for $\omega \sim \textrm{Normal}(\mu = \log\,0.7, \sigma = 0.2)$ that encodes our prior belief that students will have fewer indoor contacts outside school days and thus lower odds of getting infected. In addition, this informative prior also considers potential underreporting of cases on weekends (see Section~\ref{subsec:consider-weekends}).  
-
-\clearpage
-
-\subsection{Choice of priors for the effects of interventions}
-
-We consider that the mandates may not have been equally effective in all classes. Therefore, we model the effects of mask mandates as $\theta_{j}^M = \textrm{Normal}(\theta^M, \tau)$, where $\theta^M \sim \textrm{Student-t}(\nu = 7, \mu = 0, \sigma = 2.5)$ is the average effect across classes and $\tau \sim \textrm{Student-t}^{+}(\nu = 5, \mu = 0, \sigma = 1)$ is the variation in the effect between classes. 
-
-Air cleaners only applied to three classes and were installed towards the end of the study period when most students may have already been infected. Therefore, we do not estimate variation in the effect between classes but only the average effect. In addition, we choose a prior leaning towards smaller effects, \ie $\theta^A \sim \textrm{Student-t}(\nu = 7, \mu = 0, \sigma = 1)$.
-
-\subsection{Choice of priors for the incubation period}\label{subsec:prior-incubation-period} 
-
-We estimate the distribution of the incubation period from our data as part of fitting the overall model. Our prior choices for the parameters of this distribution are informed by a meta-analysis\cite{McAloon2020}, which reported a Lognormal distribution with $\log \mu \sim \textrm{Normal}(1.63, 0.06)$ and $\log \sigma \sim \textrm{Normal}^{\textrm{+}}(0.50, 0.05)$. The prior for $p_\text{IN}$ is shown in Fig.~\ref{fig:prior-pin}. Note that $p_\text{IN}$ is discretized via $p_\text{IN}(s) = \int_0^{0.5} p_\text{IN}(\tau) \;\text{d}\tau$ for $s = 0$ and $p_\text{IN}(s) = \int_{s-0.5}^{s+0.5} p_\text{IN}(\tau) \;\text{d}\tau$ for $s > 0$, where $p_\text{IN}(\tau) \sim \textrm{Lognormal}(\mu, \sigma)$ is the density of the lognormal distribution. 
+We estimate the pathogen-specific distributions from our data as part of fitting the overall model. Furthermore, note that $p_\text{IN}$ is discretized via $p_\text{IN}(s) = \int_0^{0.5} p_\text{IN}(\tau) \;\text{d}\tau$ for $s = 0$ and $p_\text{IN}(s) = \int_{s-0.5}^{s+0.5} p_\text{IN}(\tau) \;\text{d}\tau$ for $s > 0$, where $p_\text{IN}(\tau) \sim \textrm{Lognormal}(\mu, \sigma)$ is the density of the lognormal distribution. 
 
 \begin{figure}[!htpb]
     \centering
     \includegraphics{../../results/epi-data/incubation-periods.pdf}
-    \caption[Choices of prior for incubation period]{Choices of prior for incubation period. \textbf{(a)}~Prior for parameter $\log \mu$. \textbf{(a)}~Prior for parameter $\log \sigma$. \textbf{(c)}~Resulting prior $p_\text{IN}$ (posterior mean as line and 50\%, 80\%, and 95\%-quantile as shaded area).}
+    \caption[Choices of priors for the incubation periods]{Choices of priors for the distribution of the pathogen-specific incubation periods. Pathogens: Influenza B (Flu B), rhinovirus (HRV), adenovirus (AdV), SARS-CoV-2 (CoV), metapneumovirus (MPV), parainfluenza virus (PIV).}
     \label{fig:prior-pin}
 \end{figure}
 
-\subsection{Choice of prior distributions (summary)}
+\subsection{Adjusting for under-reporting of cases on weekends}
 
-Table~\ref{tbl:prior_choices} provides an overview of the model parameters together with the prior choices. If not tailored to the specifics of the model, our choices are  informed by recommendations on the choice of priors from the Stan Development Team \cite{Stan2020Priors}. 
+Despite recording cases by date of symptom onset, we recorded a higher proportion of cases on Mondays than on weekends, suggesting recall bias and under-reporting of cases on weekends. To consider weekday effects in the reporting of cases, we re-weight the expected number of cases each week as follows. Let $k \in $(1: Saturday, 2: Sunday, 3: Monday, $\dots$, 7: Friday) denote the weekday with the week starting on Saturday. The re-weighted expected number of cases $\Tilde{\mu}$ (class and day indexes omitted) are computed as
+\begin{align*}
+    \Tilde{\mu}_{k} &= \mu_k \cdot \nu_k \cdot \left(\frac{\sum_k \mu_k}{\sum_k \nu_k \cdot \mu_k}\right)\\
+    \sum_k \nu_k &= 1,
+\end{align*}
+where $\nu_k$ is the weight for weekday $k$. These weights are modeled with a Dirichlet prior
+\begin{align*}
+    \nu &\sim \text{Dirichlet}(c) \\
+    c_k &= \sum_j \sum_t C_{jt} \mathbb{I}_{\text{Weekday}(t)=k}
+\end{align*}
+where $c_k$ is the total number of cases reported for weekday $k$ and $\mathbb{I}$ is a binary indicator. 
 
-\begin{table}
-\centering
-\footnotesize
-\begin{tabular}{p{7cm}p{1.5cm}p{6.5cm}}
-\toprule
-Parameter & Notation & (Hyper-)Prior  \\ 
-\midrule
-Effects of mask mandates & $\theta_{j}^M$ &  $\textrm{Normal}(\theta^M, \tau)$\\
-& $\theta^M$ & $\textrm{Student-t}(\nu = 7, \mu = 0, \sigma = 2.5)$\\
-& $\tau$ & $\textrm{Student-t}^{+}(\nu = 5, \mu = 0, \sigma = 1)$ \\
-Effects of air cleaners & $\theta^A$ & $\textrm{Student-t}(\nu = 7, \mu = 0, \sigma = 1)$\\
-Prob. of getting infected w/o interventions (logit) & $\beta_j$ & $\beta_j = \alpha_j + \omega$ \\
-Prob. of getting infected during school (logit) & $\alpha_j$ & $\textrm{Student-t}(\nu = 3, \mu = -4.1, \sigma = 1.6)$ \\
-Weekend effect & $\omega$ & $\textrm{Normal}(\mu = \log\,0.7, \sigma = 0.2)$ \\
-Overdispersion & $\phi^N$ & $\phi^N = \left(\frac{1}{\xi^N}\right)^2$ \\
- & $\xi^N$ & $\textrm{Normal}^{+}(\mu = 0, \sigma = 1)$ \\
-Time from infection to new case & $p_\text{IN}$ & $\textrm{Lognormal}(\log \mu, \log \sigma)$ \\
-& $\mu$ & $\textrm{Normal}(\mu = 1.63, \sigma = 0.06)$ \\
-& $\sigma$ & $\textrm{Normal}^{\textrm{+}}(\mu = 0.50, \sigma = 0.05)$ \\
-Adjustments & $\bm{\gamma}$ & $\textrm{Student-t}(\nu = 7, \mu = 0, \sigma = 2.5)$ \\ 
-\bottomrule
-\end{tabular}
-\caption{Prior choices for model parameters.}
-\label{tbl:prior_choices}
-\end{table}
+\subsection{Modeling school-free days}
+
+Infections may have occurred during the week of vacation that falls into the study period. The expected number of infections and cases are computed during vacation, but vacation days are not modeled (\ie not incorporated into the model likelihood). In addition, we assume lower transmission of respiratory infections on days without school (weekends and vacations). We incorporate our prior belief into the model intercept $\beta_0$  
+\begin{align*}
+    \beta_0 &= \alpha + \omega \cdot \text{NoSchool},
+\end{align*}
+where $\alpha$ is the rate of new infections on school days and $\alpha + \omega$ is the rate on days without school. We model $\omega$ with an informative prior for a 10\% decrease in new infections on school-free days
+\begin{align*}
+    \omega &\sim \text{Normal}(\log 1.1, 0.05)~.
+\end{align*}
+
+\subsection{Seeding infections before study start}
+
+Cases in the first week of the study could indicate infections before the study commenced. We will therefore seed our model $2 \cdot \text{m}\,$days before the study start, where $\text{m}$ is the average incubation period of the pathogen with the largest incubation period (\ie adenovirus). The number of infections before the study start will be modeled with an exponential prior
+\begin{align*}
+    I_{jt} \sim \text{Exponential}(1) \quad t = -2\cdot\text{m}+1, \dots, 0~. 
+\end{align*}
+
+Note that we deviated from the statistical analysis plan by changing the parameter of the Exponential distribution from $\lambda = 2 \cdot m$ to $\lambda = 1$. After inspecting the model fit, we realized that the model could not adequately fit the number of new cases at the start of study, because the expected number of new infections in the seeding period $\mu = 1 / \lambda = 1 / (2 \cdot m)$ were too low. After increasing the expected number of new infections in the seeding period to $\mu = 1$ the model could adequately capture new respiratory cases observed at the study start.
+
+\subsection{Priors for modeling parameters}
+
+We use weakly informative priors for all modeling parameters following recommendations on the choice of priors \cite{Gelman2008StatMed,Gelman2008StatAnnals,Gelman2020RegOther,Stan2020Priors,Gabry2023Priors}. The continuous adjustment variables are standardized to have zero mean and a standard deviation of 0.5. 
+\begin{align*}
+    \alpha &\sim \text{Student-t}_5(0, 10) \\
+    \beta_2, \dots, \beta_6 &\sim \text{Student-t}_5(0, 2.5) \\
+    \frac{1}{\sqrt{\phi}} &\sim \text{Half-Normal}(0,1),
+\end{align*}
+where Student-t$_5$ is a Student-t distribution with 5 degrees of freedom. 
 
 \clearpage
 
-\section{Modeling positive rate of human saliva samples}\label{sec:multinomial-model}
+\section{Modeling positivity rate of human saliva samples}\label{sec:multinomial-model}
 
 \section{Modeling changes in particle concentrations}\label{sec:env-regression-model}
 
@@ -490,7 +442,7 @@ where $\alpha$ is the log of the aerosol concentration without interventions, $\
 
 \clearpage
 
-\section{Detailed model results for risk of infection model}\label{sec:detailed-redcap}
+\section{Detailed results for risk of infection model}\label{sec:detailed-redcap}
 
 Table~\ref{tab:estimation-results} presents the posterior mean, credible intervals and model diagnostics for all model parameters. See the main paper for a discussion of the effects of interventions. Here we briefly discuss some of the additional model parameters.
 
@@ -533,7 +485,8 @@ Our model accounts for the delay from infection to case confirmation and allows 
 
 \clearpage
 
-\section{Detailed model results for positivity rate in human saliva samples}\label{sec:detailed-molecular}
+\section{Detailed results for positivity rate in saliva samples}
+\label{sec:detailed-molecular}
 
 \begin{figure}[!htb]
 \centering
@@ -544,7 +497,7 @@ Our model accounts for the delay from infection to case confirmation and allows 
 
 \clearpage
 
-\section{Detailed model results for changes in particle concentrations}\label{sec:detailed-palas}
+\section{Detailed results for changes in particle concentrations}\label{sec:detailed-palas}
 
 In the main paper, we showed results for changes in particle concentrations by study condition and summarized them across schools. In Fig.~\ref{fig:palas-supp-descriptives}, we present additional results disaggregated by schools and including other environmental variables. Furthermore, numerical estimation results for the reduction in particle concentrations with interventions are shown in Table~\ref{tab:palas-est-results}
 
