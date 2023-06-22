@@ -176,7 +176,7 @@ effects_env_main <- draws_filt %>%
 save_plot(effects_env_main, 
           pdf_file = "../results/env-data/estimation-results-figure.pdf",
           eps_file = "../results/env-data/estimation-results-figure.eps",
-          w = 16, h = 4)
+          w = 16, h = 5)
 ```
 
 
