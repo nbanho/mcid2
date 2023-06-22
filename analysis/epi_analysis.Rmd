@@ -78,26 +78,29 @@ cases_by_week_pl <- epi_data %>%
   summarize(cases = sum(new_cases),
             aircleaner = first(aircleaner)) %>%
   ungroup() %>%
-  ggplot(aes(x = factor(week), y = cases, fill = aircleaner)) +
-  geom_bar_pattern(stat = "identity", aes(pattern_angle = class), pattern = "stripe",
-                   pattern_fill = "white", pattern_color = NA, color = "black", pattern_density = 0.25, pattern_spacing = 0.05) +
-  labs(x = "Study week", y = "Number of cases", fill = "Air cleaner", pattern_angle = "Class", title = "a") +
-  scale_fill_manual(values = wes_palette("Royal1")) +
+  mutate(aircleaner = factor(aircleaner, levels = c("Yes", "No")),
+         class = factor(class, levels = c("A", "B"))) %>%
+  arrange(class, aircleaner) %>%
+  ggplot(aes(x = factor(week), y = cases, fill = aircleaner, pattern = class)) +
+  geom_bar_pattern(stat = "identity", color = "black", pattern_fill = "white", pattern_angle = 45,
+                   pattern_density = 0.25, pattern_spacing = 0.05) +
+  labs(x = "Study week", y = "Number of cases", fill = "Air cleaner", pattern = "Class", title = "a") +
+  scale_fill_manual(values = rev(wes_palette("Royal1")[1:2])) +
   scale_x_discrete(breaks = c(1:5, 7:10)) +
   scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
-  scale_pattern_angle_discrete(range = c(-45, 45)) +
+  scale_pattern_manual(values = c(A = "stripe", B = "none")) +
   theme_custom() +
   theme(legend.position = c(0.13, 0.8),
         legend.key.width = unit(0.5, "cm"),
         legend.key.height = unit(0.3, "cm"),
         plot.title.position = "plot") +
-  guides(fill = guide_legend(nrow = 1),
-         pattern_angle = guide_legend(nrow = 1))
+  guides(fill = guide_legend(nrow = 1, override.aes = list(pattern = "none", order = 2)),
+         pattern = guide_legend(nrow = 1, override.aes = list(fill = "white"), order = 1))
 
 save_plot(cases_by_week_pl,
           pdf_file = "../results/epi-data/cases_by_week.pdf",
           eps_file = "../results/epi-data/cases_by_week.eps",
-          w = 12, h = 8) 
+          w = 16, h = 8) 
 ```
 
 ## Prepare data
