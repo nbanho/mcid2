@@ -30,6 +30,7 @@ theme_custom <- function() {
           panel.border = element_blank(),
           axis.line.x = element_line(),
           axis.line.y = element_line(),
+          axis.ticks =  element_line(),
           legend.text = element_text(size = 8))
 }
 

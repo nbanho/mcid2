@@ -69,17 +69,28 @@ df_pos <- df %>%
          variable = ifelse(variable == "SARS-CoV-2", "CoV", variable),
          variable = factor(variable, levels = c("Flu B", "HRV", "AdV", "CoV", "MPV", "PIV")))
 
-pos_week_pl <- ggplot(mapping = aes(x = week, y = n, fill = variable)) +
-  geom_bar(data = df_pos, stat = "identity") +
-  geom_text(data = subset(df_pos, n > 0), mapping = aes(label = n), 
+pos_week_pl <- ggplot(mapping = aes(x = week, y = n)) +
+  geom_bar(data = df_pos %>% mutate(class = paste("Class", class)), mapping = aes(fill = variable),
+           stat = "identity") +
+  geom_text(data = subset(df_pos, n > 0) %>% mutate(class = paste("Class", class)), mapping = aes(label = n), 
             size = 8 / cm(1), position = position_stack(vjust = 0.5), color = "white") +
   facet_wrap(~ class) +
+  geom_text(
+    data = data.frame(class = c("Class A", "Class B"), axis_title = c("Study week", "Study week")),
+    mapping = aes(label = axis_title), hjust = 0.5, vjust = 3.5,
+    x = min(df_pos$week) + diff(range(df_pos$week)) / 2,
+    y = -Inf, color = 'black', size = 8 / cm(1)
+  ) +
+  
   scale_fill_manual(values = wes_palette("IsleofDogs1")) +
-  scale_y_continuous(expand = expansion(add = c(0,1))) +
+  scale_y_continuous(expand = expansion(add = c(0,1)), breaks = scales::breaks_width(2)) +
   scale_x_continuous(breaks = seq(1, 7, 1)) +
   labs(y = "Number of positive samples", x = "Study week", fill = "Pathogen", title = "c") +
   theme_custom() +
+  coord_cartesian(clip = "off") +
   theme(panel.grid = element_blank(),
+        panel.spacing.x = unit(2, "cm"),
+        axis.title.x = element_text(color = "white"),
         legend.position = "none") +
   guides(fill = guide_legend(nrow = 1))
 pos_week_pl

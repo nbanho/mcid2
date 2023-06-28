@@ -35,6 +35,59 @@ sec_data <- readRDS("../data-clean/secondary.rds")
 
 ## Descriptives
 
+### Baseline data
+
+```{r}
+# absent person days
+absent_pers_days <- epi_data_ll %>%
+  mutate(absent_days = as.numeric(date_back - date_absent),
+         reason = ifelse(as.character(reason) == "unknown", "other", as.character(reason))) %>%
+  group_by(class, reason) %>%
+  summarize(n = sum(absent_days)) %>%
+  ungroup() %>%
+  group_by(class) %>%
+  mutate(p = n / sum(n)) %>%
+  ungroup()
+absent_pers_days <- absent_pers_days %>%
+  add_row(class = "A", reason = "total", n = sum(absent_pers_days$n[absent_pers_days$class=="A"]),
+          p = sum(absent_pers_days$n[absent_pers_days$class=="A"]) / sum(absent_pers_days$n)) %>%
+  add_row(class = "B", reason = "total", n = sum(absent_pers_days$n[absent_pers_days$class=="B"]),
+          p = sum(absent_pers_days$n[absent_pers_days$class=="B"]) / sum(absent_pers_days$n)) 
+absent_pers_days <- absent_pers_days %>%
+  add_row(class = "Total", reason = "total", n = sum(absent_pers_days$n[absent_pers_days$reason=="total"]),
+          p = 1) %>%
+  add_row(class = "Total", reason = "sickness", n = sum(absent_pers_days$n[absent_pers_days$reason=="sickness"]),
+          p = sum(absent_pers_days$n[absent_pers_days$reason=="sickness"])  / sum(absent_pers_days$n[absent_pers_days$reason=="total"])) %>%
+  add_row(class = "Total", reason = "other", n = sum(absent_pers_days$n[absent_pers_days$reason=="other"]),
+          p = sum(absent_pers_days$n[absent_pers_days$reason=="other"])  / sum(absent_pers_days$n[absent_pers_days$reason=="total"])) %>%
+  mutate(p = round(100 * p)) %>%
+  mutate(class = factor(class, levels = c("A", "B", "Total")),
+         reason = factor(reason, levels = c("total", "sickness", "other"))) %>%
+  arrange(class, reason) 
+absent_pers_days
+
+# total absent
+round(absent_pers_days$n[absent_pers_days$class=="Total"] / (7 * 5 * 20 + 7 * 5 * 18) * 100)
+
+
+# epidemiological cases
+epi_data %>%
+  group_by(class) %>%
+  summarize(n = sum(new_cases)) %>%
+  ungroup() %>%
+  mutate(p = n / sum(n) * 100 %>% round) %>%
+  add_row(class = "Total", n = sum(.$n), p = 100)
+
+# molecular cases
+mol_data %>%
+  mutate(Pos = N - Neg) %>%
+  group_by(class) %>%
+  summarize(n = sum(Pos)) %>%
+  ungroup() %>%
+  mutate(p = n / sum(n) * 100 %>% round) %>%
+  add_row(class = "Total", n = sum(.$n), p = 100)
+```
+
 ### Line List
 
 ```{r}
@@ -74,6 +127,7 @@ epi_data %>%
 cases_by_week_pl <- epi_data %>%
   mutate(week = isoweek(date)) %>%
   filter(week != 6) %>%
+  mutate(week = ifelse(week < 6, week - min(week) + 1, week - min(week))) %>%
   group_by(class, week) %>%
   summarize(cases = sum(new_cases),
             aircleaner = first(aircleaner)) %>%
@@ -83,10 +137,10 @@ cases_by_week_pl <- epi_data %>%
   arrange(class, aircleaner) %>%
   ggplot(aes(x = factor(week), y = cases, fill = aircleaner, pattern = class)) +
   geom_bar_pattern(stat = "identity", color = "black", pattern_fill = "white", pattern_angle = 45,
-                   pattern_density = 0.25, pattern_spacing = 0.05) +
+                   pattern_density = 0.25, pattern_spacing = 0.05, width = .5) +
   labs(x = "Study week", y = "Number of cases", fill = "Air cleaner", pattern = "Class", title = "a") +
   scale_fill_manual(values = rev(wes_palette("Royal1")[1:2])) +
-  scale_x_discrete(breaks = c(1:5, 7:10)) +
+  scale_x_discrete(breaks = 1:7) +
   scale_y_continuous(expand = expansion(mult = c(0, 0.05)), breaks = seq(0, 10, 2)) +
   scale_pattern_manual(values = c(A = "stripe", B = "none")) +
   theme_custom() +
@@ -364,8 +418,8 @@ arr
 
 ```{r}
 types <- c("Air cleaners partially installed",
-           "Air cleaners never installed",
-           "Air cleaners always installed")
+           "Scenario 2: Air cleaners not installed",
+           "Scenario 1: Air cleaners installed throughout the study")
 
 avoid_infections <- spread_draws(latInfMod, mu_cases_ac[day,class,type]) %>%
   group_by(.draw, type) %>%
@@ -388,11 +442,11 @@ avoid_infections_pl <- avoid_infections  %>%
   facet_wrap(~ type, ncol = 1) +
   scale_fill_manual(values = wes_palette("Royal1")[c(3,4,2)]) +
   scale_y_continuous(expand = expansion(mult = c(0.25, 0.25))) +
-  scale_x_continuous(limits = c(0, NA), expand = expansion(mult = c(0, 0))) +
+  scale_x_continuous(limits = c(0, NA), expand = expansion(mult = c(0, 0)), breaks = seq(0, 200, 25)) +
   labs(x = "Estimated number of infections", fill = "CrI", title = "b") +
   theme_custom() +
   theme(axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
+        axis.text.y = element_text(color = "white"),
         axis.ticks.y = element_blank(),
         legend.position = "top", legend.direction = "horizontal",
         legend.key.height = unit(.25, "cm"), legend.key.width = unit(.35, "cm"), 
@@ -493,6 +547,8 @@ fitted_cases <- spread_draws(latInfMod, muCases[day,class]) %>%
             by = c("class", "day")) %>%
   mutate(week = isoweek(date)) %>%
   filter(week != 6) %>%
+  ungroup() %>%
+  mutate(week = ifelse(week < 6, week - min(week) + 1, week - min(week))) %>%
   group_by(week, .draw) %>%
   summarise(estimated_cases = sum(muCases),
             true_cases = sum(new_cases)) %>%
@@ -506,7 +562,7 @@ fitted_cases_pl <- ggplot(mapping = aes(x = week)) +
             mapping = aes(y = true_cases, color = "Observed"), size = 1.5) +
   scale_fill_manual(values = wes_palette("Royal1")[c(3,4,2)]) +
   scale_x_continuous(expand = c(0,0)) +
-  scale_y_continuous(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0), limits = c(0, NA), breaks = scales::breaks_width(2)) +
   scale_color_manual(values = "black") +
   labs(y = "Number of new infections", x = "Study week", fill = "Estimated (CrI)") +
   theme_custom() +
@@ -515,5 +571,5 @@ fitted_cases_pl <- ggplot(mapping = aes(x = week)) +
 fitted_cases_pl
 
 save_plot(fitted_cases_pl, pdf_file = "../results/epi-data/model-fit.pdf",
-          w = 12, h = 10)
+          w = 16, h = 10)
 ```

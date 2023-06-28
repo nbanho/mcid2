@@ -49,12 +49,19 @@ names(vars_labels_no_units) <- vars
 ## Summaries
 
 ```{r}
+# overall
+env_epi_data %>%
+  summarize(across(c(CO2, AER, Cn, PM1), .fns = list(mean = mean, sd = sd), .names = "{.col}_{.fn}")) %>%
+  mutate(across(c(CO2_mean, CO2_sd, Cn_mean, Cn_sd), round),
+         across(c(AER_mean, AER_sd, PM1_mean, PM1_sd), round, 2))
+
+# by air cleaner
 env_epi_data %>%
   group_by(aircleaner) %>%
-  summarize(across(c(CO2, AER, Cn), .fns = list(mean = mean, sd = sd), .names = "{.col}_{.fn}")) %>%
+  summarize(across(c(CO2, AER, Cn, PM1), .fns = list(mean = mean, sd = sd), .names = "{.col}_{.fn}")) %>%
   ungroup() %>%
   mutate(across(c(CO2_mean, CO2_sd, Cn_mean, Cn_sd), round),
-         across(c(AER_mean, AER_sd), round, 2))
+         across(c(AER_mean, AER_sd, PM1_mean, PM1_sd), round, 2))
 ```
 
 ## Boxplots
@@ -166,7 +173,7 @@ effects_env_main <- draws_filt %>%
   labs(x = "Estimated reduction (%)", fill = "CrI", title = "b") +
   theme_custom() +
   theme(axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
+        axis.text.y = element_text(color = "white"),
         axis.ticks.y = element_blank(),
         legend.position = "top", legend.direction = "horizontal",
         legend.key.height = unit(.25, "cm"), legend.key.width = unit(.35, "cm"), 
