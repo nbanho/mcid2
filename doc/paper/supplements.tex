@@ -120,7 +120,7 @@
 \renewcommand\large{\@setfontsize\large{16pt}{18}}
 \makeatother
 
-\addto\captionsenglish{\renewcommand{\figurename}{Fig }}
+\addto\captionsenglish{\renewcommand{\figurename}{Figure}}
 
 % \usepackage{xstring}
 % \usepackage{etoolbox}
@@ -233,11 +233,11 @@
 \makeatother
 
 
-%\renewcommand{\thesection}{Text \arabic{section}}
+\renewcommand{\thesection}{Text \arabic{section}}
 \usepackage{titlesec}
-\titleformat{\section}{\normalfont\Large\bfseries}{Text \thesection.~#1}{1em}{}
-\renewcommand{\thefigure}{\Alph{figure}}
-\renewcommand{\thetable}{\Alph{table}}
+%\titleformat{\section}{\normalfont\Large\bfseries}{Text \thesection.~#1}{1em}{}
+\renewcommand{\thefigure}{S\arabic{figure}}
+\renewcommand{\thetable}{S\arabic{table}}
 
 \begin{document}
 \doublespacing
@@ -250,7 +250,6 @@ Transmission of airborne respiratory infections with and without air cleaners in
 
 % author list
 \author[1$\ddag$]{Nicolas Banholzer}
-\author[1$\ddag$]{Kathrin Z\"urcher}
 \author[2]{Philipp Jent}
 \author[3]{Pascal Bittel}
 \author[3]{Lavinia Furrer}
