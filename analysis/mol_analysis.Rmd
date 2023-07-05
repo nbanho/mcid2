@@ -85,13 +85,14 @@ pos_week_pl <- ggplot(mapping = aes(x = week, y = n)) +
   scale_fill_manual(values = wes_palette("IsleofDogs1")) +
   scale_y_continuous(expand = expansion(add = c(0,1)), breaks = scales::breaks_width(2)) +
   scale_x_continuous(breaks = seq(1, 7, 1)) +
-  labs(y = "Number of positive samples", x = "Study week", fill = "Pathogen", title = "c") +
+  labs(y = "Number of positive samples", x = "Study week", fill = "Virus", title = "c") +
   theme_custom() +
   coord_cartesian(clip = "off") +
   theme(panel.grid = element_blank(),
         panel.spacing.x = unit(1, "cm"),
         axis.title.x = element_text(color = "white"),
-        legend.position = "none") +
+        legend.position = "none",
+        plot.title.position = "plot") +
   guides(fill = guide_legend(nrow = 1))
 pos_week_pl
 ```
@@ -108,10 +109,11 @@ pos_cond_pl <- ggplot(mapping = aes(x = aircleaner, y = n, fill = variable)) +
             size = 8 / cm(1), position = position_stack(vjust = 0.5), color = "white") +
   scale_fill_manual(values = wes_palette("IsleofDogs1")) +
   scale_y_continuous(expand = c(0,0)) +
-  labs(y = "Number of positive samples", x = "Air cleaner", fill = "Pathogen", title = "b") +
+  labs(y = "Number of positive samples", x = "Air cleaner", fill = "Virus", title = "b") +
   theme_custom() +
   theme(panel.grid = element_blank(),
-        legend.position = "bottom") +
+        legend.position = "bottom",
+        plot.title.position = "plot") +
   guides(fill = guide_legend(nrow = 1))
 pos_cond_pl
 ```
@@ -129,10 +131,11 @@ pos_tot_pl <- df_pos_tot %>%
   geom_text(aes(label = n, y = n + 1), size = 8 / cm(1)) +
   scale_fill_manual(values = wes_palette("IsleofDogs1")) +
   scale_y_continuous(expand = expansion(add = c(0,1))) +
-  labs(y = "Number of positive samples", x = "Pathogen", fill = "Pathogen", title = "a") +
+  labs(y = "Number of positive samples", x = "Virus", fill = "Virus", title = "a") +
   theme_custom() +
   theme(panel.grid = element_blank(),
-        legend.position = "bottom") +
+        legend.position = "bottom",
+        plot.title.position = "plot") +
   guides(fill = guide_legend(nrow = 1))
 pos_tot_pl
 ```

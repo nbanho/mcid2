@@ -436,16 +436,16 @@ avoid_infections <- spread_draws(latInfMod, mu_cases_ac[day,class,type]) %>%
 
 avoid_infections_pl <- avoid_infections  %>%
   ggplot() +
-  geom_rect(aes(xmin = .lower, xmax = .upper, ymin = 0.75, ymax = 1.25, fill = `.width`)) +
-  geom_segment(aes(x = infections, xend = infections, y = 0.75, yend = 1.25), size = 1.5 / cm(1)) +
-  geom_point(aes(x = infections, y = 1), size = 3, fill = "white", shape = 21) +
+  geom_rect(aes(xmin = .lower, xmax = .upper, ymin = 7.5, ymax = 12.5, fill = `.width`)) +
+  geom_segment(aes(x = infections, xend = infections, y = 7.5, yend = 12.5), size = 1.5 / cm(1)) +
+  geom_point(aes(x = infections, y = 10), size = 3, fill = "white", shape = 21) +
   facet_wrap(~ type, ncol = 1) +
   scale_fill_manual(values = wes_palette("Royal1")[c(3,4,2)]) +
   scale_y_continuous(expand = expansion(mult = c(0.25, 0.25))) +
   scale_x_continuous(limits = c(0, NA), expand = expansion(mult = c(0, 0)), breaks = seq(0, 200, 25)) +
-  labs(x = "Estimated number of infections", fill = "CrI", title = "b") +
+  labs(x = "Estimated number of infections", y = "Scenario", fill = "CrI", title = "b") +
   theme_custom() +
-  theme(axis.title.y = element_blank(),
+  theme(axis.title.y = element_text(color = "white"),
         axis.text.y = element_text(color = "white"),
         axis.ticks.y = element_blank(),
         legend.position = "top", legend.direction = "horizontal",
