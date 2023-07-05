@@ -78,7 +78,7 @@ Molecular analysis detected multiple viruses in saliva samples throughout the st
 % Study limitations include unknown specific causes of absences related to respiratory infections (i.e which pathogen caused the sickness). Furthermore, students occasionally had lessons outside the classroom, thus limiting the potential effectiveness of air cleaners.
 \medskip %\vspace{-1.3em}
 
-\noindent\textbf{Conclusions:} A wide range of respiratory viruses were detected  in students, but rarely SARS-CoV-2. Airborne molecular detection was also rare.  Our results show a reduction in aerosol concentrations with air cleaners and suggest a small benefit of air cleaners in reducing the transmission of airborne respiratory infections in school rooms. 
+\noindent\textbf{Conclusions:} A wide range of respiratory viruses were detected  in students, but rarely SARS-CoV-2. Airborne molecular detection of respiratory viruses was rare, and when detected, it was not SARS-CoV-2.  Our results show a reduction in aerosol concentrations with air cleaners and suggest a small benefit of air cleaners in reducing the transmission of airborne respiratory infections in school rooms. 
 
 \par
 \end{abstract}
@@ -121,7 +121,7 @@ We used a multiple-measurement approach to study the transmission of respiratory
 
 \subsection{Study setting and design} 
 
-\noindent We collected data in two classrooms of a secondary school (age of students 14-17~years) in the Canton of Solothurn, Switzerland, over a seven-week study period from 26~January to 11~March 2023. \Cref{fig:study-setup} shows the schematic study setup and \Cref{tab:data} provides an overview of the types of data that were collected in each classroom.
+\noindent We collected data in two classrooms of a secondary school (age of students 14-17~years) in the Canton of Solothurn, Switzerland, over a seven-week study period from 26~January to 11~March 2023. \Cref{fig:study-setup} shows the schematic study setup and Table~\zref{tab:data} in \supp \, provides an overview of the types of data that were collected in each classroom.
 
 \begin{figure}[!htpb]
     \centering
@@ -130,34 +130,6 @@ We used a multiple-measurement approach to study the transmission of respiratory
     \label{fig:study-setup}
 \end{figure}
 
-\begin{table}[!htpb]
-    \footnotesize
-    \centering
-    \caption{\textbf{Data collection}. Type of data collected, method/device, and frequency in the rooms of classes A and B.}
-    \begin{tabular}{p{3.5cm}p{6cm} p{1cm} p{1cm} p{3cm}}
-    \midrule
-    Type of data & Method / device & Class A & Class B & Frequency \\
-    \midrule
-    \textbf{Molecular data} \\
-    \midrule
-    Bioaerosol sampling & Bioaerosol sampling devices: BioSpot-VIVAS (Aerosol Devices Inc., Ft. Collins, Colorado, United States) and Coriolis Micro Air (Bertin Instruments Montigny-le/Bretonneux, France) & x & (x) \newline only Coriolis & daily \\
-    Saliva samples & Saliva samples & x & x & twice per week \\
-    Swabs from air cleaners & Swab samples from Xiaomi HEPA filters (Xiaomi Mi Air Pro 70m2, Shenzhen, China) & x & x & after each intervention phase (both classes) and before the vacation (only class B) \\ 
-    \midrule
-    \textbf{Environmental data} \\
-    \midrule
-    CO$_2$, aerosol/particle concentrations, humidity, temperature & Air quality device: AQ Guard (Palas GmbH, Karlsruhe, Germany) & x & x & daily by minute \\
-    Coughs & Sounds collected via microphones and coughs detected with a Machine Learning model \cite{Bertschinger2023CBMS} & x & x & daily by seconds \\
-    \midrule
-    \textbf{Epidemiological data} \\
-    \midrule
-    Absences & Survey & x & x & daily \\
-    Student characteristics & Survey & x & x & at study start \\
-    \bottomrule
-    \end{tabular}
-    \label{tab:data}
-\end{table}
-
 \subsection{Study intervention} 
 
 \noindent We used a cross-over design to study the effectiveness of air cleaners, thereby distinguishing two study conditions in each class: weeks with and weeks without air cleaners being installed in each classroom (\Cref{tab:study_design}). Air cleaners refer to commercially available portable HEPA-filtration devices (Xiaomi Mi Air Pro 70m², Shenzhen, China; approx. USD\,250 per device). According to the manufacturer, these air cleaners run at a clean air delivery rate of 2$\,\times\,$600 m$^{3}$/h. Based on our own experiments conducted in the classrooms, we measured a lower clean air delivery rate of 2$\,\times\,$420 m$^{3}$/h. Window ventilation was done at the discretion of the teachers, as there were no specific recommendations from the national health authorities at that time.
@@ -165,14 +137,14 @@ We used a multiple-measurement approach to study the transmission of respiratory
 \begin{table}[!htpb]
     \footnotesize
     \centering
-    \caption{\textbf{Study design.} Cross-over design where two portable air cleaners (AC) were installed during different time periods in classes A and B over a seven-week study period from 16~January to 11~March 2023, excluding a week of vacation between February 6 and 11.}\label{tab:study_design}
+    \caption{\textbf{Study design.} Cross-over design where two portable air cleaners (AC) were installed during different time periods in classes A and B over a seven-week study period from 16~January to 11~March 2023, excluding a week of vacation between February 6 and 11. Swabs from the HEPA filters were taken after each intervention phase as indicated by the ``*''.}\label{tab:study_design}
     \begin{tabular}{l l l l l l l l l}
     \toprule
       & \textbf{Week 1} & \textbf{Week 2} & \textbf{Week 3} & Vacation & \textbf{Week 4} & \textbf{Week 5} & \textbf{Week 6} & \textbf{Week 7} \\
       & Jan 16-21 & Jan 23-28 & Jan 30-Feb 3 & Feb 6-11 & Feb 13-18 & Feb 20-25 & Feb 27-March 3 & March 6-11 \\
       \midrule
-      \textbf{A} & \cellcolor{gray!50} AC & \cellcolor{gray!50} AC & \cellcolor{gray!10} None & & \cellcolor{gray!10} None & \cellcolor{gray!10} None & \cellcolor{gray!50} AC & \cellcolor{gray!50} AC \\
-      \textbf{B} & \cellcolor{gray!10} None & \cellcolor{gray!10} None & \cellcolor{gray!50} AC & & \cellcolor{gray!50} AC & \cellcolor{gray!50} AC & \cellcolor{gray!10} None & \cellcolor{gray!10} None \\
+      \textbf{A} & \cellcolor{gray!50} AC & \cellcolor{gray!50} AC\hphantom{0000}*& \cellcolor{gray!10} None & & \cellcolor{gray!10} None & \cellcolor{gray!10} None & \cellcolor{gray!50} AC & \cellcolor{gray!50} AC\hphantom{00009}* \\
+      \textbf{B} & \cellcolor{gray!10} None & \cellcolor{gray!10} None & \cellcolor{gray!50} AC\hphantom{0000000}* & & \cellcolor{gray!50} AC & \cellcolor{gray!50} AC\hphantom{0000}*& \cellcolor{gray!10} None & \cellcolor{gray!10} None \\
       \bottomrule
     \end{tabular}
 \end{table}
@@ -193,7 +165,7 @@ In addition, both classes participated in repetitive bi-weekly (Tuesdays and Thu
 
 \noindent \emph{Bioaerosol sampling and HEPA filters of the air cleaners} 
 
-\noindent We collected airborne respiratory viruses in both classrooms with a bioaerosol sampling device (Coriolis Micro Air, Bertin Instruments Montigny-le-Bretonneux, France) , running at 200\,l/min and collecting into 15\,mL PBS, as previously reported in clinic settings\cite{Moore2021}. The Coriolis Micro Air only operated shortly before and during break times to reduce noise exposure (approximately 60\,min/day). In one class, we also used the BioSpot-VIVAS device sampler (Aerosol Devices Inc., Ft. Collins, CO, USA). This device samples airborne virus particles into a viral transport medium (VTM) using a laminar flow water-based condensation method\cite{Pan2016JAM,Lednicky2016AST}. BioSpot-VIVAS operated throughout lessons. The removable parts of both sampling devices were regularly autoclaved to avoid contamination. At the end of the day, samples were transported to the Institute of Infectious Diseases (IFIK) and stored at $-$80°C. After each intervention phase (see table xxx), the HEPA filters were carefully removed from the air cleaners, divided into 20~fields, and one swab per field was taken for a total of 20~swabs per filter.\medskip
+\noindent We collected airborne respiratory viruses in both classrooms with a bioaerosol sampling device (Coriolis Micro Air, Bertin Instruments Montigny-le-Bretonneux, France) , running at 200\,l/min and collecting into 15\,mL PBS, as previously reported in clinic settings\cite{Moore2021}. The Coriolis Micro Air only operated shortly before and during break times to reduce noise exposure (approximately 60\,min/day). In one class, we also used the BioSpot-VIVAS device sampler (Aerosol Devices Inc., Ft. Collins, CO, USA). This device samples airborne virus particles into a viral transport medium (VTM) using a laminar flow water-based condensation method\cite{Pan2016JAM,Lednicky2016AST}. BioSpot-VIVAS operated throughout lessons. The removable parts of both sampling devices were regularly autoclaved to avoid contamination. At the end of the day, samples were transported to the Institute of Infectious Diseases (IFIK) and stored at $-$80°C. After each intervention phase (see \Cref{tab:study_design}), the HEPA filters were carefully removed from the air cleaners, divided into 20~fields, and one swab per field was taken for a total of 20~swabs per filter.\medskip
 
 \subsection{Laboratory and molecular analyses}\label{sec:mol_analyses}
 
@@ -298,7 +270,7 @@ Overall, there were 35~respiratory cases (absences related to respiratory infect
 \begin{figure}[!htpb]
     \includegraphics[width=\linewidth]{../../results/epi-data/cases_by_week.pdf} 
     \includegraphics[width=\linewidth]{../../results/epi-data/avoided-infections.pdf}
-    \caption{\textbf{Analysis of epidemiological data and estimated relative risk of infection with air cleaners.}. \textbf{(a)}~Weekly number of respiratory cases with and without air cleaners. \textbf{(b)}~Estimated mean number of infections (posterior mean as dot and 50\%, 80\%, and 95\%-CrI as shaded areas) if air cleaners had always or never been installed in both classes.}
+    \caption{\textbf{Analysis of epidemiological data and estimated relative risk of infection with air cleaners.}. \textbf{(a)}~Weekly number of respiratory cases with and without air cleaners. \textbf{(b)}~Estimated mean number of infections (posterior mean as dot and 50\%, 80\%, and 95\%-CrI as shaded areas) if, in both classes, air cleaners had been installed throughout the study or not been installed.}
     \label{fig:redcap-results}
 \end{figure}
 
@@ -311,7 +283,7 @@ Overall, there were 35~respiratory cases (absences related to respiratory infect
 
 % summary
 
-We collected epidemiological, environmental, and molecular data to estimate the risk of infection with respiratory infectious diseases in a Swiss school and assessed the effectiveness of air cleaners as an infection control measure. We found a wide range of respiratory viruses in human saliva samples, primarily adenovirus, influenza B, and rhinovirus, but only few viruses were detected in bioaerosol samples and on the filters of air cleaners. Aerosol number and particle mass concentrations dropped significantly with air cleaners. Bayesian modeling showed conflicting results between the analysis of molecular data and absences related to respiratory infections. While the positivity rate of human saliva samples was comparable between study conditions, the relative risk of infection based on absences tended to be lower with air cleaners.
+We collected epidemiological, environmental, and molecular data to estimate the risk of infection with respiratory infectious diseases in a Swiss school and assessed the effectiveness of air cleaners as an infection control measure. We found a wide range of respiratory viruses in human saliva samples, primarily adenovirus, influenza B, and rhinovirus, but only few non-SARS-CoV-2 respiratory viruses were detected in bioaerosol samples and on the filters of air cleaners. Aerosol number and particle mass concentrations dropped significantly with air cleaners. Bayesian modeling showed conflicting results between the analysis of molecular data and absences related to respiratory infections. While the positivity rate of human saliva samples was comparable between study conditions, the relative risk of infection based on absences tended to be lower with air cleaners.
 
 % comparison with our previous study
 
@@ -319,11 +291,11 @@ In a previous study\cite{Banholzer2023PLoSMed}, we estimated the effectiveness o
 
 % why air cleaners may not have been so effective
 
-Despite a tendency to lower the risk of infection, our study indicates that air cleaners were not as effective as other infection control measures. Compared to \eg mask wearing, air cleaners cannot influence transmission outside the classrooms. Furthermore, air cleaners are unable to prevent close range high particle density aerosol transmission. By contrast, face masks can also reduce the generation of airborne infectious particles and can thus mitigate transmission over short ranges. Evidence from our previous\cite{Banholzer2023PLoSMed} and this study further suggest that air cleaners are more effective in the removal of the larger particles ($>5\mu$m) than the smaller particles ($\leq5\mu$m). Yet, a larger proportion of respiratory pathogens are carried in the smaller particles\cite{Fennelly2020}. 
+Our study indicated that air cleaners can reduce the risk of infection, although we we only were able tho show a trend. Other infection control measures, such as universal mask use, appear to be more effective (REFS). There may be several reasons for this. Compared to \eg mask wearing, air cleaners cannot influence transmission outside the classrooms. Furthermore, air cleaners are unable to prevent close range high particle density aerosol transmission. By contrast, face masks can also reduce the generation of airborne infectious particles and can thus mitigate transmission over short ranges. Evidence from our previous\cite{Banholzer2023PLoSMed} and this study further suggest that air cleaners are more effective in the removal of the larger particles ($>5\mu$m) than the smaller particles ($\leq5\mu$m). Yet, a larger proportion of respiratory pathogens are carried in the smaller particles\cite{Fennelly2020}. 
 
 % why could we not detect so many bioaerosols
 
-We detected few respiratory pathogens in bioaerosol samples (3~positive bioaoerosl and 50~positive saliva samples), especially when comparing to our previous study\cite{Banholzer2023PLoSMed} (10~positive bioaerosol and 21~positive saliva samples). The number of pathogens detected on the filters of the air cleaners was also lower (this study: 4~positive samples in 160~swabs, previous study: 8~positive samples in 80~swabs). The bioaerosol sampling devices were the same in both studies and technical issues were not observed. It is also unlikely that environmental factors are responsible for the differences. Temperature and humidity were similar, and CO$_2$ levels were even higher in this study (1,702$\pm$370\,ppm in this vs 1,064$\pm$232\,ppm in the previous study), suggesting that classrooms were not as well ventilated as during the COVID-19 pandemic. Therefore, we think that the differences in the number of positive bioaerosols samples between both studies is most likely related to differences in the distribution of respiratory pathogens. In this study, we detected a wide range of respiratory pathogens (Flu B, HRV, AdV, etc), as compared to just SARS-CoV-2 in our previous study. SARS-CoV-2 may be easier to detect in bioaerosol samples due to differences in the physicochemical properties of virus-laden aerosols (\eg physical size, viral load, and infectivity) that influence the generation and survival of airborne viral RNA\cite{Wang2021,Sattar2016Book}. In addition, although respiratory pathogens have been detected in bioaerosols (\eg Flu\cite{Bischoff2013JID,Pan2017mSphere}, HRV\cite{Myatt2004AJRCCM,Fabian2011JAMPDD}, AdV\cite{Nguyen2017OFID,Pan2017mSphere}, and CoV\cite{Guo2020EID,Liu2020Nature}), bioaerosol sampling is a challenge\cite{Wang2021 ,Belser2023PLOSPath,Bekking2019IORV,Mainelis2020AST}. 
+We detected few respiratory pathogens in bioaerosol samples (3~positive bioaoerosl and 50~positive saliva samples), especially when comparing to our previous study\cite{Banholzer2023PLoSMed} (10~positive bioaerosol and 21~positive saliva samples). The number of pathogens detected on the filters of the air cleaners was also lower (this study: 4~positive samples in 160~swabs, previous study: 8~positive samples in 80~swabs). The bioaerosol sampling devices were the same in both studies and technical issues were not observed. It is also unlikely that environmental factors are responsible for the differences. Temperature and humidity were similar, and CO$_2$ levels were even higher in this study (1,702$\pm$370\,ppm in this vs 1,064$\pm$232\,ppm in the previous study), suggesting that classrooms were not as well ventilated as during the COVID-19 pandemic. Therefore, we think that the differences in the number of positive bioaerosols samples between both studies is most likely related to differences in the distribution of respiratory pathogens. Strikingly, we detected a wide range of respiratory pathogens (Flu B, HRV, AdV, etc) in this study, as compared to only SARS-CoV-2 in our previous study. The shift in the pattern of respiratory viruses has been observed in other studies (xxx). SARS-CoV-2 may be present in higher concentrations in air and may be more easily detected in bioaerosol samples due to differences in physicochemical properties of virus-laden aerosols (\eg physical size, viral load, and infectivity) that influence the generation and survival of airborne viral RNA\cite{Wang2021,Sattar2016Book}. In addition, although respiratory pathogens have been detected in bioaerosols (\eg Flu\cite{Bischoff2013JID,Pan2017mSphere}, HRV\cite{Myatt2004AJRCCM,Fabian2011JAMPDD}, AdV\cite{Nguyen2017OFID,Pan2017mSphere}, and CoV\cite{Guo2020EID,Liu2020Nature}), bioaerosol sampling remains a technical challenge\cite{Wang2021 ,Belser2023PLOSPath,Bekking2019IORV,Mainelis2020AST}. 
 
 % transmission within classrooms
 
@@ -332,12 +304,11 @@ The low rate of positive bioaerosol samples also means that it is unclear to wha
 
 % limitations
 
-Our study has several limitations. First, aerosol measurements and molecular detection of pathogens in bioaerosol samples document exposure, but not necessarily transmission and the direction of transmission (human to air, air to human) cannot be determined. Nevertheless, the pathogen-specific distribution of positive saliva samples between classes indicate potential transmission within classrooms. Second, it was not possible to ascertain the specific causes for the absences based on the epidemiological data. Therefore, some absences may have falsely been attributed to respiratory infections and we could only approximate the incubation period for each epidemiological case. Third, the effectiveness of air cleaners was somewhat limited because students occasionally had lessons outside the classroom. This is in contrast to other infection control measures such as face masks that had to be worn in every indoor space during pandemic times.
+Our study has several limitations. First, aerosol measurements and molecular detection of pathogens in bioaerosol samples document exposure, but not necessarily transmission and the direction of transmission (human to air, air to human) cannot be determined. Nevertheless, the pathogen-specific distribution of positive saliva samples between classes indicate potential transmission within classrooms. Second, it was not possible to ascertain the specific causes for the absences based on the epidemiological data. Therefore, some absences may have falsely been attributed to respiratory infections and we could only approximate the incubation period for each epidemiological case. Third, the effectiveness of air cleaners was somewhat limited because students occasionally had lessons outside the classroom. This is in contrast to other infection control measures such as face masks that had to be used in every indoor space during pandemic times.
 
 % conclusion
 
-In conclusion, using epidemiological, environmental, and molecular data, our study shows that considerable transmission of respiratory pathogens occurred in the studied Swiss school. Air cleaners significantly reduced aerosol concentrations, but it remains unclear how effectively they remove infectious particles as the number of positive bioaerosol samples was generally too low. A tendency towards fewer absences related to respiratory infection during non-pandemic times was estimated. Future studies may use our multiple-measurement approach to assess 
-whether air cleaners can reduce the risk of airborne transmission and whether their effectiveness varies with the respiratory pathogen that is studied. 
+In conclusion, using epidemiological, environmental, and molecular data, our study shows that considerable transmission of respiratory pathogens other than SARS-CoV-2 occurred in school rooms under non-pandemic conditions. Air cleaners significantly reduced aerosol concentrations, but airborne respiratory viruses were rarely detected and if only viruses other than SARS-CoV-2. The epidemiologic transmission model estimated a trend toward a reduction in infections with air filters. Future studies may use our multiple-measurement approach to assess whether professional building ventilation, which should be preferred over air cleaners in the long term, and other infection control measures reduce the risk of airborne transmission. Whether their effectiveness varies with the seasonal distribution of respiratory pathogens under non-pandemic conditions remains to be investigated. 
 
 
 \newpage
