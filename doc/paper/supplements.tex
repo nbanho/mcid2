@@ -345,12 +345,12 @@ Transmission of airborne respiratory infections with and without air cleaners in
 
 \section{Molecular line list data}\label{sec:mol-data}
 
-\Cref{tab:mol-data-line-list} shows the line list data for the laboratory test results from human saliva samples. For each class and test, it shows the date when the test was taken, the test result and (if positive) the pathogen that was detected. Recall that all students in class were sampled twice per week every Tuesday and Thursday. 
+\Cref{tab:mol-data-line-list} shows the line list data for the laboratory test results from human saliva samples. For each class and test, it shows the date when the test was taken, the test result and (if positive) the virus that was detected. Recall that all students in class were sampled twice per week every Tuesday and Thursday. 
 
 {\footnotesize\begin{longtable}{l l l l l}
-    \caption[Line list of molecular test results over the study period]{Line list of respiratory cases over the study period. Pathogens: Influenza B (Flu B), rhinovirus (HRV), adenovirus (AdV), SARS-CoV-2 (CoV), metapneumovirus (MPV), parainfluenza virus (PIV).}\label{tab:mol-data-line-list} \\
+    \caption[Line list of molecular test results over the study period]{Line list of respiratory cases over the study period. Viruses: Influenza B (Flu B), rhinovirus (HRV), adenovirus (AdV), SARS-CoV-2 (CoV), metapneumovirus (MPV), parainfluenza virus (PIV).}\label{tab:mol-data-line-list} \\
     \toprule
-    Class & Date of test & Weekday & Test result & Pathogen \\
+    Class & Date of test & Weekday & Test result & Virus \\
     \midrule
     \input ../../results/mol-data/line-list-data
     \bottomrule
@@ -401,19 +401,19 @@ Note that we deviated from the statistical analysis plan by using as model offse
 
 \subsection{Specifying the distribution of the incubation period}
 
-The pathogen of each respiratory infection could not be identified from the epidemiological data because the students never obtained a laboratory test result. As a consequence, different incubation periods need to be considered in $p_{\text{IN}}$, reflecting a combination of the pathogen-specific incubation periods. The combination is determined based on the weekly proportion of positive saliva samples for each pathogen found in the molecular analysis. Formally, let $p_{\text{IN}}^{v}$ be the distribution for the incubation period of respiratory virus $v$ and let $pp_{vw}$ be the proportion of positive saliva samples in study week $w$, then each week the combined incubation period is computed as the weighted sum of the pathogen-specific incubation periods
+The virus of each respiratory infection could not be identified from the epidemiological data because the students never obtained a laboratory test result. As a consequence, different incubation periods need to be considered in $p_{\text{IN}}$, reflecting a combination of the virus-specific incubation periods. The combination is determined based on the weekly proportion of positive saliva samples for each virus found in the molecular analysis. Formally, let $p_{\text{IN}}^{v}$ be the distribution for the incubation period of respiratory virus $v$ and let $pp_{vw}$ be the proportion of positive saliva samples in study week $w$, then each week the combined incubation period is computed as the weighted sum of the virus-specific incubation periods
 \begin{align}
     p_{\text{IN}}^w(s) = \sum_{v} p_{\text{IN}}^{v}(s) \cdot pp_{vw} \quad \forall s.
 \end{align}
 
-The prior distributions for the pathogen-specific incubation periods are based on estimates published in the literature\cite{McAloon2020,Lessler2009LancetID}. The distributions are shown in \Cref{fig:prior-pin}. Since we could not obtain prior estimates for the incubation period of metapneumovirus (MPV) from the literature, we instead formed a distribution by using the equally weighted average of the parameters from the other distributions. 
+The prior distributions for the virus-specific incubation periods are based on estimates published in the literature\cite{McAloon2020,Lessler2009LancetID}. The distributions are shown in \Cref{fig:prior-pin}. Since we could not obtain prior estimates for the incubation period of metapneumovirus (MPV) from the literature, we instead formed a distribution by using the equally weighted average of the parameters from the other distributions. 
 
-We estimate the pathogen-specific distributions from our data as part of fitting the overall model. Furthermore, note that $p_\text{IN}$ is discretized via $p_\text{IN}(s) = \int_0^{0.5} p_\text{IN}(\tau) \;\text{d}\tau$ for $s = 0$ and $p_\text{IN}(s) = \int_{s-0.5}^{s+0.5} p_\text{IN}(\tau) \;\text{d}\tau$ for $s > 0$, where $p_\text{IN}(\tau) \sim \textrm{Lognormal}(\mu, \sigma)$ is the density of the lognormal distribution. 
+We estimate the virus-specific distributions from our data as part of fitting the overall model. Furthermore, note that $p_\text{IN}$ is discretized via $p_\text{IN}(s) = \int_0^{0.5} p_\text{IN}(\tau) \;\text{d}\tau$ for $s = 0$ and $p_\text{IN}(s) = \int_{s-0.5}^{s+0.5} p_\text{IN}(\tau) \;\text{d}\tau$ for $s > 0$, where $p_\text{IN}(\tau) \sim \textrm{Lognormal}(\mu, \sigma)$ is the density of the lognormal distribution. 
 
 \begin{figure}[!htpb]
     \centering
     \includegraphics{../../results/epi-data/incubation-periods.pdf}
-    \caption[Choices of priors for the incubation periods]{Choices of priors for the distribution of the pathogen-specific incubation periods. Pathogens: Influenza B (Flu B), rhinovirus (HRV), adenovirus (AdV), SARS-CoV-2 (CoV), metapneumovirus (MPV), parainfluenza virus (PIV).}
+    \caption[Choices of priors for the incubation periods]{Choices of priors for the distribution of the virus-specific incubation periods. Viruses: Influenza B (Flu B), rhinovirus (HRV), adenovirus (AdV), SARS-CoV-2 (CoV), metapneumovirus (MPV), parainfluenza virus (PIV).}
     \label{fig:prior-pin}
 \end{figure}
 
@@ -444,7 +444,7 @@ where $\alpha$ is the rate of new infections on school days and $\alpha + \omega
 
 \subsection{Seeding infections before study start}
 
-Cases in the first week of the study could indicate infections before the study commenced. We will therefore seed our model $2 \cdot \text{m}\,$days before the study start, where $\text{m}$ is the average incubation period of the pathogen with the largest incubation period (\ie adenovirus). The number of infections before the study start will be modeled with an exponential prior
+Cases in the first week of the study could indicate infections before the study commenced. We will therefore seed our model $2 \cdot \text{m}\,$days before the study start, where $\text{m}$ is the average incubation period of the virus with the largest incubation period (\ie adenovirus). The number of infections before the study start will be modeled with an exponential prior
 \begin{align*}
     I_{jt} \sim \text{Exponential}(1) \quad t = -2\cdot\text{m}+1, \dots, 0~. 
 \end{align*}
@@ -465,7 +465,7 @@ where Student-t$_5$ is a Student-t distribution with 5 degrees of freedom.
 
 \section{Modeling positivity rate of human saliva samples}\label{sec:multinomial-model}
 
-Molecular analysis determined which saliva samples were positive for a respiratory pathogen. Let $p = 0, 1, \dots, P$ denote the pathogen, where $0$ refers to negative samples and $P$ is the number of different pathogens detected over the study. The number of positive bioaerosol and saliva samples $y_p$ in samples of sizes $n$ is analyzed with a Multinomial logistic regression model
+Molecular analysis determined which saliva samples were positive for a respiratory virus. Let $p = 0, 1, \dots, P$ denote the virus, where $0$ refers to negative samples and $P$ is the number of different viruses detected over the study. The number of positive bioaerosol and saliva samples $y_p$ in samples of sizes $n$ is analyzed with a Multinomial logistic regression model
 \begin{align*}
     y_0, y_1, \cdots, y_P | n, \beta_0, \beta_1, \beta_2, \beta_3 &\sim \text{Multinomial-Logit}(\theta_0, \theta_1, \dots \theta_P) \\
     \theta &= \text{softmax}(\mu) \\
@@ -476,9 +476,9 @@ Molecular analysis determined which saliva samples were positive for a respirato
     \beta_{0p} &\sim \text{Normal}(0, 2.5) \quad \forall p \\
     \beta_1, \beta_2, \beta_3 &\sim \text{Student-t}_5\left(0, \frac{2.5}{s_{x}}\right) 
 \end{align*}
-where $\text{softmax}(\mu) = \exp(\mu)/\sum\exp(\mu)$ and $s_{x}$ is the empirical standard deviation of each input variable.  The negative test is set as the reference category. Overall variation in positive samples by pathogen will be modeled with $\beta_{0p}$ and the effect of air cleaners will be modeled with $\beta_1$. The effect of air cleaners is adjusted for class-specific effects and the decreasing number of susceptibles over time (for each pathogen computed as the number of students minus the total number of positive samples).
+where $\text{softmax}(\mu) = \exp(\mu)/\sum\exp(\mu)$ and $s_{x}$ is the empirical standard deviation of each input variable.  The negative test is set as the reference category. Overall variation in positive samples by virus will be modeled with $\beta_{0p}$ and the effect of air cleaners will be modeled with $\beta_1$. The effect of air cleaners is adjusted for class-specific effects and the decreasing number of susceptibles over time (for each virus computed as the number of students minus the total number of positive samples).
 
-Note that we deviated from the statistical analysis plan by estimating $\beta_{0p}$ and $\beta_1$ without a hierarchical prior. First, there was considerable variation in the overall positivity rate of each pathogen, so that we decided to use unpooled intercepts $\beta_{0p}$ instead of partially pooled intercepts $\beta_{0[p]}$ for each pathogen. Second, there was insufficient variation in the data to inform partially pooled estimates $\beta_{1[p]}$ for the effects of air cleaners. Therefore, we decided to only estimate the average effect across pathogens, \ie the completely pooled estimate $\beta_1$.  
+Note that we deviated from the statistical analysis plan by estimating $\beta_{0p}$ and $\beta_1$ without a hierarchical prior. First, there was considerable variation in the overall positivity rate of each virus, so that we decided to use unpooled intercepts $\beta_{0p}$ instead of partially pooled intercepts $\beta_{0[p]}$ for each virus. Second, there was insufficient variation in the data to inform partially pooled estimates $\beta_{1[p]}$ for the effects of air cleaners. Therefore, we decided to only estimate the average effect across viruses, \ie the completely pooled estimate $\beta_1$.  
 
 \section{Modeling changes in particle concentrations}\label{sec:env-regression-model}
 
