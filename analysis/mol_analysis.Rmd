@@ -89,7 +89,7 @@ pos_week_pl <- ggplot(mapping = aes(x = week, y = n)) +
   theme_custom() +
   coord_cartesian(clip = "off") +
   theme(panel.grid = element_blank(),
-        panel.spacing.x = unit(2, "cm"),
+        panel.spacing.x = unit(1, "cm"),
         axis.title.x = element_text(color = "white"),
         legend.position = "none") +
   guides(fill = guide_legend(nrow = 1))
@@ -140,16 +140,16 @@ pos_tot_pl
 
 ```{r}
 # combine
-descr <- pos_tot_pl + pos_cond_pl & theme(legend.position = "bottom", legend.key.height = unit(.1, "cm"),
+descr <- pos_tot_pl + plot_spacer() + pos_cond_pl & theme(legend.position = "bottom", legend.key.height = unit(.1, "cm"),
                                           legend.key.width = unit(.3, "cm"))
-descr <- descr + plot_layout(guides = "collect", widths = c(10, 6), ncol = 2) 
+descr <- descr + plot_layout(guides = "collect", widths = c(9.5, 1, 5.5), ncol = 2) 
 descr <- descr + pos_week_pl 
-descr <- descr + plot_layout(nrow = 2, heights = c(8, 8), design = 'AB
-                             CC')
+descr <- descr + plot_layout(nrow = 2, heights = c(8, 8), design = 'ABC
+                             DDD')
 save_plot(descr, pdf_file = "../results/mol-data/descriptives.pdf", eps_file = "../results/mol-data/descriptives.eps", h = 16, w = 16)
-saveRDS(pos_tot_pl + ggtitle(""), file = "../results/mol-data/descriptives-total.rds")
-saveRDS(pos_cond_pl + ggtitle(""), file = "../results/mol-data/descriptives-cond.rds")
-saveRDS(pos_week_pl + ggtitle(""), file = "../results/mol-data/descriptives-week.rds")
+# saveRDS(pos_tot_pl + ggtitle(""), file = "../results/mol-data/descriptives-total.rds")
+# saveRDS(pos_cond_pl + ggtitle(""), file = "../results/mol-data/descriptives-cond.rds")
+# saveRDS(pos_week_pl + ggtitle(""), file = "../results/mol-data/descriptives-week.rds")
 ```
 
 ## Prepare data
