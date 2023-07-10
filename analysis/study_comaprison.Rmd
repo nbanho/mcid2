@@ -1,0 +1,146 @@
+---
+title: "Study Comparison"
+author: "Nicolas Banholzer"
+date: "2023-07-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Libraries
+
+```{r}
+library(tidyverse)
+library(reshape2)
+source("../utils/epi.r")
+source("../utils/bayes.r")
+source("../utils/plotting.r")
+source("../utils/tex.r")
+```
+
+
+## Virus distribution
+
+```{r}
+saliva <- data.frame(
+    year = c(rep(2022, 6), rep(2023, 6)),
+    virus = rep(c("Flu", "HRV", "AdV", "CoV", "MPV", "PIV"), 2),
+    n = c(c(1, NA, 1, 19, NA, NA), c(15, 15, 14, 3, 2, 1))
+  ) %>%
+  group_by(year) %>%
+  mutate(p = round(100 * n / sum(n, na.rm = T))) %>%
+  ungroup() %>%
+  mutate(year = factor(year, levels = c(2022, 2023)),
+         virus = factor(virus, levels = c("Flu", "HRV", "AdV", "CoV", "MPV", "PIV"))) %>%
+  ggplot(mapping = aes(y = factor(year), x = p, fill = virus)) +
+  geom_bar(stat = "identity", position = position_stack(reverse = TRUE), width = .5) +
+  geom_text(mapping = aes(label = p), size = 8 / cm(1), color = "white", position = position_stack(vjust = 0.5, reverse = T)) +
+  scale_x_continuous(expand = expansion(mult = c(0,0.025))) +
+  scale_fill_manual(values = wes_palette("IsleofDogs1")) +
+  labs(x = "Proportion of positive saliva samples (%)", y = "Study year", fill = "Virus", title = "a") +
+  theme_custom() +
+  theme(legend.position = "top",
+        plot.title.position = "plot",
+        legend.key.height = unit(.1, "cm"),
+        legend.key.width = unit(.3, "cm")) +
+  guides(fill = guide_legend(nrow = 1))
+
+saliva
+```
+
+
+## No. of positive samples
+
+```{r}
+pos_samples <- data.frame(
+  year = factor(c(rep(2022, 3), rep(2023, 3)), levels = c(2022, 2023)),
+  type = factor(rep(c("Saliva", "Bioaerosols", "HEPA-filter"), times = 2), levels = c("Saliva", "Bioaerosols", "HEPA-filter")),
+  n = c(c(21, 10, 8), c(50, 2, 4))
+) %>%
+  ggplot(aes(x = n, y = year, pattern = year, color = year, pattern_color = year)) +
+  geom_bar_pattern(stat = "identity", fill = "white", pattern_density = 0.1, pattern_spacing = 0.1, width = .75) +
+  geom_text(aes(label = n), size = 8 / cm(1), hjust = -1) +
+  facet_wrap(~ type, ncol = 1) +
+  scale_x_continuous(expand = expansion(add = c(0,9.5))) +
+  scale_color_manual(values = wes_palette("Darjeeling2")[c(2, 5)]) +
+  scale_pattern_color_manual(values = wes_palette("Darjeeling2")[c(2, 5)]) +
+  labs(y = "Study year", x = "Frequency", title = "b") +
+  theme_custom() +
+  theme(legend.position = "none",
+        plot.title.position = "plot")
+
+pos_samples
+```
+
+
+## Particle reduction
+
+```{r}
+vars <- c("CO2", "rH", "Temp", "AER", "Cn", "PM1", "PM25", "PM4", "PM10")
+vars_labels_no_units <- c("CO[2]", "Relative~humidity", "Temperature", "Air~exchange~rate",
+                          "CN", "PM[1]", "PM[2.5]", "PM[4]", "PM[10]")
+names(vars_labels_no_units) <- vars
+
+particle <- data.frame(
+  year = factor(c(rep(2022, 15), rep(2023, 15)), levels = c(2022, 2023)),
+  variable = factor(c(rep(c("Cn", "PM1", "PM25", "PM4", "PM10"), each = 3, times = 2)), levels = c("Cn", "PM1", "PM25", "PM4", "PM10")),
+  interval = rep(c("Mean", "Lower", "Upper"), times = 5),
+  estimate = c(c(39.24, 3.88, 68.80, 
+                 41.05, 6.62, 67.98,
+                 45.12, 19.66, 63.16,
+                 46.49, 27.26, 61.72,
+                 46.60, 29.99, 59.49),
+               c(76.83, 63.20, 86.28,
+                 76.79, 64.84, 85.46,
+                 72.86, 64.24, 79.66,
+                 70.77, 63.46, 76.97,
+                 99.99, 99.94, 100.00))
+) %>%
+  dcast(year + variable ~ interval) %>%
+  ggplot(aes(y = year, color = year)) +
+  facet_wrap(~ variable, nrow = 1, dir = "h", labeller = as_labeller(vars_labels_no_units, label_parsed)) +
+  geom_errorbar(mapping = aes(xmin = Lower, xmax = Upper), lineend = "square", size = 1, width = .05) +
+  geom_point(mapping = aes(x = Mean), shape = 23, size = 2, fill = "white") +
+  scale_color_manual(values = wes_palette("Darjeeling2")[c(2, 5)]) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.1)), breaks = c(0, 50, 100), limits = c(0, 100)) +
+  labs(y = "Study year", x = "Estimated reduction (%)", title = "c") + 
+  theme_custom() +
+  theme(legend.position = "none",
+        plot.title.position = "plot",
+        panel.spacing = unit(.5, "lines"))
+
+particle
+```
+
+
+## Risk ratio
+
+```{r}
+rr <- data.frame(
+  year = factor(c(rep(2022, 3), rep(2023, 3)), levels = c(2022, 2023)),
+  interval = rep(c("Mean", "Lower", "Upper"), times = 2),
+  estimate = c(c(1.00, 0.22, 2.067), c(0.72, 0.44, 1.15))
+) %>%
+  dcast(year ~ interval) %>%
+  ggplot(aes(y = year, color = year)) +
+  geom_vline(aes(xintercept = 1), linetype = "dashed") +
+  geom_errorbar(mapping = aes(xmin = Lower, xmax = Upper), lineend = "square", size = 1, width = .05) +
+  geom_point(mapping = aes(x = Mean), shape = 23, size = 2, fill = "white") +
+  labs(y = "Study year", x = "Adjusted risk ratio (%)", title = "d") + 
+  scale_color_manual(values = wes_palette("Darjeeling2")[c(2, 5)]) +
+  theme_custom() +
+  theme(legend.position = "none",
+        plot.title.position = "plot")
+
+rr  
+```
+
+
+## Combined 
+
+```{r}
+comparison <- grid.arrange(saliva, pos_samples, particle, rr, ncol = 2, nrow = 2, heights = c(6, 4), widths = c(10,6))
+ggsave(plot = comparison, file = "../results/comparison.pdf", width = 16 / cm(1), height = 10 / cm(1))
+```
