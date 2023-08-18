@@ -246,21 +246,27 @@
 \newcommand{\supp}{SI Appendix}
 
 \title{\LARGE\singlespacing{\textbf{S1 Appendix} \\ \medskip
-Transmission of airborne respiratory infections with and without air cleaners in a Swiss school during non-pandemic conditions: A modeling study of epidemiological, environmental, and molecular data}}
+Transmission of respiratory viral infections with and without air cleaners in a Swiss school under non-pandemic conditions in 2023: A modeling study of epidemiological, environmental, and molecular data}}
 
 % author list
-\author[1$\ddag$]{Nicolas Banholzer}
-\author[2]{Philipp Jent}
-\author[3]{Pascal Bittel}
-\author[3]{Lavinia Furrer}
+\author[1$\ddag$,2]{Nicolas Banholzer}
+\author[2,3]{Philipp Jent}
+\author[2,4]{Pascal Bittel}
+\author[4]{Lavinia Furrer}
+\author[4]{Alban Ramette}
+\author[4]{Ronald Dijkman}
+\author[5]{Jenna Kelly}
+\author[1]{Kathrin Zürcher}
 \author[1]{Matthias Egger}
-\author[4]{Tina Hascher}
-\author[1*]{Lukas Fenner}
+\author[2,6]{Tina Hascher}
+\author[1*,2]{Lukas Fenner}
 
 \affil[1]{Institute of Social and Preventive Medicine, University of Bern, Bern, Switzerland}
-\affil[2]{Department of Infectious Diseases, Inselspital, Bern University Hospital, University of Bern, Bern, Switzerland}
-\affil[3]{Institute of Infectious Diseases, University of Bern, Bern, Switzerland}
-\affil[4]{Institute of Educational Science, University of Bern, Bern, Switzerland}
+\affil[2]{Multidisciplinary Center for Infectious Diseases, University of Bern, Bern, Switzerland}
+\affil[3]{Department of Infectious Diseases, Inselspital, Bern University Hospital, University of Bern, Bern, Switzerland}
+\affil[4]{Institute of Infectious Diseases, University of Bern, Bern, Switzerland}
+\affil[5]{Interfaculty Bioinformatics Unit, University of Bern, Bern, Switzerland}
+\affil[6]{Institute of Educational Science, University of Bern, Bern, Switzerland}
 
 \affil[*]{Corresponding author: lukas.fenner@ispm.unibe.ch }
 
@@ -492,6 +498,20 @@ We only analyze particle concentration data of the time periods during which stu
     \sigma &\sim \text{Exponential}\left(\frac{1}{s_{y}}\right)~.
 \end{align*}
 The effect of air cleaners is adjusted for class- and weekday-specific effects, the number of students in school, the air change rate, and the cumulative number of cases related to respiratory infections. A log transform is applied to all continuous input variables. 
+
+\clearpage
+
+\section{Modeling changes in cough frequency}\label{sec:aud-regression-model}
+
+We analyze the daily number of coughs $Y$ with a Negative Binomial regression model
+\begin{align*}
+    Y | \beta_0, \beta_1, \dots, \beta_6 &\sim \text{Negative-Binomial}(\mu,\phi) \\
+    \log \mu &= \log T + \beta_0 + \beta_1 \cdot \text{AirCleaner} + \beta_2 \cdot \text{Class} + \beta_3 \cdot \text{Weekday} + \beta_4 \cdot \text{Students} + \beta_5 \cdot \text{Ventilation} + \beta_6 \cdot \text{Cases} \\
+    \beta_0 &\sim \text{Student-t}_5(0, 2.5) \\
+    \beta_1, \dots, \beta_6 &\sim \text{Student-t}_5\left(0, \frac{2.5}{s_{x}}\right) \\
+    \frac{1}{\sqrt{\phi}} &\sim \text{Half-Normal}(0,1),
+\end{align*}
+where $T$ is the daily duration that students were in the classroom and $\phi$ is the parameter modeling over-dispersion in count data. 
 
 \clearpage
 
