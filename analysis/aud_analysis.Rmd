@@ -1,0 +1,187 @@
+---
+title: "Cough Analysis"
+author: "Nicolas Banholzer"
+date: "2023-08-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Libraries
+
+```{r}
+library(tidyverse)
+library(reshape2)
+library(tidybayes)
+library(lubridate)
+library(rstanarm)
+library(brms)
+library(rstan)
+source("../utils/epi.r")
+source("../utils/bayes.r")
+source("../utils/plotting.r")
+source("../utils/tex.r")
+```
+
+## Data
+
+```{r}
+# load cough data 
+coughs <- read.csv("../data-clean/coughs.csv", sep = ";") %>%
+  mutate(class =  ifelse(class == "B", "A", "B")) %>% # correct wrong label by Simon who put Kontrollklasse 3a=A instead of Kontrollklasse 3a=B
+  rename(n_coughs = `coughs.detected`) %>%
+  mutate(datetime = as.POSIXct(paste(date, time), format = "%d.%m.%Y %H:%M:%S"),
+         date = as.Date(datetime)) %>%
+  dplyr::select(class, date, datetime, n_coughs)
+
+# load time in the class room
+time_in_room <- readRDS("../data-clean/time-in-room.rds") %>%
+  dplyr::select(class, datetime, no_palas) %>%
+  group_by(class) %>%
+  complete(datetime = full_seq(datetime, 60)) %>%
+  fill(no_palas, .direction = "down") %>%
+  ungroup()
+
+# filter time in room
+coughs <- coughs %>%
+  left_join(time_in_room) %>%
+  filter(!no_palas) 
+
+# summarize coughs
+coughs <- coughs %>%
+  group_by(class, date) %>%
+  summarize(n_coughs = sum(n_coughs),
+            TT = n()) %>%
+  ungroup()
+  
+# load epi data 
+epi_data <- readRDS("../data-clean/epidemiological.rds") %>%
+  dplyr::select(class, date, weekday, n_present, new_cases, aircleaner) %>%
+  group_by(class) %>%
+  arrange(date) %>%
+  mutate(cases = cumsum(new_cases)) %>%
+  ungroup() %>%
+  dplyr::select(-new_cases)
+
+# load env data
+env_data <- readRDS("../data-clean/environmental.rds") %>%
+  dplyr::select(class, date, AER)
+
+# merge all together
+coughs <- coughs %>%
+  left_join(epi_data) %>%
+  left_join(env_data)
+```
+
+
+## Descriptives
+
+```{r}
+# raw data
+coughs %>%
+  ggplot(aes(x = date, y = n_coughs / TT)) +
+  geom_point(aes(color = aircleaner)) +
+  geom_smooth() +
+  facet_wrap(~ class)
+hist(coughs$n_coughs/coughs$TT)
+
+# global average
+coughs %>%
+  group_by(aircleaner) %>%
+  summarize(sum(n_coughs) / sum(TT))
+
+# weekly coughs per min by class and condition
+coughs_pl <- coughs %>%
+  mutate(week = isoweek(date)) %>%
+  filter(week != 6) %>%
+  mutate(week = ifelse(week < 6, week - min(week) + 1, week - min(week))) %>%
+  group_by(class, week) %>%
+  summarize(coughs_per_min = sum(n_coughs) / sum(TT),
+            aircleaner = first(aircleaner)) %>%
+  ungroup() %>%
+  mutate(aircleaner = factor(aircleaner, levels = c("Yes", "No")),
+         class = factor(class, levels = c("A", "B"))) %>%
+  arrange(class, aircleaner) %>%
+  ggplot(aes(x = factor(week), y = coughs_per_min, fill = aircleaner, pattern = class)) +
+  geom_bar_pattern(stat = "identity", color = "black", pattern_fill = "white", pattern_angle = 45,
+                   pattern_density = 0.25, pattern_spacing = 0.05, width = .5) +
+  labs(x = "Study week", y = "Number of coughs per min", fill = "Air cleaner", pattern = "Class") +
+  scale_fill_manual(values = rev(wes_palette("Royal1")[1:2])) +
+  scale_x_discrete(breaks = 1:7) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05)), breaks = seq(0, 10, 2)) +
+  scale_pattern_manual(values = c(A = "stripe", B = "none")) +
+  theme_custom() +
+  theme(legend.position = "top",
+        legend.direction = "horizontal",
+        legend.key.width = unit(0.5, "cm"),
+        legend.key.height = unit(0.3, "cm")) +
+        #plot.title.position = "plot") +
+  guides(fill = guide_legend(nrow = 1, override.aes = list(pattern = "none", order = 2)),
+         pattern = guide_legend(nrow = 1, override.aes = list(fill = "white"), order = 1))
+
+
+coughs_pl
+
+save_plot(coughs_pl, pdf_file = "../results/cough-data/coughs-frequency-per-week.pdf", eps_file = "../results/cough-data/coughs-frequency-per-week.eps", w = 12, h = 8)
+```
+
+
+## Model
+
+### Main
+
+```{r}
+# prepare stan data
+sdl <- list()
+coughs_A <- coughs %>% filter(class == "A") %>% arrange(date)
+coughs_B <- coughs %>% filter(class == "B") %>% arrange(date)
+sdl$Da <- nrow(coughs_A)
+sdl$Db <- nrow(coughs_B)
+sdl$coughsA <- coughs_A$n_coughs
+sdl$coughsB <- coughs_B$n_coughs
+sdl$tA <- coughs_A$TT
+sdl$tB <- coughs_B$TT
+sdl$airCleanerA <- ifelse(coughs_A$aircleaner == 'Yes', 1, 0)
+sdl$airCleanerB <- ifelse(coughs_B$aircleaner == 'Yes', 1, 0)
+sdl$aerA <- (coughs_A$AER - mean(coughs$AER)) 
+sdl$aerB <- (coughs_B$AER - mean(coughs$AER))
+sdl$nA <- (coughs_A$n_present - mean(coughs$n_present)) 
+sdl$nB <- (coughs_B$n_present - mean(coughs$n_present)) 
+sdl$casesA <- (coughs_A$cases - mean(coughs$cases)) 
+sdl$casesB <- (coughs_B$cases - mean(coughs$cases)) 
+sdl$weekdayA <- coughs_A %>%
+  mutate(weekday = factor(weekday, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday"))) %>%
+  dplyr::select(date, weekday) %>%
+  dcast(date ~ weekday) %>%
+  mutate(across(-date, ~ ifelse(is.na(.x), 0, 1))) %>%
+  dplyr::select(-date, -Monday) %>%
+  as.matrix()
+sdl$weekdayB <- coughs_B %>%
+  mutate(weekday = factor(weekday, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday"))) %>%
+  dplyr::select(date, weekday) %>%
+  dcast(date ~ weekday) %>%
+  mutate(across(-date, ~ ifelse(is.na(.x), 0, 1))) %>%
+  dplyr::select(-date, -Monday) %>%
+  as.matrix()
+sdl$s_x <- c(sd(ifelse(coughs$aircleaner == "Yes", 1, 0)), # aircleaner
+             sd(ifelse(coughs$aircleaner == "Yes", 1, 0)), # class
+             apply(rbind(sdl$weekdayA, sdl$weekdayB), 2, sd),
+             sd(coughs$n_present),
+             sd(coughs$AER),
+             sd(coughs$cases))
+
+# model
+stan_file <- "../models/negbinom-coughs-model.stan"
+coughsMod <- stan(stan_file, data = sdl, seed = 12345, cores = 4)
+
+# results
+raw_res <- summary(coughsMod, probs = c(0.025, 0.5, 0.975), pars = c("phi", "beta0", "beta1", "beta2", "beta3", "beta4", "beta5", "beta6"))$summary %>%
+  data.frame() %>%
+  mutate_all(round, 2) 
+raw_res
+
+exp(raw_res["beta1",c("mean", "X2.5.", "X97.5.")])
+exp(raw_res["beta2",c("mean", "X2.5.", "X97.5.")])
+```
