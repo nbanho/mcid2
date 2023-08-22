@@ -128,7 +128,7 @@ rr <- data.frame(
   geom_vline(aes(xintercept = 1), linetype = "dashed") +
   geom_errorbar(mapping = aes(xmin = Lower, xmax = Upper), lineend = "square", size = 1, width = .05) +
   geom_point(mapping = aes(x = Mean), shape = 23, size = 2, fill = "white") +
-  labs(y = "Study year", x = "Adjusted risk ratio (%)", title = "d") + 
+  labs(y = "Study year", x = "Adjusted relative risk (%)", title = "d") + 
   scale_color_manual(values = wes_palette("Darjeeling2")[c(2, 5)]) +
   theme_custom() +
   theme(legend.position = "none",

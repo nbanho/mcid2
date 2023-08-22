@@ -280,7 +280,7 @@ res_pl <- res  %>%
   geom_vline(aes(xintercept = 1), linetype = "dashed") +
   scale_x_continuous(limits = c(0, NA), expand = expansion(mult = c(0, 0)), breaks = seq(0, 2, .25)) +
   scale_size_continuous(range = c(1, 9)) +
-  labs(x = "Relative risk ratio", y = "Lag of sampling results", fill = "CrI") +
+  labs(x = "Relative risk", y = "Lag of sampling results", fill = "CrI") +
   theme_custom() +
   theme(legend.position = "top", legend.direction = "horizontal",
         legend.key.height = unit(.25, "cm"), legend.key.width = unit(.35, "cm"))

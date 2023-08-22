@@ -111,7 +111,7 @@ coughs_pl <- coughs %>%
   ggplot(aes(x = factor(week), y = coughs_per_min, fill = aircleaner, pattern = class)) +
   geom_bar_pattern(stat = "identity", color = "black", pattern_fill = "white", pattern_angle = 45,
                    pattern_density = 0.25, pattern_spacing = 0.05, width = .5) +
-  labs(x = "Study week", y = "Number of coughs per min", fill = "Air cleaner", pattern = "Class", title = "A") +
+  labs(x = "Study week", y = "Number of coughs per min", fill = "Air cleaner", pattern = "Class", title = "a") +
   scale_fill_manual(values = rev(wes_palette("Royal1")[1:2])) +
   scale_x_discrete(breaks = 1:7) +
   scale_y_continuous(expand = expansion(mult = c(0, 0.05)), breaks = seq(0, 10, 2)) +
@@ -243,7 +243,7 @@ theta_pl <- draws_theta %>%
   geom_vline(aes(xintercept = 1), linetype = "dotted", color = "red") +
   stat_pointinterval(shape = 21, fill = "white") +
   scale_color_manual(values = wes_palette("IsleofDogs1")) +
-  labs(x = "Relative risk ratio", title = "B") +
+  labs(x = "Relative risk", title = "b") +
   theme_custom() +
   theme(axis.title.y = element_blank(), legend.position = "none",
         plot.title.position = "plot")
