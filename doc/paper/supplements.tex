@@ -513,6 +513,18 @@ We analyze the daily number of coughs $Y$ with a Negative Binomial regression mo
 \end{align*}
 where $T$ is the daily duration that students were in the classroom and $\phi$ is the parameter modeling over-dispersion in count data. 
 
+In addition, we analyze the association between the daily number of coughs $Y$ and the number of positive saliva test resutls for respiratory viruses with a Negative Binomial hierarchical regression model
+\begin{align*}
+    Y | \beta_0, \theta_{[v]}, \theta, \tau &\sim \text{Negative-Binomial}(\mu,\phi) \\
+    \log \mu &= \log T + \beta_0 + \sum_v \theta_{[v]} \cdot \text{Saliva}_v \\
+    \beta_0 &\sim \text{Student-t}_5(0, 2.5) \\
+    \theta_{[\text{Flu~B}]}, \dots, \theta_{[\text{PIV}]} &\sim \text{Normal}\left(\theta, \tau\right) \\
+    \theta &\sim \text{Student-t}_5\left(0, \frac{2.5}{s_{v}}\right) \\
+    \tau &\sim \text{Half-Normal}\left(0, 1\right) \\
+    \frac{1}{\sqrt{\phi}} &\sim \text{Half-Normal}(0,1),
+\end{align*}
+where $\theta_{[v]}$ is the partially pooled estimate for respiratory virus $v \in$ (Flu~B, HRV, AdV, CoV, MPV, PIV), $\tau$ estimates variation between viruses, and $s_v$ is the average standard deviation across the count variables of the respiratory viruses. 
+
 \clearpage
 
 \section{Detailed results for risk of infection model}\label{sec:detailed-redcap}
@@ -560,7 +572,7 @@ There can be unknown delay between when students were infected and when they tes
 \begin{figure}[!htb]
 \centering
     \includegraphics[width=10cm]{../../results/mol-data/model-results.pdf}
-    \caption[Sensitivity analysis for the estimated effect of air cleaners on the positivity rate of saliva samples]{Sensitivity analysis for the estimated effect of air cleaners on the positivity rate of saliva samples. Shown is the adjusted relative risk ratio (posterior mean as dot and 50\%-, 80\%, and 95\%-CrIs as lines) for air cleaners by lag of the molecular test results.}
+    \caption[Sensitivity analysis for the estimated effect of air cleaners on the positivity rate of saliva samples]{Sensitivity analysis for the estimated effect of air cleaners on the positivity rate of saliva samples. Shown is the adjusted relative risk (posterior mean as dot and 50\%-, 80\%, and 95\%-CrIs as lines) for air cleaners by lag of the molecular test results.}
     \label{fig:mol-estimation-results-sensitivity}
 \end{figure}
 
