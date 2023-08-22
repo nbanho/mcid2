@@ -50,7 +50,10 @@
 
 \vspace{1em}
 
-% \begin{information}\normalfont
+\begin{information}\normalfont
+
+xxxx
+
 % \noindent\textbf{Running head}: SARS-COV-2 transmission in schools and effect of air cleaners
 
 % %\noindent\textbf{Subject categorization}: 6.20  Indoor Air; 10.11 Pediatrics: Respiratory Infections
@@ -72,7 +75,7 @@
 % \noindent Conception and design: NB, LF. Epidemiological and environmental data collection: NB, PJ, TS, LF. Laboratory data collection: PB, LFu. Additional data collection: TH. Statistical analysis: NB, KZ. Genomic analysis: LB, LFu. Paper draft: NB, LF, ME. All authors reviewed and approved the final version of the manuscript.
 
 % \par
-% \end{information}
+\end{information}
 
 %TC:newcounter abst Words in abstract
 %TC:envir abstract [] abst
@@ -185,7 +188,7 @@ For adenovirus-positive samples (saliva, bioaerosol, and air filter samples), we
 
 \subsection{Audio recordings and cough detection}
 
-We installed one microphone (RØDE NT-USB; Sydney, Australia) in each classroom to continuously record sounds. We detected the number of coughs per minute using an AI algorithm based on a convolutional neural network\cite{Bertschinger2023IEEE}, which was recently trained and validated with audio data from the waiting room of primary care clinic\cite{Zurcher2022}. 
+We installed one microphone (RØDE NT-USB; Sydney, Australia) in each classroom to continuously record sounds. We detected the number of coughs per minute using an AI algorithm based on a convolutional neural network\cite{Bertschinger2023IEEE}, which was recently trained and validated with audio data from the waiting room of a primary care clinic\cite{Zurcher2022}. 
 
 \subsection{Statistical analyses and modeling}
 
@@ -211,7 +214,7 @@ A detailed description of the model and choice of priors for all model parameter
 
 \noindent\textbf{Number of detected coughs} \smallskip
 
-We computed the daily number of detected coughs and compared it between study conditions. We estimated the reduction in the number of coughs using a Bayesian Negative Binomial regression model (Supplementary Text~\zref{sec:aud-regression-model}) with time in class as the model offset, adjusting for class and weekday effects, the number of students in class, the air change rate, and the cumulative number of respiratory cases.
+\noindent We computed the daily number of detected coughs and compared it between study conditions. We estimated the reduction in the number of coughs using a Bayesian Negative Binomial regression model (Supplementary Text~\zref{sec:aud-regression-model}) with time in class as the model offset, adjusting for class and weekday effects, the number of students in class, the air change rate, and the cumulative number of respiratory cases. \medskip
 
 
 \noindent\textbf{Software and model estimation} \smallskip
@@ -298,8 +301,8 @@ Slightly fewer coughs were detected during study weeks where air cleaners were i
 
 \begin{figure}[!htpb]
     \centering
-    \includegraphics{}
-    \caption{Caption}
+    \includegraphics{results/cough-data/coughs-frequency-per-week.pdf}
+    \caption{Daily average number of detected coughs per minute by study week, condition and class.}
     \label{fig:coughing}
 \end{figure}
 
@@ -336,11 +339,14 @@ In a previous study\cite{Banholzer2023PLoSMed}, we estimated the effectiveness o
 % why could we not detect so many bioaerosols
 
 We detected fewer respiratory viruses in bioaerosol samples compared to our previous study\cite{Banholzer2023PLoSMed} (1~sample of adenovirus and 1~sample of rhinovirus in this study vs 10~samples of SARS-CoV-2 in the previous study), especially in relation to the number of positive saliva samples (50~samples in this study vs 21~in the previous study). Similarly, the number of viruses detected on the filters of the air cleaners was also lower in this study (4~positive samples in 160~swabs vs 8~positive samples in 80~swabs in the previous study). Importantly, there was a clear shift in the distribution of respiratory viruses in the current study compared to the previous study in 2022 during the SARS-CoV-2 Omicron variant. Whereas in 2022 we detected almost exclusively SARS-CoV-2 in human saliva, the most common respiratory viruses in 2023 were adenovirus, influenza~B, and rhinoviruses (only three SARS-CoV-2-positive samples). The shift in the pattern of respiratory viruses has been observed in other studies\cite{Nygaard2023Lancet,Sauteur2022EuroSurv}. xxxxx
-Technical reasons for these differences are unlikely. The bioaerosol sampling devices and laboratory procedures were the same in both studies and no technical issues were observed. It is also unlikely that environmental factors inhibited airborne detection. Temperature and humidity were similar, and CO$_2$ levels were even higher in this study (1,702$\pm$370\,ppm vs 1,064$\pm$232\,ppm in the previous study), suggesting that classrooms were not as well ventilated as during the COVID-19 pandemic, although lower ventilation was partially offset by a greater reduction in aerosol and particle concentrations from air cleaners. However, the removal of particles through air cleaners may be slower than through ventilation.
+
+% other reasons
+
+Technical reasons for the differences in airborne detection are unlikely. The bioaerosol sampling devices and laboratory procedures were the same in both studies and no technical issues were observed. Instead, airborne detection could have been influenced by environmental factors. Although temperature (between 19 and 25$^{\circ}$C) and relative humidity (between 25 and 50\%) were similar in both studies, the same levels can have a different effect on airborne survival of respiratory viruses. For example, for rhinovirus and adenovirus, survival increases with relative humidity, while the reverse relationship has been documented for influenza and SARS-CoV-2\cite{Tellier2009JTRSI,Ahlawat2020AAQR,Biryukov2020mS,Karim1985CJM,Davis1971AM}. A change in ventilation conditions could have had a profound effect, but CO$_2$ levels were even higher in this study (1,702$\pm$370\,ppm vs 1,064$\pm$232\,ppm in the previous study), suggesting that classrooms were not as well ventilated as during the COVID-19 pandemic. Although lower ventilation was partially offset by a greater reduction in aerosol and particle concentrations from air cleaners, the removal of particles through air cleaners may be slower than through ventilation.
 
 % bioaerosol sampling in more depth
 
-we speculate that the difference in airborne molecular detection of respiratory viruses is due to the characteristics of the respiratory viruses. Differences in physicochemical properties of virus-laden aerosols (\eg physical size, viral load, and infectivity), which influence the generation and survival of airborne viral RNA\cite{Wang2021,Sattar2016Book}, could make it easier to detect SARS-CoV-2 in the air. The reason is that viral loads do often not exceed the detection limits of existing devices for bioaerosol sampling, which remains a challenge\cite{Wang2021,Belser2023PLOSPath,Bekking2019IORV,Mainelis2020AST}. For example, one study was unable to detect any human rhinovirus in the exhaled breath of 16~HRV-infected subjects\cite{Fabian2011JAMPDD}. Nevertheless, previous studies show that also influenza\cite{Bischoff2013JID,Pan2017mSphere}, rhinovirus\cite{Myatt2004AJRCCM}, and adenovirus\cite{Nguyen2017OFID,Pan2017mSphere} can be detected in airborne samples. The ability to detect pathogens in bioaerosols could also be related to patient characteristics of the study participants. Multiple studies suggest an association between the generation of pathogenic aerosols and infectiousness\cite{Leung2020NatMed,Bischoff2013JID,Escombe2008PLoSMed}. Therefore, studies including more infectious patients (intentionally or unintentionally) will probably have a higher chance of detecting respiratory viruses in the air. 
+As a consequence, we speculate that the difference in airborne molecular detection of respiratory viruses is due to the characteristics of the respiratory viruses. Differences in physicochemical properties of virus-laden aerosols (\eg physical size, viral load, and infectivity), which influence the generation and survival of airborne viral RNA\cite{Wang2021,Sattar2016Book}, could make it easier to detect SARS-CoV-2 in the air. The reason is that viral loads do often not exceed the detection limits of existing devices for bioaerosol sampling, which remains a challenge\cite{Wang2021,Belser2023PLOSPath,Bekking2019IORV,Mainelis2020AST}. For example, one study was unable to detect any human rhinovirus in the exhaled breath of 16~HRV-infected subjects\cite{Fabian2011JAMPDD}. Nevertheless, previous studies show that also influenza\cite{Bischoff2013JID,Pan2017mSphere}, rhinovirus\cite{Myatt2004AJRCCM}, and adenovirus\cite{Nguyen2017OFID,Pan2017mSphere} can be detected in airborne samples. The ability to detect pathogens in bioaerosols could also be related to patient characteristics of the study participants. Multiple studies suggest an association between the generation of pathogenic aerosols and infectiousness\cite{Leung2020NatMed,Bischoff2013JID,Escombe2008PLoSMed}. Therefore, studies including more infectious patients (intentionally or unintentionally) will probably have a higher chance of detecting respiratory viruses in the air. 
 
 % transmission within classrooms
 
@@ -348,7 +354,7 @@ Molecular transmission networks based on targeted sequencing or whole genome seq
 
 % effects of air cleaners
 
-Our study indicated a small, potential benefit of air cleaners, but other infection control measures such as universal mask wearing appear to be more effective\cite{Banholzer2023PLoSMed,Heinsohn2022,Gettings2021,Dharmadhikari2012AJRCCM,Leung2020NatMed,Milton2013PLoSPathogens}. There may be several reasons for this. Compared to \eg mask wearing, air cleaners cannot influence transmission outside the classrooms. Furthermore, previous work suggests that prolonged close contact may be needed for transmission\cite{Leung2020NatMed,Brankston2007LancetIDw}. However, compared to face masks, air cleaners are unable to prevent such close range high particle density aerosol transmission. Evidence from our previous\cite{Banholzer2023PLoSMed} and this study further suggest that air cleaners are more effective in the removal of larger particles ($>5\mu$m). Yet, a larger proportion of respiratory viruses are carried in the smaller particles ($\leq5\mu$m)\cite{Fennelly2020}. Finally, classroom activity, airflow and other unobserved, confounding factors make it difficult to assess the effects of air cleaners. Nevertheless, it is important to assess their effectiveness in a real-life setting, and compare with the hypothetical impact suggested by simulation studies\cite{Lindsley2021,Cortellessa2023Build}.
+Our study indicated a small, potential benefit of air cleaners, but other infection control measures such as universal mask wearing appear to be more effective\cite{Banholzer2023PLoSMed,Heinsohn2022,Gettings2021,Dharmadhikari2012AJRCCM,Leung2020NatMed,Milton2013PLoSPathogens}. There may be several reasons for this. Compared to \eg mask wearing, air cleaners cannot influence transmission outside the classrooms. Furthermore, previous work suggests that prolonged close contact may be needed for transmission\cite{Leung2020NatMed,Brankston2007LancetID}. However, compared to face masks, air cleaners are unable to prevent such close range high particle density aerosol transmission. Evidence from our previous\cite{Banholzer2023PLoSMed} and this study further suggest that air cleaners are more effective in the removal of larger particles ($>5\mu$m). Yet, a larger proportion of respiratory viruses are carried in the smaller particles ($\leq5\mu$m)\cite{Fennelly2020}. Finally, classroom activity, airflow and other unobserved, confounding factors make it difficult to assess the effects of air cleaners. Nevertheless, it is important to assess their effectiveness in a real-life setting, and compare with the hypothetical impact suggested by simulation studies\cite{Lindsley2021,Cortellessa2023Build}.
 
 
 % limitations
