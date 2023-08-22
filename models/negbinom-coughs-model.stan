@@ -20,7 +20,6 @@ data {
 
 
 parameters {
-  simplex[7] vega; // weights of weekday cases
   real<lower=0> invphi; // reciprocal over-dispersion parameter
   real beta0; // model intercept
   real beta1; // aircleaner effect
@@ -51,7 +50,7 @@ model {
   invphi ~ normal(0., 1.);
   beta0 ~ student_t(5., 0, 2.5);
   beta1 ~ student_t(5., 0, 2.5 / s_x[1]);
-  beta2~ student_t(5., 0, 2.5 / s_x[2]);
+  beta2 ~ student_t(5., 0, 2.5 / s_x[2]);
   for (wd in 1:4) {
     beta3[wd] ~ student_t(5., 0, 2.5 / s_x[2+wd]);
   }

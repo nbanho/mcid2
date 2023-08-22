@@ -69,10 +69,14 @@ epi_data <- readRDS("../data-clean/epidemiological.rds") %>%
 env_data <- readRDS("../data-clean/environmental.rds") %>%
   dplyr::select(class, date, AER)
 
+# load mol data
+mol_data <- readRDS("../data-clean/molecular.rds") %>%
+  dplyr::select(-weekday, -aircleaner, -N, -n_class)
+
 # merge all together
 coughs <- coughs %>%
   left_join(epi_data) %>%
-  left_join(env_data)
+  left_join(env_data) 
 ```
 
 
@@ -107,7 +111,7 @@ coughs_pl <- coughs %>%
   ggplot(aes(x = factor(week), y = coughs_per_min, fill = aircleaner, pattern = class)) +
   geom_bar_pattern(stat = "identity", color = "black", pattern_fill = "white", pattern_angle = 45,
                    pattern_density = 0.25, pattern_spacing = 0.05, width = .5) +
-  labs(x = "Study week", y = "Number of coughs per min", fill = "Air cleaner", pattern = "Class") +
+  labs(x = "Study week", y = "Number of coughs per min", fill = "Air cleaner", pattern = "Class", title = "A") +
   scale_fill_manual(values = rev(wes_palette("Royal1")[1:2])) +
   scale_x_discrete(breaks = 1:7) +
   scale_y_continuous(expand = expansion(mult = c(0, 0.05)), breaks = seq(0, 10, 2)) +
@@ -116,8 +120,8 @@ coughs_pl <- coughs %>%
   theme(legend.position = "top",
         legend.direction = "horizontal",
         legend.key.width = unit(0.5, "cm"),
-        legend.key.height = unit(0.3, "cm")) +
-        #plot.title.position = "plot") +
+        legend.key.height = unit(0.3, "cm"),
+        plot.title.position = "plot") +
   guides(fill = guide_legend(nrow = 1, override.aes = list(pattern = "none", order = 2)),
          pattern = guide_legend(nrow = 1, override.aes = list(fill = "white"), order = 1))
 
@@ -184,4 +188,66 @@ raw_res
 
 exp(raw_res["beta1",c("mean", "X2.5.", "X97.5.")])
 exp(raw_res["beta2",c("mean", "X2.5.", "X97.5.")])
+```
+
+### Association with molecular data
+
+```{r}
+# subset data
+coughs_TueThu <- mol_data %>%
+  left_join(dplyr::select(coughs, class, date, n_coughs, TT)) %>%
+  left_join(epi_data) %>%
+  left_join(env_data) %>%
+  dplyr::select(-Neg) %>%
+  left_join(coughs) %>%
+  filter(!is.na(n_coughs))
+
+# create stan data
+sdl_acm <- list(
+  N = nrow(coughs_TueThu),
+  C = 2,
+  V = 6,
+  coughs = coughs_TueThu$n_coughs,
+  TT = coughs_TueThu$TT,
+  viruses = as.matrix(dplyr::select(coughs_TueThu, `Flu B`, HRV, AdV, `SARS-CoV-2`, MPV, PIV))
+)
+sdl_acm$s_v <- mean(apply(sdl_acm$viruses, 2, sd))
+
+# model fit
+stan_file_acm <- "../models/negbinom-cough-molecular-model.stan"
+coughsMolMod <- stan(stan_file_acm, data = sdl_acm, seed = 12345, cores = 4)
+
+# results
+raw_res_acm <- summary(coughsMolMod, probs = c(0.025, 0.5, 0.975), pars = c("phi", "beta0", "theta", "theta_v", "tau"))$summary %>%
+  data.frame() %>%
+  mutate_all(round, 2) 
+raw_res_acm
+
+# plot
+viruses <- c("Average", "Flu B", "HRV", "AdV", "CoV", "MPV", "PIV")
+names(viruses) <- 0:6
+draws_theta <- coughsMolMod %>% spread_draws(theta_v[v]) %>%
+  mutate(v = recode(v, !!! viruses),
+         v = factor(v, levels = viruses),
+         rr = exp(theta_v))
+
+draws_theta %>%
+  dplyr::select(v, rr) %>%
+  group_by(v) %>%
+  mean_qi() %>%
+  ungroup() %>%
+  mutate_if(is.numeric, round, 2)
+
+theta_pl <- draws_theta %>%
+  ggplot(aes(y = v, x = rr, color = v)) +
+  geom_vline(aes(xintercept = 1), linetype = "dotted", color = "red") +
+  stat_pointinterval(shape = 21, fill = "white") +
+  scale_color_manual(values = wes_palette("IsleofDogs1")) +
+  labs(x = "Relative risk ratio", title = "B") +
+  theme_custom() +
+  theme(axis.title.y = element_blank(), legend.position = "none",
+        plot.title.position = "plot")
+
+theta_pl
+save_plot(theta_pl, pdf_file = "../results/cough-data/coughs-virus-association.pdf", eps_file = "../results/cough-data/coughs-virus-association.eps", w = 12, h = 8)
 ```
