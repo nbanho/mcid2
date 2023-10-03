@@ -191,7 +191,7 @@ tnet_pl <- tnet %>%
   geom_point(shape = 21, color = "black") +
   geom_segment(aes(y = from, yend = to, xend = virus), size = 1,
                arrow = arrow(length = unit(0.2, "cm")), color = "black") +
-  labs(size = "No. of infections", fill = "Virus", title = "c") +
+  labs(size = "Number of infections", fill = "Virus") +
   coord_y_datetime(ylim = c(max(tnet$date_infection), min(tnet$date_infection))) +
   scale_y_datetime(date_breaks = "1 week", date_labels = "%b %d") +
   scale_size_discrete(range = c(4,8)) +
@@ -200,7 +200,7 @@ tnet_pl <- tnet %>%
   theme(legend.position = "top",
         legend.direction = "horizontal",
         legend.box = "vertical",
-        plot.title.position = "plot",
+        #plot.title.position = "plot",
         axis.title = element_blank(),
         #axis.text.x = element_blank(),
         #axis.ticks.x = element_blank(),
@@ -211,7 +211,7 @@ tnet_pl <- tnet %>%
   guides(fill = "none",
          size = guide_legend(nrow = 1, order = 1))
 
-save_plot(tnet_pl, pdf_file = "../results/mol-data/network-plot.pdf", eps_file = "../results/mol-data/network-plot.eps", w = 16, h = 22)
+save_plot(tnet_pl, pdf_file = "../results/mol-data/network-plot.pdf", eps_file = "../results/mol-data/network-plot.eps", w = 16, h = 21)
 ```
 
 
