@@ -230,17 +230,17 @@ prior_pin_pl <- prior_pin %>%
   ggplot(aes(x = x, y = y)) +
   stat_lineribbon(point_interval = "mean_qi") +
   scale_fill_brewer() + 
-  facet_wrap(~ virus) +
-  labs(x = "s (delay in days)", y = expression(p[IN]*" (%)")) +
+  facet_wrap(~ virus, scales = "free_x") +
+  labs(x = "s (delay in days)", y = expression(p[IN]*" (%)"), fill = "Prior distribution (CrI)") +
   scale_x_continuous(expand = c(0,0), breaks = seq(0, 10, 2)) +
   scale_y_continuous(expand = expansion(mult = c(0,0.05))) +
-  theme_bw2() +
-  theme(plot.title = element_text(hjust = 0), legend.position = "none",
-        panel.spacing = unit(15, units = "pt"), 
+  theme_custom() +
+  theme(plot.title = element_text(hjust = 0), legend.position = "top",
+        panel.spacing = unit(25, units = "pt"), 
         plot.margin = margin(r = 10))
 prior_pin_pl
 
-save_plot(prior_pin_pl, pdf_file = "../results/epi-data/incubation-periods.pdf", w = 16, h = 10)
+save_plot(prior_pin_pl, pdf_file = "../results/epi-data/incubation-periods.pdf", w = 16, h = 11)
 ```
 
 ### Stan data
