@@ -16,6 +16,7 @@ library(tidyverse)
 library(reshape2)
 library(tidybayes)
 library(lubridate)
+library(scales)
 library(rstan)
 source("../utils/epi.r")
 source("../utils/bayes.r")
@@ -28,6 +29,8 @@ source("../utils/tex.r")
 ```{r}
 df <- readRDS("../data-clean/molecular.rds")
 df_ll <- readRDS("../data-clean/molecular-long.rds")
+df_network <- rbind(readxl::read_excel("../data-clean/transmission-network.xlsx", sheet = "A"),
+                    readxl::read_excel("../data-clean/transmission-network.xlsx", sheet = "B"))  
 ```
 
 ## Descriptives
@@ -50,6 +53,58 @@ print.xtable(line_list_dat,
              include.rownames = F,
              only.contents = T,
              hline.after = NULL)
+```
+
+
+### Transmission network
+
+```{r}
+tnet <- df_network %>%
+  mutate(date_infection = as.POSIXct(paste0(date_infection, "00:00:00")),
+         virus = ifelse(virus == "SARS-CoV-2", "CoV", virus),
+         virus = factor(virus, levels = c("Flu B", "HRV", "AdV", "CoV", "MPV", "PIV")),
+         class = paste("Class", class)) %>%
+  group_by(id, class, date_infection, virus, chain) %>%
+  summarize(n = n()) %>%
+  ungroup() %>%
+  mutate(n = factor(n, levels = c(1,2,3))) %>%
+  group_by(class, chain) %>%
+  arrange(date_infection) %>%
+  mutate(from = date_infection + hours(12),
+         to = lead(date_infection) - hours(12)) %>%
+  ungroup() 
+
+coord_y_datetime <- function(xlim = NULL, ylim = NULL, expand = TRUE) {
+  if (!is.null(ylim)) {
+    ylim <- lubridate::as_datetime(ylim)
+  }
+  ggplot2::coord_cartesian(xlim = xlim, ylim = ylim, expand = expand)
+}
+
+tnet_pl <- tnet %>%
+  ggplot(aes(y = date_infection, x = virus, fill = virus, size = n)) +
+  facet_wrap(~ class, ncol = 2, scales = "free_x") +
+  geom_point(shape = 21, color = "black") +
+  geom_segment(aes(y = from, yend = to, xend = virus), size = 1,
+               arrow = arrow(length = unit(0.2, "cm")), color = "black") +
+  labs(size = "No. of infections", fill = "Virus", title = "c") +
+  coord_y_datetime(ylim = c(max(tnet$date_infection), min(tnet$date_infection))) +
+  scale_y_datetime(date_breaks = "1 week", date_labels = "%b %d") +
+  scale_size_discrete(range = c(4,8)) +
+  scale_fill_manual(values = wes_palette("IsleofDogs1")) +
+  theme_custom() +
+  theme(legend.position = "none",
+        plot.title.position = "plot",
+        axis.title = element_blank(),
+        #axis.text.x = element_blank(),
+        #axis.ticks.x = element_blank(),
+        panel.spacing = unit(1, "cm"),
+        panel.grid.major.x = element_line(),
+        panel.grid.minor.y = element_blank(),
+        strip.text.x = element_text(size = 10, margin = margin(b = 10))) #+
+  #guides(fill = "none")
+
+#save_plot(tnet_pl, "../results/mol-data/network-plot.pdf", w = 16, h = 20)
 ```
 
 ### Number of positive samples
@@ -147,10 +202,10 @@ pos_tot_pl
 descr <- pos_tot_pl + plot_spacer() + pos_cond_pl & theme(legend.position = "bottom", legend.key.height = unit(.1, "cm"),
                                           legend.key.width = unit(.3, "cm"))
 descr <- descr + plot_layout(guides = "collect", widths = c(9.5, 1, 5.5), ncol = 2) 
-descr <- descr + pos_week_pl 
-descr <- descr + plot_layout(nrow = 2, heights = c(8, 8), design = 'ABC
+descr <- descr + tnet_pl 
+descr <- descr + plot_layout(nrow = 2, heights = c(4, 16), design = 'ABC
                              DDD')
-save_plot(descr, pdf_file = "../results/mol-data/descriptives.pdf", eps_file = "../results/mol-data/descriptives.eps", h = 16, w = 16)
+save_plot(descr, pdf_file = "../results/mol-data/descriptives.pdf", eps_file = "../results/mol-data/descriptives.eps", h = 24, w = 16)
 # saveRDS(pos_tot_pl + ggtitle(""), file = "../results/mol-data/descriptives-total.rds")
 # saveRDS(pos_cond_pl + ggtitle(""), file = "../results/mol-data/descriptives-cond.rds")
 # saveRDS(pos_week_pl + ggtitle(""), file = "../results/mol-data/descriptives-week.rds")

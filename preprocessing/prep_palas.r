@@ -187,6 +187,65 @@ aer %>%
   geom_point() +
   geom_smooth()
 
+# check entire day
+df %>%
+  mutate(hh = hour(datetime),
+         mm_n = minute(datetime) / 60,
+         hhmm_n = hh + mm_n,
+         class = paste("Class", class)) %>%
+  ggplot(aes(x = hhmm_n, y = CO2, group = date)) +
+  facet_wrap(~class, scales = "free_x") +
+  geom_line(color = "black", alpha = .5) +
+  geom_vline(aes(xintercept = 7.3), color = "red", linetype = "dashed") +
+  annotate("text", x = 8, y = 3600, color = "red", label = "School start", size = 10 / cm(1), hjust = 0) +
+  scale_x_continuous(expand = c(0,0), breaks = seq(0, 24, 4)) +
+  scale_y_continuous(expand = c(0,0), breaks = seq(500, 4000, 500)) +
+  labs(y = expression("CO"[2]*" (ppm)")) +
+  theme_bw() +
+  theme(axis.title.x = element_blank())
+ggsave("results/co2-full-time.png", width = 16 / cm(1), height = 8 / cm(1))
+
+# full day AER
+vent_dat_full <- df %>%
+  group_by(class, date) %>%
+  slice(1, n()) %>%
+  dplyr::select(class, date, datetime) %>%
+  mutate(datetime = map(date, function(x) seq.POSIXt(first(datetime), last(datetime), by = "1 min"))) %>%
+  unnest(datetime) %>%
+  left_join(df %>% dplyr::select(class, datetime, CO2, no_palas)) %>%
+  mutate(no_palas = ifelse(is.na(no_palas), T, no_palas)) %>%
+  group_by(class, date) %>%
+  arrange(datetime) %>%
+  mutate(CO2 = zoo::na.approx(CO2, na.rm = F, maxgap = Inf)) %>%
+  tidyr::fill(CO2, .direction = "downup") %>%
+  ungroup() %>%
+  left_join(epi_dat %>% dplyr::select(date, class, n_present)) %>%
+  mutate(n_present = ifelse(no_palas, 0, n_present)) %>%
+  group_by(class, date) %>%
+  arrange(datetime) %>%
+  mutate(n_present_imp = linear_impute(n_present, no_palas)) %>%
+  ungroup() %>% 
+  mutate(n_present_imp = ifelse(!no_palas, n_present_imp + 1, n_present_imp),
+         V = 233) %>%
+  mutate(nG = ifelse(!no_palas, (n_present_imp-1) * 0.3 + n_present_imp * 0.36, n_present_imp * 0.3)) %>%
+  rename(C = CO2) %>%
+  group_by(class, date) %>%
+  arrange(datetime) %>%
+  mutate(C1 = lead(C)) %>%
+  slice(-n()) %>%
+  ungroup() %>%
+  filter(hm(format(datetime, format = "%H:%M")) >= hm("07:00"),
+         hm(format(datetime, format = "%H:%M")) <= hm("17:00")) %>%
+  mutate(dt = 1 / 60) %>%
+  group_by(class, date) %>%
+  nest() %>%
+  ungroup() %>%
+  mutate(results = lapply(data, function(X) optim(par = c(1, 400), fn = min_rss, data = X, lower = c(0.01, 350), upper = c(Inf, 600), method = "L-BFGS-B")),
+         Q = sapply(results, function(x) x$par[1]),
+         Cr = sapply(results, function(x) x$par[2]),
+         AER = Q / 233) 
+  
+
 #### Combine data ####
 
 env_dat <- left_join(
