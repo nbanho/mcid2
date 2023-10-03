@@ -197,7 +197,7 @@ tnet_pl <- tnet %>%
   scale_size_discrete(range = c(4,8)) +
   scale_fill_manual(values = wes_palette("IsleofDogs1")) +
   theme_custom() +
-  theme(legend.position = "top",
+  theme(legend.position = "bottom",
         legend.direction = "horizontal",
         legend.box = "vertical",
         #plot.title.position = "plot",
