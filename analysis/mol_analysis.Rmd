@@ -144,6 +144,22 @@ pos_tot_pl <- df_pos_tot %>%
 pos_tot_pl
 ```
 
+
+
+```{r}
+# combine
+descr <- pos_tot_pl + plot_spacer() + pos_cond_pl & theme(legend.position = "bottom", legend.key.height = unit(.1, "cm"),
+                                          legend.key.width = unit(.3, "cm"))
+descr <- descr + plot_layout(guides = "collect", widths = c(9.5, 1, 5.5), ncol = 2) 
+descr <- descr + pos_week_pl 
+descr <- descr + plot_layout(nrow = 2, heights = c(8, 8), design = 'ABC
+                             DDD')
+save_plot(descr, pdf_file = "../results/mol-data/descriptives.pdf", eps_file = "../results/mol-data/descriptives.eps", h = 16, w = 16)
+# saveRDS(pos_tot_pl + ggtitle(""), file = "../results/mol-data/descriptives-total.rds")
+# saveRDS(pos_cond_pl + ggtitle(""), file = "../results/mol-data/descriptives-cond.rds")
+# saveRDS(pos_week_pl + ggtitle(""), file = "../results/mol-data/descriptives-week.rds")
+```
+
 ### Transmission network
 
 ```{r}
@@ -181,34 +197,23 @@ tnet_pl <- tnet %>%
   scale_size_discrete(range = c(4,8)) +
   scale_fill_manual(values = wes_palette("IsleofDogs1")) +
   theme_custom() +
-  theme(legend.position = "none",
+  theme(legend.position = "top",
+        legend.direction = "horizontal",
+        legend.box = "vertical",
         plot.title.position = "plot",
         axis.title = element_blank(),
-        axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
+        #axis.text.x = element_blank(),
+        #axis.ticks.x = element_blank(),
         panel.spacing = unit(1, "cm"),
         panel.grid.major.x = element_line(),
         panel.grid.minor.y = element_blank(),
-        strip.text.x = element_text(size = 10, margin = margin(b = 10))) #+
-  #guides(fill = "none")
+        strip.text.x = element_text(size = 10, margin = margin(b = 10))) +
+  guides(fill = "none",
+         size = guide_legend(nrow = 1, order = 1))
 
-#save_plot(tnet_pl, "../results/mol-data/network-plot.pdf", w = 16, h = 20)
+save_plot(tnet_pl, pdf_file = "../results/mol-data/network-plot.pdf", eps_file = "../results/mol-data/network-plot.eps", w = 16, h = 22)
 ```
 
-
-```{r}
-# combine
-descr <- pos_tot_pl + plot_spacer() + pos_cond_pl & theme(legend.position = "bottom", legend.key.height = unit(.1, "cm"),
-                                          legend.key.width = unit(.3, "cm"))
-descr <- descr + plot_layout(guides = "collect", widths = c(9.5, 1, 5.5), ncol = 2) 
-descr <- descr + tnet_pl 
-descr <- descr + plot_layout(nrow = 2, heights = c(4, 16), design = 'ABC
-                             DDD')
-save_plot(descr, pdf_file = "../results/mol-data/descriptives.pdf", eps_file = "../results/mol-data/descriptives.eps", h = 22, w = 16)
-# saveRDS(pos_tot_pl + ggtitle(""), file = "../results/mol-data/descriptives-total.rds")
-# saveRDS(pos_cond_pl + ggtitle(""), file = "../results/mol-data/descriptives-cond.rds")
-# saveRDS(pos_week_pl + ggtitle(""), file = "../results/mol-data/descriptives-week.rds")
-```
 
 ## Prepare data
 
