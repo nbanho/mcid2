@@ -205,7 +205,7 @@ descr <- descr + plot_layout(guides = "collect", widths = c(9.5, 1, 5.5), ncol =
 descr <- descr + tnet_pl 
 descr <- descr + plot_layout(nrow = 2, heights = c(4, 16), design = 'ABC
                              DDD')
-save_plot(descr, pdf_file = "../results/mol-data/descriptives.pdf", eps_file = "../results/mol-data/descriptives.eps", h = 24, w = 16)
+save_plot(descr, pdf_file = "../results/mol-data/descriptives.pdf", eps_file = "../results/mol-data/descriptives.eps", h = 22, w = 16)
 # saveRDS(pos_tot_pl + ggtitle(""), file = "../results/mol-data/descriptives-total.rds")
 # saveRDS(pos_cond_pl + ggtitle(""), file = "../results/mol-data/descriptives-cond.rds")
 # saveRDS(pos_week_pl + ggtitle(""), file = "../results/mol-data/descriptives-week.rds")
