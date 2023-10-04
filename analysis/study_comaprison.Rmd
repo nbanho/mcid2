@@ -66,7 +66,7 @@ pos_samples <- data.frame(
   scale_x_continuous(expand = expansion(add = c(0,9.5))) +
   scale_color_manual(values = wes_palette("Darjeeling2")[c(2, 5)]) +
   scale_pattern_color_manual(values = wes_palette("Darjeeling2")[c(2, 5)]) +
-  labs(y = "Study year", x = "Frequency", title = "b") +
+  labs(y = "Study year", x = "Frequency of positive samples", title = "b") +
   theme_custom() +
   theme(legend.position = "none",
         plot.title.position = "plot")
@@ -105,7 +105,7 @@ particle <- data.frame(
   geom_point(mapping = aes(x = Mean), shape = 23, size = 2, fill = "white") +
   scale_color_manual(values = wes_palette("Darjeeling2")[c(2, 5)]) +
   scale_x_continuous(expand = expansion(mult = c(0, 0.1)), breaks = c(0, 50, 100), limits = c(0, 100)) +
-  labs(y = "Study year", x = "Estimated reduction (%)", title = "c") + 
+  labs(y = "Study year", x = "Estimated reduction in particle concentration (%)", title = "c") + 
   theme_custom() +
   theme(legend.position = "none",
         plot.title.position = "plot",
@@ -128,7 +128,7 @@ rr <- data.frame(
   geom_vline(aes(xintercept = 1), linetype = "dashed") +
   geom_errorbar(mapping = aes(xmin = Lower, xmax = Upper), lineend = "square", size = 1, width = .05) +
   geom_point(mapping = aes(x = Mean), shape = 23, size = 2, fill = "white") +
-  labs(y = "Study year", x = "Adjusted relative risk (%)", title = "d") + 
+  labs(y = "Study year", x = "ARR of infection with air cleaners (%)", title = "d") + 
   scale_color_manual(values = wes_palette("Darjeeling2")[c(2, 5)]) +
   theme_custom() +
   theme(legend.position = "none",

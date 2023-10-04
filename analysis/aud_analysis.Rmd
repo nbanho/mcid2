@@ -98,23 +98,23 @@ coughs %>%
 
 # weekly coughs per min by class and condition
 coughs_pl <- coughs %>%
-  mutate(week = isoweek(date)) %>%
-  filter(week != 6) %>%
-  mutate(week = ifelse(week < 6, week - min(week) + 1, week - min(week))) %>%
-  group_by(class, week) %>%
-  summarize(coughs_per_min = sum(n_coughs) / sum(TT),
-            aircleaner = first(aircleaner)) %>%
+  group_by(class, aircleaner) %>%
+  summarize(coughs_per_min = sum(n_coughs) / sum(TT)) %>%
   ungroup() %>%
-  mutate(aircleaner = factor(aircleaner, levels = c("Yes", "No")),
+  mutate(aircleaner = factor(aircleaner, levels = c("No", "Yes")),
          class = factor(class, levels = c("A", "B"))) %>%
   arrange(class, aircleaner) %>%
-  ggplot(aes(x = factor(week), y = coughs_per_min, fill = aircleaner, pattern = class)) +
-  geom_bar_pattern(stat = "identity", color = "black", pattern_fill = "white", pattern_angle = 45,
+  ggplot(aes(x = aircleaner, y = coughs_per_min, fill = aircleaner)) +
+  geom_bar_pattern(mapping = aes(pattern = class),
+                   stat = "identity", position = position_dodge(width = .66), color = "black", pattern_fill = "white", pattern_angle = 45,
                    pattern_density = 0.25, pattern_spacing = 0.05, width = .5) +
+  geom_text(data = coughs %>% group_by(aircleaner) %>% summarize(coughs_per_min = sum(n_coughs) / sum(TT)) %>% ungroup() %>%
+              mutate(y = 4.5),
+            mapping = aes(y = y, label = paste("Mean =", round(coughs_per_min, 1))),
+            size = 8 / cm(1), vjust = -1) +
   labs(x = "Study week", y = "Number of coughs per min", fill = "Air cleaner", pattern = "Class", title = "a") +
-  scale_fill_manual(values = rev(wes_palette("Royal1")[1:2])) +
-  scale_x_discrete(breaks = 1:7) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.05)), breaks = seq(0, 10, 2)) +
+  scale_fill_manual(values = wes_palette("Royal1")[1:2]) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1)), breaks = seq(0, 10, 2)) +
   scale_pattern_manual(values = c(A = "stripe", B = "none")) +
   theme_custom() +
   theme(legend.position = "top",
@@ -122,13 +122,16 @@ coughs_pl <- coughs %>%
         legend.key.width = unit(0.5, "cm"),
         legend.key.height = unit(0.3, "cm"),
         plot.title.position = "plot") +
-  guides(fill = guide_legend(nrow = 1, override.aes = list(pattern = "none", order = 2)),
+  guides(fill = "none",
          pattern = guide_legend(nrow = 1, override.aes = list(fill = "white"), order = 1))
 
 
 coughs_pl
 
-save_plot(coughs_pl, pdf_file = "../results/cough-data/coughs-frequency-per-week.pdf", eps_file = "../results/cough-data/coughs-frequency-per-week.eps", w = 12, h = 8)
+save_plot(coughs_pl, 
+          pdf_file = "../results/cough-data/coughs-frequency-by-condition.pdf", 
+          eps_file = "../results/cough-data/coughs-frequency-by-condition.eps", 
+          w = 6, h = 8)
 ```
 
 
@@ -249,5 +252,8 @@ theta_pl <- draws_theta %>%
         plot.title.position = "plot")
 
 theta_pl
-save_plot(theta_pl, pdf_file = "../results/cough-data/coughs-virus-association.pdf", eps_file = "../results/cough-data/coughs-virus-association.eps", w = 12, h = 8)
+save_plot(theta_pl, 
+          pdf_file = "../results/cough-data/coughs-virus-association.pdf", 
+          eps_file = "../results/cough-data/coughs-virus-association.eps", 
+          w = 10, h = 8)
 ```

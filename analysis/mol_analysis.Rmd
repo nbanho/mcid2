@@ -185,9 +185,12 @@ coord_y_datetime <- function(xlim = NULL, ylim = NULL, expand = TRUE) {
   ggplot2::coord_cartesian(xlim = xlim, ylim = ylim, expand = expand)
 }
 
+mirror_scales <- list(scale_x_discrete(limits = rev), scale_x_discrete())
+
 tnet_pl <- tnet %>%
   ggplot(aes(y = date_infection, x = virus, fill = virus, size = n)) +
   facet_wrap(~ class, ncol = 2, scales = "free_x") +
+  ggh4x::facetted_pos_scales(x = mirror_scales) +
   geom_point(shape = 21, color = "black") +
   geom_segment(aes(y = from, yend = to, xend = virus), size = 1,
                arrow = arrow(length = unit(0.2, "cm")), color = "black") +
