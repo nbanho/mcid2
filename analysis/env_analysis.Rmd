@@ -55,6 +55,8 @@ env_epi_data %>%
   mutate(across(c(CO2_mean, CO2_sd, Cn_mean, Cn_sd), round),
          across(c(AER_mean, AER_sd, PM1_mean, PM1_sd), round, 2))
 
+tt_co2 <- t.test(env_epi_data$CO2[env_epi_data$aircleaner=="Yes"], env_epi_data$CO2[env_epi_data$aircleaner=="No"])
+
 # by air cleaner
 env_epi_data %>%
   group_by(aircleaner) %>%

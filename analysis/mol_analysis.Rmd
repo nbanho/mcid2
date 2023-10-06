@@ -37,10 +37,10 @@ df_network <- rbind(readxl::read_excel("../data-clean/transmission-network.xlsx"
 air_samples <- matrix(
   c("B", "25-01-2023", "HRV", "Air",
     "A", "20-02-2023", "AdV", "Air",
-    "B", "01-02-2023", "Flu B", "Filter", # we use the middle of the week(s) when the swabs were taken
-    "A", "05-03-2023", "CoV", "Filter",
-    "A", "05-03-2023", "AdV", "Filter",
-    "A", "05-03-2023", "HRV", "Filter"),
+    "B", "01-02-2023", "Flu B", "Filter", # we set the dates for the filter swabs to align with saliva
+    "A", "27-02-2023", "CoV", "Filter",
+    "A", "03-03-2023", "AdV", "Filter",
+    "A", "08-03-2023", "HRV", "Filter"),
   ncol = 4, byrow = T
 ) %>%
   data.frame() %>%
