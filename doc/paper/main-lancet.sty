@@ -1,0 +1,333 @@
+\ProvidesPackage{main}
+
+% \documentclass[review,,times,10pt]{elsarticle}
+
+% % Packages
+
+% \usepackage{threeparttable}
+% \usepackage{tabularx}
+% \usepackage{booktabs}
+% \usepackage{pdfpages}
+% \usepackage{graphicx}
+% \usepackage{url}
+% \PassOptionsToPackage{pdftex}{graphicx}
+% \usepackage{tikz}
+% \usepackage{xstring}
+% \usepackage{etoolbox}
+% \usepackage[bf]{caption}
+% \captionsetup[figure]{labelfont={bf},name={Fig},labelsep=none}
+% \usepackage{subcaption}
+% \usepackage{amssymb}
+% \usepackage{amsmath}
+% \usepackage{float}
+% \usepackage{siunitx}
+%     \sisetup{
+%       detect-all,
+%       detect-weight=true,
+% %      detect-inline-family=math,
+%       group-separator={,},
+% %      output-decimal-marker = {\textperiodcentered},
+%       input-symbols={()*},
+%       tophrase={\text{~to~}},
+%       range-units=single
+%     }%
+%     \newcommand{\sym}[1]{\rlap{$^{#1}$}}
+% \makeatletter
+%     \renewcommand{\fps@figure}{H}         % default {tbp}
+%     \renewcommand{\fps@table}{H}         % default {tbp}
+% \makeatother 
+% \setlength{\parindent}{0pt}
+% \usepackage[none]{hyphenat}
+% % bibliography
+
+% %\biboptions{sort&compress,super}
+% %\bibliographystyle{naturemag}
+% \bibliographystyle{naturemag}
+
+
+% % additional commands
+
+% \newcommand\TODO[1]{{\color{red}#1}}  
+% \DeclareRobustCommand{\figCapTemporalNewCases}{\input{other/figure_caption_temporal_new_cases}}
+% \DeclareRobustCommand{\figCapPredictedNewCases}{\input{other/figure_caption_new_cases_plots}}
+
+% % cross referencing
+
+% % entities
+% \journal{Nature Medicine}
+
+% % header
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{Banholzer et al.}
+\rhead{SARS-CoV-2 transmission in schools and effect of air cleaners}
+%\lfoot{Article submitted to PLOS Medicine}
+\renewcommand{\headrulewidth}{1pt}
+\renewcommand{\footrulewidth}{1pt}
+\setlength{\headheight}{14pt}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+%\usepackage[top=3cm,left=3cm,right=3cm,bottom=3cm]{geometry}% by courtesy of Mico
+\usepackage{lmodern}
+\usepackage{bbm}
+\usepackage{graphicx}
+\usepackage{epstopdf}
+\usepackage{colortbl}
+%\usepackage{siunitx}
+% \sisetup{
+%   detect-all,
+%   detect-weight=true,
+%   detect-family=true,
+%   mode=text,
+% %   detect-inline-family=math,
+%   group-separator={,},
+% %   group-minimum-digits={3}			
+% }
+\usepackage{rotating}
+\usepackage{tabularx}
+\usepackage{tabu}
+\usepackage{authblk}
+%\usepackage{mathtools}
+\usepackage{overpic}
+\usepackage{url}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usetikzlibrary{arrows}
+\usetikzlibrary{fit}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage[normalem]{ulem}
+%\usepackage{bm}
+\usepackage{enumitem}
+\usepackage[absolute,overlay%,showboxes
+                        ]{textpos}
+% \usepackage{caption}
+\usepackage[font=small,labelfont=bf,justification=justified]{caption}
+\usepackage{subcaption}
+\usepackage{xspace}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[section]{placeins}
+\usepackage{makecell, booktabs}
+\usepackage{eqparbox}
+\usepackage{rotating}
+\usepackage{graphicx}
+\usepackage{xspace}
+\usepackage{setspace}
+%\usepackage{comment}
+\usepackage[sort&compress,noabbrev]{cleveref}
+
+% allow referencing to starred sections
+\makeatletter
+\def\ttl@useclass#1#2{%
+  \@ifstar
+    {\ttl@labelfalse\@dblarg{#1{#2}}}% {\ttl@labelfalse#1{#2}[]}%
+    {\ttl@labeltrue\@dblarg{#1{#2}}}}
+\makeatother
+
+% Table formatting packages
+\usepackage{dcolumn} % align decimal points in tables
+\newcolumntype{d}[1]{D{.}{.}{#1}}
+\usepackage{booktabs} 
+\usepackage[flushleft]{threeparttable}
+\usepackage{lineno}
+
+% math
+\usepackage{amsmath,amsfonts,amssymb}
+% additional math symbols
+\DeclareFontFamily{U}{mathb}{}
+\DeclareFontShape{U}{mathb}{m}{n}{
+  <-5.5> mathb5
+  <5.5-6.5> mathb6
+  <6.5-7.5> mathb7
+  <7.5-8.5> mathb8
+  <8.5-9.5> mathb9
+  <9.5-11.5> mathb10
+  <11.5-> mathb12
+}{}
+\DeclareSymbolFont{mathb}{U}{mathb}{m}{n}
+\DeclareMathSymbol{\ulsh}{3}{mathb}{"E8}
+\DeclareMathSymbol{\ursh}{3}{mathb}{"E9}
+\DeclareMathSymbol{\dlsh}{3}{mathb}{"EA}
+\DeclareMathSymbol{\drsh}{3}{mathb}{"EB}
+
+% text symbols
+\usepackage{textcomp}
+
+%% Patch 'normal' math environments:
+\newcommand*\linenomathpatch[1]{%
+  \cspreto{#1}{\linenomath}%
+  \cspreto{#1*}{\linenomath}%
+  \csappto{end#1}{\endlinenomath}%
+  \csappto{end#1*}{\endlinenomath}%
+}
+
+% \linenomathpatch{equation}
+% \linenomathpatch{gather}
+% \linenomathpatch{multline}
+% \linenomathpatch{align}
+% \linenomathpatch{alignat}
+% \linenomathpatch{flalign}
+
+%\linenumbers
+
+\addto\captionsenglish{\renewcommand{\figurename}{Fig }}
+
+% colored text boxes
+\usepackage{tcolorbox}
+\tcbuselibrary{xparse,skins,breakable}
+
+\tcbset{%
+    basestyle/.style={enhanced,breakable,
+        coltitle=white},
+    defstyle/.style={basestyle,colback=gray!10!white},
+    theostyle/.style={basestyle,colback=gray!10!white},
+}
+\DeclareTColorBox[auto counter,crefname={definition}{definitions}]{definition}{ o O{} t\label g }{%
+    defstyle,IfValueTF={#1}{title={Box~\thetcbcounter.\ #1}}{title=Box~\thetcbcounter.}, IfBooleanTF={#3}{label=#4}{},#2}
+    
+% two columns inside environment
+\usepackage{multicol,lipsum,xparse}
+
+\let\multicolmulticols\multicols
+\let\endmulticolmulticols\endmulticols
+
+\RenewDocumentEnvironment{multicols}{mO{}}
+ {%
+  \ifnum#1=1
+    #2%
+  \else % More than 1 column
+    \multicolmulticols{#1}[#2]
+  \fi
+ }
+ {%
+  \ifnum#1=1
+  \else % More than 1 column
+    \endmulticolmulticols
+  \fi
+ }
+
+
+% \usepackage{xstring}
+% \usepackage{etoolbox}
+% \usepackage{caption}
+
+% \captionsetup{labelfont=bf,tableposition=top}
+
+% \makeatletter
+% \newcommand\formatlabel[1]{%
+%     \noexpandarg
+%     \IfSubStr{#1}{.}{%
+%       \StrBefore{#1}{.}[\firstcaption]%
+%       \StrBehind{#1}{.}[\secondcaption]%
+%       \textbf{\firstcaption.} \secondcaption}{%
+%       #1}%
+%       }
+
+
+% \patchcmd{\@caption}{#3}{\formatlabel{#3}}
+% \makeatother
+
+% cross referencing
+
+\usepackage{zref-xr,zref-user}
+\zexternaldocument*{supplements}
+\newcommand{\supp}{appendix}
+
+% referencing of unnumbered materials and methods
+\newcounter{methods}
+\renewcommand{\themethods}{Materials and methods}
+
+% Track changes
+% \usepackage[markup=underlined]{changes}
+% \makeatletter
+% \@namedef{Changes@AuthorColor}{magenta}
+% \colorlet{Changes@Color}{magenta}
+% \makeatother
+
+
+%=====================================================================% Declare
+
+% \DeclareSIUnit\eur{\officialeuro}
+% \DeclareSIUnit\M{M}
+% \DeclareSIUnit\k{k}
+
+% % Widebar symbol
+% \DeclareFontFamily{U}{mathx}{\hyphenchar\font45}
+% \DeclareFontShape{U}{mathx}{m}{n}{<-> mathx10}{}
+% \DeclareSymbolFont{mathx}{U}{mathx}{m}{n}
+% \DeclareMathAccent{\widebar}{0}{mathx}{"73}
+
+%=====================================================================% New commands (Macros)
+
+% def
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\definecolor{darkgreen}{rgb}{0.0, 0.5, 0.0}
+
+% new command
+\newcommand{\smallsim}{\smallsym{\mathrel}{\sim}}
+\newcommand{\specialcell}[2][c]{%
+  \begin{tabular}[#1]{@{}l@{}}#2\end{tabular}}
+\newcommand{\specialcellc}[2][c]{%
+  \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+\newcommand\ie{i.\,e.\xspace}
+\newcommand\eg{e.\,g.\xspace}
+\newcommand{\dd}[1][]{\mathrm{d}#1}
+\newcommand{\BK}[1]{{\color{orange}{BK: #1}}}
+\newcommand{\figletter}[1]{{{\fontfamily{\sfdefault}\selectfont \textbf{#1}}}}
+\newcommand\TODO[1]{{\color{red}#1}}  
+\newcommand{\FIX}[1]{{\color{darkgreen}#1}}  
+
+% renewcommand
+\renewcommand\theadfont{\bfseries}
+\renewcommand\theadalign{lc}
+\renewcommand\cellalign{tl}
+
+
+\makeatletter
+
+\newbox\@abstract%
+\def\abstitle{\textbf{Abstract}}%
+\renewenvironment{abstract}{
+  \global\setbox\@abstract\vbox\bgroup%
+   \noindent
+}{%
+   \egroup%
+}%
+
+\newbox\@information%
+\def\infotitle{\textbf{Supporting information}}%
+\newenvironment{information}{
+  \global\setbox\@information\vbox\bgroup%
+   \noindent
+}{%
+   \egroup%
+}%
+
+\renewcommand*{\Affilfont}{\normalsize\normalfont}
+\renewcommand*{\Authfont}{\normalfont}
+
+\def\@maketitle{%
+  \newpage
+  \thispagestyle{empty}
+    {\raggedright\fontsize{18pt}{20pt}\selectfont \@title \par}%
+    \vskip 0.5em%
+    {\large
+      \lineskip .5em%
+      \begin{tabular}[t]{l}%
+        \raggedright \normalsize\mdseries{\@author} %
+      \end{tabular}\par}%
+      \vskip 1em
+      \raggedright\Large\infotitle\par
+      \vskip 1em
+    {\unvbox\@information\par}
+    \newpage
+      \raggedright\Large\abstitle\par
+      \vskip 1em
+    {\unvbox\@abstract\par}%
+    \par
+  \vskip 0.5em
+}
+  
+\makeatother
