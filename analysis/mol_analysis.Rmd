@@ -30,7 +30,22 @@ source("../utils/tex.r")
 df <- readRDS("../data-clean/molecular.rds")
 df_ll <- readRDS("../data-clean/molecular-long.rds")
 df_network <- rbind(readxl::read_excel("../data-clean/transmission-network.xlsx", sheet = "A"),
-                    readxl::read_excel("../data-clean/transmission-network.xlsx", sheet = "B"))  
+                    readxl::read_excel("../data-clean/transmission-network.xlsx", sheet = "B")) %>%
+  mutate(date_infection = gsub("2022", "2023", as.character(date_infection)))
+
+# manually from file because it is only a few samples
+air_samples <- matrix(
+  c("B", "25-01-2023", "HRV", "Air",
+    "A", "20-02-2023", "AdV", "Air",
+    "B", "01-02-2023", "Flu B", "Filter", # we use the middle of the week(s) when the swabs were taken
+    "A", "05-03-2023", "CoV", "Filter",
+    "A", "05-03-2023", "AdV", "Filter",
+    "A", "05-03-2023", "HRV", "Filter"),
+  ncol = 4, byrow = T
+) %>%
+  data.frame() %>%
+  set_names(c("class", "date", "virus", "type")) %>%
+  mutate(date = as.Date(date, format = "%d-%m-%Y"))
 ```
 
 ## Descriptives
@@ -188,21 +203,33 @@ coord_y_datetime <- function(xlim = NULL, ylim = NULL, expand = TRUE) {
 mirror_scales <- list(scale_x_discrete(limits = rev), scale_x_discrete())
 
 tnet_pl <- tnet %>%
-  ggplot(aes(y = date_infection, x = virus, fill = virus, size = n)) +
+  mutate(type = factor("Saliva", levels = c("Saliva", "Air", "Filter"))) %>%
+  ggplot(aes(y = date_infection, x = virus, size = n, shape = type)) +
   facet_wrap(~ class, ncol = 2, scales = "free_x") +
   ggh4x::facetted_pos_scales(x = mirror_scales) +
-  geom_point(shape = 21, color = "black") +
+  geom_point(data = air_samples %>% 
+               mutate(date_infection = as.POSIXct(paste0(date, "00:00:00", format = "%d-%m-%Y %H:%M:%S")),
+                      n = factor(1, levels = c(1,2,3)),
+                      class = factor(paste("Class", class), levels = c("Class A", "Class B")),
+                      type = factor(type, levels = c("Saliva", "Air", "Filter")),
+                      virus = factor(virus, levels = c("Flu B", "HRV", "AdV", "CoV", "MPV", "PIV"))),
+             mapping = aes(color = virus), fill = "white",
+             position = position_dodge(width = -.6, preserve = "single")) +
+  geom_point(mapping = aes(fill = virus), color = "black") +
   geom_segment(aes(y = from, yend = to, xend = virus), size = 1,
-               arrow = arrow(length = unit(0.2, "cm")), color = "black") +
-  labs(size = "Number of infections", fill = "Virus") +
+              arrow = arrow(length = unit(0.2, "cm")), color = "black") +
+  labs(size = "Number of infections", fill = "Virus", shape = "") +
   coord_y_datetime(ylim = c(max(tnet$date_infection), min(tnet$date_infection))) +
   scale_y_datetime(date_breaks = "1 week", date_labels = "%b %d") +
   scale_size_discrete(range = c(4,8)) +
   scale_fill_manual(values = wes_palette("IsleofDogs1")) +
+  scale_color_manual(values = wes_palette("IsleofDogs1")) +
+  scale_shape_manual(values = c("Saliva" = 21, "Air" = 22, "Filter" = 23),
+                     breaks = c("Saliva", "Air", "Filter")) +
   theme_custom() +
   theme(legend.position = "bottom",
         legend.direction = "horizontal",
-        legend.box = "vertical",
+        legend.box = "horizontal",
         #plot.title.position = "plot",
         axis.title = element_blank(),
         #axis.text.x = element_blank(),
@@ -212,7 +239,9 @@ tnet_pl <- tnet %>%
         panel.grid.minor.y = element_blank(),
         strip.text.x = element_text(size = 10, margin = margin(b = 10))) +
   guides(fill = "none",
-         size = guide_legend(nrow = 1, order = 1))
+         color = "none",
+         shape = guide_legend(order = 1),
+         size = guide_legend(nrow = 1, order = 2))
 
 save_plot(tnet_pl, pdf_file = "../results/mol-data/network-plot.pdf", eps_file = "../results/mol-data/network-plot.eps", w = 16, h = 21)
 ```
