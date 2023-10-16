@@ -4,6 +4,7 @@ require(gridExtra)
 require(GGally)
 require(Cairo)
 require(gg.layers)
+require(kunstomverse)
 require(wesanderson) # https://github.com/karthik/wesanderson
 
 # ggplot theme for Nature style

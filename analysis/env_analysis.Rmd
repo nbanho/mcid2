@@ -69,6 +69,30 @@ env_epi_data %>%
 ## Boxplots
 
 ```{r}
+# only particle number concentration
+boxpl_cn <- env_epi_data %>%
+  dplyr::select(class, date, aircleaner, Cn) %>%
+  ggplot(aes(x = aircleaner, fill = aircleaner, y = Cn)) +
+  geom_boxplot2() +
+  #geom_jitter(alpha = .3, width = .2, color = "grey") +
+  scale_fill_manual(values = wes_palette("Royal1")) +
+  scale_shape_manual(values = c(2,20)) +
+  scale_y_continuous(expand = c(0,0), limits = c(0, NA)) +
+  labs(title = "b", y = expression("Aerosol number concentration (1/cm"^3*")"), x = "Air cleaner") +
+  theme_custom() +
+  theme(legend.position = "none",
+        plot.title.position = "plot") +
+  guides(color = "none")
+
+boxpl_cn
+
+save_plot(boxpl_cn, 
+          pdf_file = "../results/env-data/aerosol-number-boxplot.pdf", 
+          eps_file = "../results/env-data/aerosol-number-boxplot.eps", 
+          w = 8, h = 8)
+```
+
+```{r}
 # particle concentrations
 boxpl_pc <- env_epi_data %>%
   dplyr::select(class, date, weekday, aircleaner, Cn, PM1, PM25, PM4, PM10) %>%
@@ -86,6 +110,7 @@ boxpl_pc <- env_epi_data %>%
   theme(axis.title.y = element_blank(), legend.position = "top",
         plot.title.position = "plot") +
   guides(color = "none")
+
 save_plot(boxpl_pc, pdf_file = "../results/env-data/particles-boxplot.pdf", eps_file = "../results/env-data/particles-boxplot.eps", w = 16, h = 8)
 saveRDS(boxpl_pc, file = "../results/env-data/particles-boxplot.rds")
 
