@@ -156,10 +156,10 @@ df_pos_tot <- df_pos %>%
   ungroup()
 
 pos_tot_pl <- ggplot(mapping = aes(y = n, x = 1, fill = variable)) +
-  geom_bar(data = df_pos_tot, stat = "identity", position = position_stack(), width = .5) +
+  geom_bar(data = df_pos_tot, stat = "identity", position = position_stack(reverse = T), width = .5) +
   geom_text(data = df_pos_tot %>% mutate(n_lab = paste0(variable, ": ", n)), 
             mapping = aes(label = n_lab), 
-            size = 8 / cm(1), position = position_stack(vjust = 0.5), color = "white") +
+            size = 8 / cm(1), position = position_stack(vjust = 0.5, reverse = T), color = "white") +
   scale_fill_manual(values = wes_palette("IsleofDogs1")) +
   scale_color_manual(values = wes_palette("IsleofDogs1")) +
   scale_y_continuous(expand = c(0,0)) +
@@ -183,7 +183,7 @@ pos_tot_pl
 save_plot(pos_tot_pl, 
           "../results/mol-data/saliva-distribution.pdf",
           "../results/mol-data/saliva-distribution.eps",
-          w = 3.25, h = 21)
+          w = 3.25, h = 20)
 ```
 
 <!-- ```{r} -->
@@ -240,7 +240,7 @@ tnet_pl <- tnet %>%
                       type = factor(type, levels = c("Saliva", "Air", "Filter")),
                       virus = factor(virus, levels = c("Flu B", "HRV", "AdV", "CoV", "MPV", "PIV"))),
              mapping = aes(color = virus), fill = "white",
-             position = position_dodge(width = -.6, preserve = "single")) +
+             position = position_dodge(width = -.85, preserve = "single")) +
   geom_point(mapping = aes(fill = virus), color = "black") +
   geom_segment(aes(y = from, yend = to, xend = virus), size = 1,
               arrow = arrow(length = unit(0.2, "cm")), color = "black") +
@@ -258,9 +258,7 @@ tnet_pl <- tnet %>%
         legend.box = "horizontal",
         plot.title.position = "plot",
         axis.title = element_blank(),
-        #axis.text.x = element_blank(),
-        #axis.ticks.x = element_blank(),
-        panel.spacing = unit(1, "cm"),
+        panel.spacing = unit(.5, "cm"),
         panel.grid.major.x = element_line(),
         panel.grid.minor.y = element_blank(),
         strip.text.x = element_text(size = 10, margin = margin(b = 10))) +
@@ -272,7 +270,7 @@ tnet_pl <- tnet %>%
 save_plot(tnet_pl, 
           pdf_file = "../results/mol-data/network-plot.pdf", 
           eps_file = "../results/mol-data/network-plot.eps", 
-          w = 12.75, h = 21)
+          w = 12.25, h = 20)
 ```
 
 
