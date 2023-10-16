@@ -130,12 +130,12 @@ cases_by_cond_pl <- epi_data %>%
   ungroup() %>%
   mutate(aircleaner = factor(aircleaner, levels = c("No", "Yes"))) %>%
   ggplot(aes(x = aircleaner, y = cases, fill = aircleaner)) +
-  geom_bar(stat = "identity", color = "black") +
+  geom_bar(stat = "identity", color = "black", width = .4) +
   geom_text(mapping = aes(label = cases),
             size = 8 / cm(1), vjust = -1) +
   labs(x = "Air cleaner", y = "Number of cases", fill = "Air cleaner", title = "c") +
   scale_fill_manual(values = wes_palette("Royal1")[1:2]) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.1)), breaks = scales::pretty_breaks(4)) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.2)), breaks = scales::pretty_breaks(4)) +
   theme_custom() +
   theme(plot.title.position = "plot") +
   guides(fill = "none")
@@ -145,7 +145,7 @@ cases_by_cond_pl
 save_plot(cases_by_cond_pl,
           pdf_file = "../results/epi-data/cases_by_condition.pdf",
           eps_file = "../results/epi-data/cases_by_condition.eps",
-          w = 8, h = 8) 
+          w = 6, h = 6) 
 ```
 
 ## Prepare data

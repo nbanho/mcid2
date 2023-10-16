@@ -73,12 +73,12 @@ env_epi_data %>%
 boxpl_cn <- env_epi_data %>%
   dplyr::select(class, date, aircleaner, Cn) %>%
   ggplot(aes(x = aircleaner, fill = aircleaner, y = Cn)) +
-  geom_boxplot2() +
+  geom_boxplot2(width.errorbar = .3, width = .4) +
   #geom_jitter(alpha = .3, width = .2, color = "grey") +
   scale_fill_manual(values = wes_palette("Royal1")) +
   scale_shape_manual(values = c(2,20)) +
   scale_y_continuous(expand = c(0,0), limits = c(0, NA)) +
-  labs(title = "b", y = expression("Aerosol number concentration (1/cm"^3*")"), x = "Air cleaner") +
+  labs(title = "b", y = expression("Aerosol concentration (1/cm"^3*")"), x = "Air cleaner") +
   theme_custom() +
   theme(legend.position = "none",
         plot.title.position = "plot") +
@@ -89,7 +89,7 @@ boxpl_cn
 save_plot(boxpl_cn, 
           pdf_file = "../results/env-data/aerosol-number-boxplot.pdf", 
           eps_file = "../results/env-data/aerosol-number-boxplot.eps", 
-          w = 8, h = 8)
+          w = 6, h = 6)
 ```
 
 ```{r}

@@ -103,12 +103,12 @@ coughs_pl <- coughs %>%
   ungroup() %>%
   mutate(aircleaner = factor(aircleaner, levels = c("No", "Yes"))) %>%
   ggplot(aes(x = aircleaner, y = coughs_per_min, fill = aircleaner)) +
-  geom_bar(stat = "identity", color = "black") +
+  geom_bar(stat = "identity", color = "black", width = .4) +
   geom_text(mapping = aes(label = round(coughs_per_min, 1)),
             size = 8 / cm(1), vjust = -1) +
   labs(x = "Study week", y = "Number of coughs per min", fill = "Air cleaner", title = "d") +
   scale_fill_manual(values = wes_palette("Royal1")[1:2]) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.2))) +
   theme_custom() +
   theme(legend.position = "none",
         legend.direction = "horizontal",
@@ -117,13 +117,12 @@ coughs_pl <- coughs %>%
         plot.title.position = "plot") +
   guides(fill = "none")
 
-
 coughs_pl
 
 save_plot(coughs_pl, 
           pdf_file = "../results/cough-data/coughs-frequency-by-condition.pdf", 
           eps_file = "../results/cough-data/coughs-frequency-by-condition.eps", 
-          w = 8, h = 8)
+          w = 6, h = 6)
 ```
 
 

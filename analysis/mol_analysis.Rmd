@@ -128,19 +128,16 @@ df_pos_stud <- df_pos %>%
   mutate(aircleaner = factor(aircleaner, levels = c("No", "Yes")))
   
 pos_cond_pl <- ggplot(mapping = aes(x = aircleaner, y = n, fill = aircleaner)) +
-  geom_bar(data = df_pos_stud, stat = "identity", position = "stack", color = "black") +
+  geom_bar(data = df_pos_stud, stat = "identity", position = "stack", color = "black", width = .4) +
   geom_text(data = subset(df_pos_stud, n != 0), mapping = aes(label = n), 
             size = 8 / cm(1), vjust = -1) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.2))) +
   scale_fill_manual(values = wes_palette("Royal1")[1:2]) +
   labs(y = "Number of positive samples", x = "Air cleaner", fill = "Virus", title = "a") +
   theme_custom() +
   theme(panel.grid = element_blank(),
         plot.title.position = "plot",
-        legend.position = "top",
-        legend.title = element_blank(),
-        legend.key.width = unit(.3, "cm"),
-        legend.key.height = unit(.1, "cm")) +
+        legend.position = "none") +
   guides(fill = guide_legend(nrow = 1))
 
 pos_cond_pl
@@ -148,7 +145,7 @@ pos_cond_pl
 save_plot(pos_cond_pl, 
           "../results/mol-data/saliva-by-study-condition.pdf",
           "../results/mol-data/saliva-by-study-condition.eps",
-          w = 8, h = 8)
+          w = 6, h = 6)
 ```
 
 ```{r}
@@ -159,25 +156,26 @@ df_pos_tot <- df_pos %>%
   ungroup()
 
 pos_tot_pl <- ggplot(mapping = aes(y = n, x = 1, fill = variable)) +
-  geom_bar(data = df_pos_tot, stat = "identity", position = position_stack(reverse = T)) +
-  geom_text(data = subset(df_pos_tot, n != 0), mapping = aes(label = n), 
-            size = 8 / cm(1), position = position_stack(vjust = 0.5, reverse = T), color = "white") +
+  geom_bar(data = df_pos_tot, stat = "identity", position = position_stack(), width = .5) +
+  geom_text(data = df_pos_tot %>% mutate(n_lab = paste0(variable, ": ", n)), 
+            mapping = aes(label = n_lab), 
+            size = 8 / cm(1), position = position_stack(vjust = 0.5), color = "white") +
   scale_fill_manual(values = wes_palette("IsleofDogs1")) +
+  scale_color_manual(values = wes_palette("IsleofDogs1")) +
   scale_y_continuous(expand = c(0,0)) +
-  scale_x_continuous(expand = expansion(mult = c(0.05,0))) +
-  coord_flip() +
+  scale_x_continuous(expand = expansion(mult = c(0.1,0.3))) +
   labs(y = "Number of positive samples", fill = "Virus", title = "a") +
   theme_custom() +
   theme(panel.grid = element_blank(),
         plot.title.position = "plot",
-        legend.position = "top",
-        legend.title = element_blank(),
-        legend.key.width = unit(.3, "cm"),
-        legend.key.height = unit(.1, "cm"),
-        axis.title.y = element_blank(),
-        axis.line.y = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank()) +
+        legend.position = "none",
+        # legend.title = element_blank(),
+        # legend.key.width = unit(.3, "cm"),
+        # legend.key.height = unit(.1, "cm"),
+        axis.title.x = element_blank(),
+        axis.line.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank()) +
   guides(fill = guide_legend(nrow = 1))
 
 pos_tot_pl
@@ -185,7 +183,7 @@ pos_tot_pl
 save_plot(pos_tot_pl, 
           "../results/mol-data/saliva-distribution.pdf",
           "../results/mol-data/saliva-distribution.eps",
-          w = 16, h = 3.5)
+          w = 3.25, h = 21)
 ```
 
 <!-- ```{r} -->
@@ -274,7 +272,7 @@ tnet_pl <- tnet %>%
 save_plot(tnet_pl, 
           pdf_file = "../results/mol-data/network-plot.pdf", 
           eps_file = "../results/mol-data/network-plot.eps", 
-          w = 16, h = 16.5)
+          w = 12.75, h = 21)
 ```
 
 
