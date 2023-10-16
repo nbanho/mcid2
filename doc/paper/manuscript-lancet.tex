@@ -257,14 +257,15 @@ The study population consisted of 38~students (19~female, 19~male; Table~\ref{ta
 
 \subsection{Molecular analyses of saliva and air samples}
 
-We analyzed a total of 448~saliva samples. We detected 15~influenza~B~(Flu B), 15~rhinoviruses~(HRV), 14~adenovirus (AdV), 3~SARS-CoV-2~(CoV), 2~metapneumoviruses~(MPV), and 1~parainfluenza~virus~(PIV) (\cref{fig:molecular-descriptives}a). The distribution of positive saliva samples varied between classes (\cref{fig:molecular-descriptives}b). For example, during the first three study weeks, all but one sample was positive for AdV in class~A, while the vast majority of positive Flu~B samples were found in class~B. To illustrate possible transmission chains within classes, we linked positive saliva samples of the same virus that were less than one week apart. Based on this spatiotemporal analysis, we identified 10~possible transmission chains (\cref{fig:molecular-network}). The longest transmission chains possibly occurred in January and refer to a cluster of AdV infections in class~A and Flu~B infections in class~B. 
+We analyzed a total of 448~saliva samples. We detected 15~influenza~B~(Flu B), 15~rhinoviruses~(HRV), 14~adenovirus (AdV), 3~SARS-CoV-2~(CoV), 2~metapneumoviruses~(MPV), and 1~parainfluenza~virus~(PIV) (\cref{fig:molecular-descriptives}a). The distribution of positive saliva samples varied between classes. For example, during the first three study weeks, all but one sample was positive for AdV in class~A, while the vast majority of positive Flu~B samples were found in class~B. To illustrate possible transmission chains within classes, we linked positive saliva samples of the same virus that were less than one week apart. Based on this spatiotemporal analysis, we identified 10~possible transmission chains (\cref{fig:molecular-descriptives}b). The longest transmission chains possibly occurred in January and refer to a cluster of AdV infections in class~A and Flu~B infections in class~B. 
 
 Molecular genotyping to verify the proposed transmission network was not successful because we were unable to amplify and sequence any of the gene targets. Furthermore, the rate of positive bioaerosol samples was low. We analyzed 105~bioaerosol samples and detected only two respiratory viruses in the air (1~HRV in class~A and 1~AdV in class~B). Similarly, we detected only 1~Flu~B, 1~HRV, 1~AdV, and 1~CoV in the 20~swabs taken from each filter of an air cleaner after each intervention phase (160~swabs in total). However, the virus-specific variation between classes and the temporal distribution of positive samples still suggest that transmission occurred within classes. 
 
 
 \begin{figure}[!htpb]
     \centering
-    \includegraphics{../../results/mol-data/descriptives.pdf}
+    \includegraphics{../../results/mol-data/saliva-distribution.pdf}
+    \includegraphics{../../results/mol-data/network-plot.pdf}
     \caption{\textbf{Molecular detection of respiratory viruses and transmission network based on spatiotemporal analysis of students' saliva samples}. \textbf{(a)}~Number of positive saliva samples by virus. \textbf{(b)}~Daily number of positive saliva samples (colored circles) and possible transmission chains within classes (directed arrows). Positive samples are linked if they belong to the same virus and are less than 1~week apart. Positive samples from the air and filters as blank squares aligned. Flu B: Influenza B, HRV: rhinovirus, AdV: adenovirus, CoV: SARS-CoV-2, MPV: metapneumovirus, PIV: parainfluenza virus.}
     \label{fig:molecular-descriptives}
 \end{figure}
@@ -277,16 +278,16 @@ Particle concentrations differed considerably between study conditions (\cref{fi
 
 Absences related to respiratory infections were less frequent with air cleaners (\cref{fig:infection-risk}c). Overall, there were 22~respiratory cases without and 13~cases with air cleaners. Based on our Bayesian latent variable hierarchical regression model, the posterior probability that air cleaners reduced the risk of infection was 90.8\%, suggesting a beneficial effect of air cleaners. However, the decrease in the risk of infection was small (adjusted relative risk 0.72, 95\%-CrI 0.44 to 1.15). As a result, the estimated number of infections would be 36 (95\%-CrI 21 to 64) if air cleaners had been installed throughout the study period, compared to 62 (95\%-CrI 29 to 141) infections if air cleaners had not been installed (\supp~\zref{fig:avoided-infections}). Detailed estimations are provided in the \supp~text~\zref{sec:detailed-redcap}. 
 
-Slightly fewer coughs were detected in audio recordings with air cleaners (\cref{fig:coughing}a). On average, there were 2.5~coughs/min with and 3.1~coughs/min without air cleaners ($\Delta=-$0.6~coughs/min; adjusted relative risk 0.93, 95\%-CrI 0.85 to 1.02). Significantly more coughs were detected in the room of class~B (adjusted relative risk 2.16, 95\%-CrI 1.90 to 2.46), suggesting an association with the observed variation in virus-specific transmission between classes. Indeed, cough was more frequent with Flu~B positivity (relative risk 1.25, 95\%-CrI 1.03 to 1.53) and slightly less frequent with AdV positivity (0.87, 95\%-CrI 0.49 to 1.12) (\cref{fig:coughing-association}b). 
+Slightly fewer coughs were detected in audio recordings with air cleaners (\cref{fig:infection-risk}d). On average, there were 2.5~coughs/min with and 3.1~coughs/min without air cleaners ($\Delta=-$0.6~coughs/min; adjusted relative risk 0.93, 95\%-CrI 0.85 to 1.02). Significantly more coughs were detected in the room of class~B (adjusted relative risk 2.16, 95\%-CrI 1.90 to 2.46), suggesting an association with the observed variation in virus-specific transmission between classes. Indeed, cough was more frequent with Flu~B positivity (relative risk 1.25, 95\%-CrI 1.03 to 1.53) and slightly less frequent with AdV positivity (0.87, 95\%-CrI 0.49 to 1.12) (\supp~figure~\zref{fig:coughing-association}b). 
 
 \begin{figure}[!htpb]
 \centering
-    \includegraphics{../../results/mol-data/saliva-by-condition.pdf}
-    \includegraphics{../../results/env-data/estimation-results-figure.pdf}
+    \includegraphics{../../results/mol-data/saliva-by-study-condition.pdf}
+    \includegraphics{../../results/env-data/aerosol-number-boxplot.pdf}
     \includegraphics{../../results/epi-data/cases_by_condition.pdf}
-    \includegraphics{results/cough-data/coughs-frequency-by-condition.pdf}
-    \caption{\textbf{Risk of infection by study condition}. \textbf{(a)}~Number of positive saliva samples. \textbf{(b)}~Daily average aerosol number concentrations (CN in 1/cm$^3$) as boxplots. \textbf{(c)}~Number of respiratory cases. \textbf{(d)}~Daily average number of detected coughs per minute.}
-    \label{fig:palas-results}
+    \includegraphics{../../results/cough-data/coughs-frequency-by-condition.pdf}
+    \caption{\textbf{Risk of infection by study condition}. \textbf{(a)}~Number of positive saliva samples. \textbf{(b)}~Daily average aerosol number concentrations as boxplots. \textbf{(c)}~Number of respiratory cases. \textbf{(d)}~Daily average number of detected coughs per minute.}
+    \label{fig:infection-risk}
 \end{figure}
 
 \FloatBarrier
