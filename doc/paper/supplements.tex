@@ -258,7 +258,7 @@ Transmission of respiratory viral infections with and without air cleaners in a 
 \author[2,4]{Alban Ramette}
 \author[2,4]{Ronald Dijkman}
 \author[1]{Matthias Egger}
-\author[2,5]{Tina Hascher}
+\author[5]{Tina Hascher}
 \author[1*,2]{Lukas Fenner}
 
 \affil[1]{Institute of Social and Preventive Medicine, University of Bern, Bern, Switzerland}
@@ -524,8 +524,6 @@ In addition, we analyze the association between the daily number of coughs $Y$ a
 \end{align*}
 where $\theta_{[v]}$ is the partially pooled estimate for respiratory virus $v \in$ (Flu~B, HRV, AdV, CoV, MPV, PIV), $\tau$ estimates variation between viruses, and $s_v$ is the average standard deviation across the count variables of the respiratory viruses. 
 
-\clearpage
-
 \section{Detailed results for risk of infection model}\label{sec:detailed-redcap}
 
 Table~\ref{tab:estimation-results} presents the posterior mean, credible intervals and model diagnostics for all model parameters. See the main paper for a discussion of the effects of interventions. Here we briefly discuss some of the additional model parameters.
@@ -561,6 +559,14 @@ Our model accounts for the delay from infection to case confirmation and allows 
     \label{fig:coverage}
 \end{figure}
 
+Our estimation results imply a small, potential benefit of air cleaners. Subject to considerable uncertainty, \Cref{fig:avoided-infections} shows the estimated number number of infections that would have occurred if air cleaners had been installed throughout the study (scenario~1) or not been installed (scenario~2). 
+
+\begin{figure}[!htpb]
+    \includegraphics{../../results/epi-data/avoided-infections.pdf}
+    \caption[Estimated number of infections with and without air cleaners]{Estimated mean number of infections (posterior mean as dot and 50\%, 80\%, and 95\%-CrI as shaded areas) if, in both classes, air cleaners had been installed throughout the study or not been installed.}
+    \label{fig:avoided-infections}
+\end{figure}
+
 \clearpage
 
 \section{Detailed results for positivity rate in saliva samples}
@@ -579,13 +585,14 @@ There can be unknown delay between when students were infected and when they tes
 
 \section{Detailed results for changes in particle concentrations}\label{sec:detailed-palas}
 
-In the main paper, we compared particle concentrations between study conditions. \Cref{fig:env-descriptives-other-vars} compares additional environmental variables, \ie CO$_2$, air change rate, relative humidity, and temperature. There are no considerable differences between in any of the variables between study conditions. Furthermore, numerical estimation results for the reduction in particle concentrations with air cleaners are shown in \Cref{tab:palas-est-results}.
+There was a strong difference in particle concentrations between study conditions (\Cref{fig:palas-results}a). When adjusting for air change rates and multiple other factors, the aerosol number concentration decreased by 76\% (95\%-CrI 63\% to 86\%) with air cleaners (\Cref{fig:palas-results}b and \Cref{tab:palas-est-results}). The decrease in the concentration of larger particles (PM$_{10}$) was greater than the decrease in the concentration of smaller particles (PM$_1$ to PM$_{4}$). 
 
-\begin{figure}[!htb]
+\begin{figure}[!htpb]
 \centering
-    \includegraphics[width=\linewidth]{../../results/env-data/otherVars-boxplot.pdf}
-    \caption[Boxplot of environmental variables by school and study condition]{Boxplot for the daily average values of each environmental variable by school and study condition.}
-    \label{fig:env-descriptives-other-vars}
+    \includegraphics[width=\linewidth]{../../results/env-data/particles-boxplot.pdf}
+    \includegraphics[width=\linewidth]{../../results/env-data/estimation-results-figure.pdf}
+    \caption[Analysis of particle concentrations and comparison between study conditions]{\textbf{Analysis of particle concentrations and comparison between study conditions}. \textbf{(a)}~Boxplot of the daily average values for aerosol number concentration (CN in 1/cm$^3$) and particle mass concentration (PM for particles of sizes <1 to <10~$\mu$m, respectively in $\mu$gm$^{-3}$). \textbf{(b)}~Estimated reduction in aerosol number and particle mass concentrations with air cleaners (posterior mean as dot and 50\%-, 80\%- and 95\%-CrI as lines, respectively). }
+    \label{fig:palas-results}
 \end{figure}
 
 \begin{table}[!htpb]
@@ -600,8 +607,29 @@ In the main paper, we compared particle concentrations between study conditions.
     \input ../../results/env-data/estimation-results-table.tex
     \bottomrule
     \end{tabular}
-    
 \end{table}
+
+In the main paper, we compared particle concentrations between study conditions. \Cref{fig:env-descriptives-other-vars} compares additional environmental variables, \ie CO$_2$, air change rate, relative humidity, and temperature. There are no considerable differences between in any of the variables between study conditions. Furthermore, numerical estimation results for the reduction in particle concentrations with air cleaners are shown in \Cref{tab:palas-est-results}.
+
+\begin{figure}[!htb]
+\centering
+    \includegraphics[width=\linewidth]{../../results/env-data/otherVars-boxplot.pdf}
+    \caption[Boxplot of environmental variables by study condition]{Boxplot for the daily average values of each environmental variable by study condition.}
+    \label{fig:env-descriptives-other-vars}
+\end{figure}
+
+\clearpage
+
+\section{Detailed results for cough frequency}\label{sec:detailed-results-coughing}
+
+Differences in the frequency of coughs between classes suggest an association with class-specific virus patterns. \Cref{fig:coughing-association} shows the relative risk of cough for each respiratory virus. Cough appeared more frequent for Flu~B and less frequent for AdV.  
+
+\begin{figure}[!htpb]
+    \centering
+    \includegraphics{results/cough-data/coughs-virus-association.pdf}
+    \caption[Association between cough frequency and virus-specific positivity rate]{Estimated association (relative risk; posterior mean as dot, 50\%, 80\%, and 95\%-CrI as lines) between cough frequency and number of positive saliva test results by respiratory virus. Flu B: Influenza B, HRV: rhinovirus, AdV: adenovirus, CoV: SARS-CoV-2, MPV: metapneumovirus, PIV: parainfluenza virus.}
+    \label{fig:coughing-association}
+\end{figure}
 
 \clearpage
 
