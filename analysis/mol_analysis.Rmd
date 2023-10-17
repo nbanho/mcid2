@@ -184,7 +184,7 @@ pos_tot_pl
 save_plot(pos_tot_pl, 
           "../results/mol-data/saliva-distribution.pdf",
           "../results/mol-data/saliva-distribution.eps",
-          w = 3.25, h = 19)
+          w = 3.25, h = 20)
 ```
 
 <!-- ```{r} -->
@@ -271,7 +271,7 @@ tnet_pl <- tnet %>%
 save_plot(tnet_pl, 
           pdf_file = "../results/mol-data/network-plot.pdf", 
           eps_file = "../results/mol-data/network-plot.eps", 
-          w = 12.25, h = 19)
+          w = 12.25, h = 20)
 ```
 
 
