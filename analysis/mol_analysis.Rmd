@@ -37,7 +37,7 @@ df_network <- rbind(readxl::read_excel("../data-clean/transmission-network.xlsx"
 air_samples <- matrix(
   c("B", "25-01-2023", "HRV", "Air",
     "A", "20-02-2023", "AdV", "Air",
-    "B", "01-02-2023", "Flu B", "Filter", # we set the dates for the filter swabs to align with saliva
+    "B", "01-02-2023", "IFB", "Filter", # we set the dates for the filter swabs to align with saliva
     "A", "27-02-2023", "CoV", "Filter",
     "A", "03-03-2023", "AdV", "Filter",
     "A", "08-03-2023", "HRV", "Filter"),
@@ -78,14 +78,13 @@ df_pos <- df %>%
   mutate(week = week(date),
          week = week - min(week) + 1,
          week = ifelse(week > 4, week - 1, week)) %>%
-  dplyr::select(aircleaner, week, class, AdV, `Flu B`, HRV, MPV, PIV, `SARS-CoV-2`) %>%
+  dplyr::select(aircleaner, week, class, AdV, `IFB`, HRV, MPV, PIV, `CoV`) %>%
   melt(c("aircleaner", "week", "class")) %>%
   group_by(aircleaner, class, week, variable) %>%
   summarize(n = sum(value)) %>%
   ungroup() %>%
   mutate(variable = as.character(variable), 
-         variable = ifelse(variable == "SARS-CoV-2", "CoV", variable),
-         variable = factor(variable, levels = c("Flu B", "HRV", "AdV", "CoV", "MPV", "PIV")),
+         variable = factor(variable, levels = c("IFB", "HRV", "AdV", "CoV", "MPV", "PIV")),
          class = paste("Class", class)) %>%
   arrange(class, week, desc(variable))
 ```
@@ -208,7 +207,7 @@ save_plot(pos_tot_pl,
 tnet <- df_network %>%
   mutate(date_infection = as.POSIXct(paste0(date_infection, "00:00:00")),
          virus = ifelse(virus == "SARS-CoV-2", "CoV", virus),
-         virus = factor(virus, levels = c("Flu B", "HRV", "AdV", "CoV", "MPV", "PIV")),
+         virus = factor(virus, levels = c("IFB", "HRV", "AdV", "CoV", "MPV", "PIV")),
          class = paste("Class", class)) %>%
   group_by(id, class, date_infection, virus, chain) %>%
   summarize(n = n()) %>%
@@ -239,7 +238,7 @@ tnet_pl <- tnet %>%
                       n = factor(1, levels = c(1,2,3)),
                       class = factor(paste("Class", class), levels = c("Class A", "Class B")),
                       type = factor(type, levels = c("Saliva", "Air", "Filter")),
-                      virus = factor(virus, levels = c("Flu B", "HRV", "AdV", "CoV", "MPV", "PIV"))),
+                      virus = factor(virus, levels = c("IFB", "HRV", "AdV", "CoV", "MPV", "PIV"))),
              mapping = aes(color = virus), fill = "white",
              position = position_dodge(width = -.85, preserve = "single")) +
   geom_point(mapping = aes(fill = virus), color = "black") +
@@ -268,6 +267,8 @@ tnet_pl <- tnet %>%
          shape = guide_legend(order = 1),
          size = guide_legend(nrow = 1, order = 2))
 
+tnet_pl
+
 save_plot(tnet_pl, 
           pdf_file = "../results/mol-data/network-plot.pdf", 
           eps_file = "../results/mol-data/network-plot.eps", 
@@ -291,7 +292,7 @@ create.stan_data <- function(dat) {
   # outcome
   stan_data$samples <- dat %>%
     arrange(class, date) %>%
-    dplyr::select(Neg, AdV, `Flu B`, HRV, MPV, PIV, `SARS-CoV-2`) %>%
+    dplyr::select(Neg, AdV, `IFB`, HRV, MPV, PIV, `CoV`) %>%
     as.matrix()
 
   # air cleaner indicator
@@ -312,12 +313,12 @@ create.stan_data <- function(dat) {
   stan_data$susceptibles <- dat %>%
     group_by(class) %>%
     arrange(date) %>%
-    mutate(across(c(AdV, `Flu B`, HRV, MPV, PIV, `SARS-CoV-2`), ~ n_class - cumsum(.x)),
-           across(c(AdV, `Flu B`, HRV, MPV, PIV, `SARS-CoV-2`), ~ (.x - mean(.x)) / sd(.x)),
+    mutate(across(c(AdV, `IFB`, HRV, MPV, PIV, `CoV`), ~ n_class - cumsum(.x)),
+           across(c(AdV, `IFB`, HRV, MPV, PIV, `CoV`), ~ (.x - mean(.x)) / sd(.x)),
            PIV = 0) %>% # no variation in PIV
     ungroup() %>%
     arrange(class, date) %>%
-    dplyr::select(AdV, `Flu B`, HRV, MPV, PIV, `SARS-CoV-2`)
+    dplyr::select(AdV, `IFB`, HRV, MPV, PIV, `CoV`)
 
   return(stan_data)
 }

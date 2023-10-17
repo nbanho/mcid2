@@ -93,8 +93,11 @@ hist(coughs$n_coughs/coughs$TT)
 
 # global average
 coughs %>%
+  mutate(coughs_per_min = n_coughs / TT) %>%
   group_by(aircleaner) %>%
-  summarize(sum(n_coughs) / sum(TT))
+  summarize(mean(coughs_per_min),
+            sd(coughs_per_min)) %>%
+  mutate_if(is.numeric, round, 1)
 
 # weekly coughs per min by class and condition
 coughs_pl <- coughs %>%
@@ -203,7 +206,7 @@ sdl_acm <- list(
   V = 6,
   coughs = coughs_TueThu$n_coughs,
   TT = coughs_TueThu$TT,
-  viruses = as.matrix(dplyr::select(coughs_TueThu, `Flu B`, HRV, AdV, `SARS-CoV-2`, MPV, PIV))
+  viruses = as.matrix(dplyr::select(coughs_TueThu, `IFB`, HRV, AdV, `CoV`, MPV, PIV))
 )
 sdl_acm$s_v <- mean(apply(sdl_acm$viruses, 2, sd))
 
@@ -218,7 +221,7 @@ raw_res_acm <- summary(coughsMolMod, probs = c(0.025, 0.5, 0.975), pars = c("phi
 raw_res_acm
 
 # plot
-viruses <- c("Average", "Flu B", "HRV", "AdV", "CoV", "MPV", "PIV")
+viruses <- c("Average", "IFB", "HRV", "AdV", "CoV", "MPV", "PIV")
 names(viruses) <- 0:6
 draws_theta <- coughsMolMod %>% spread_draws(theta_v[v]) %>%
   mutate(v = recode(v, !!! viruses),

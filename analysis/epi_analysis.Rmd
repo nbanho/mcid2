@@ -202,13 +202,13 @@ p_in_sigma_s <- c(log(p_in_sd_ul[,1] / p_in_sd_ul[,2]), (0.55 - 0.46)) / (2 * qn
 set.seed(12345)
 
 prior_pin_par <- data.frame(
-  virus = c("AdV", "Flu B", "PIV", "HRV", "CoV", "MPV"),
+  virus = c("AdV", "IFB", "PIV", "HRV", "CoV", "MPV"),
   mum = c(p_in_mu_m, mean(p_in_mu_m)), 
   mus = c(p_in_mu_s, mean(p_in_mu_s)),
   sim = c(p_in_sigma_m, mean(p_in_sigma_m)),
   sis = c(p_in_sigma_s, mean(p_in_sigma_s))
 ) %>%
-  mutate(virus = factor(virus, levels = c("Flu B", "HRV", "AdV", "CoV", "MPV", "PIV"))) %>%
+  mutate(virus = factor(virus, levels = c("IFB", "HRV", "AdV", "CoV", "MPV", "PIV"))) %>%
   arrange(virus)
 
 prior_pin <- prior_pin_par %>%
@@ -353,14 +353,13 @@ mol_class_week <- mol_data %>%
   mutate(week = week(date),
          week = week - min(week) + 1,
          week = ifelse(week > 4, week - 1, week))  %>%
-  dplyr::select(week, class, AdV, `Flu B`, HRV, MPV, PIV, `SARS-CoV-2`) %>%
+  dplyr::select(week, class, AdV, `IFB`, HRV, MPV, PIV, `CoV`) %>%
   melt(c("week", "class")) %>%
   group_by(class, week, variable) %>%
   summarize(n = sum(value)) %>%
   ungroup() %>%
   mutate(variable = as.character(variable), 
-         variable = ifelse(variable == "SARS-CoV-2", "CoV", variable),
-         variable = factor(variable, levels = c("Flu B", "HRV", "AdV", "CoV", "MPV", "PIV")))
+         variable = factor(variable, levels = c("IFB", "HRV", "AdV", "CoV", "MPV", "PIV")))
 mol_class_week_extend <- epi_data %>%
   dplyr::select(class, date) %>%
   mutate(week = week(date),
@@ -465,7 +464,7 @@ barplot_mol <- readRDS("../results/mol-data/descriptives-cond.rds") +
   guides(fill = guide_legend(reverse = TRUE, nrow = 1)) +
   theme(legend.position = "bottom", legend.key.height = unit(.1, "cm"), legend.key.width = unit(.5, "cm"), plot.title.position = "plot") +
   ggtitle("a | Number of positive saliva samples by study condition.",
-          subtitle = "Influenza B (Flu B), rhinovirus (HRV), adenovirus (AdV), SARS-CoV-2 (CoV), metapneumovirus (MPV), parainfluenza (PIV).")
+          subtitle = "Influenza B (IFB), rhinovirus (HRV), adenovirus (AdV), SARS-CoV-2 (CoV), metapneumovirus (MPV), parainfluenza (PIV).")
 boxplot_env <- readRDS("../results/env-data/particles-boxplot.rds") +
   ggtitle("b | Aerosol number (CN) and particle matter (PM) concentrations by study condition.",
           subtitle = expression("Particle diameter between 175nm and 20"*mu*"m. PM for sizes <1 to <10"*mu*"m."))
@@ -501,13 +500,13 @@ est_res <- summary(latInfMod, probs = c(0.025, 0.975), pars = c("phi", "alpha", 
                       "$\\vartheta_{\\text{Wednesday}}$",
                       "$\\vartheta_{\\text{Thursday}}$",
                       "$\\vartheta_{\\text{Friday}}$",
-                      "$\\mu_{p_{\\text{IN}}^{\\text{Flu B}}}$",
+                      "$\\mu_{p_{\\text{IN}}^{\\text{IFB}}}$",
                       "$\\mu_{p_{\\text{IN}}^{\\text{HRV}}}$",
                       "$\\mu_{p_{\\text{IN}}^{\\text{AdV}}}$",
                       "$\\mu_{p_{\\text{IN}}^{\\text{CoV}}}$",
                       "$\\mu_{p_{\\text{IN}}^{\\text{MPV}}}$",
                       "$\\mu_{p_{\\text{IN}}^{\\text{PIV}}}$",
-                      "$\\sigma_{p_{\\text{IN}}^{\\text{Flu B}}}$",
+                      "$\\sigma_{p_{\\text{IN}}^{\\text{IFB}}}$",
                       "$\\sigma_{p_{\\text{IN}}^{\\text{HRV}}}$",
                       "$\\sigma_{p_{\\text{IN}}^{\\text{AdV}}}$",
                       "$\\sigma_{p_{\\text{IN}}^{\\text{CoV}}}$",

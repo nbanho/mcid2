@@ -14,13 +14,14 @@ df <- read_xlsx("data-raw/molecular/ZF Resultate Airchecker 2023.xlsx", sheet = 
          virus = `Auto   Interpretation`) %>%
   dplyr::select(class, date, virus) %>% # We set A as the "Studienklasse" and B as the "Kontrollklasse" --> 3a is B and 3b is A
   mutate(class = ifelse(class == "3a", "B", "A"),
-         date = as.Date(gsub("2022", "2023", as.character(date))))
+         date = as.Date(gsub("2022", "2023", as.character(date))),
+         virus = ifelse(virus == "SARS-CoV-2", "CoV", virus),
+         virus = ifelse(virus == "Flu B", "IFB", virus))
 
 # line list
 
 long_list <- df %>%
-  mutate(result = ifelse(virus == "-", "Negative", "Positive"),
-         virus = ifelse(virus == "SARS-CoV-2", "CoV", virus)) %>%
+  mutate(result = ifelse(virus == "-", "Negative", "Positive")) %>%
   dplyr::select(class, date, result, virus) %>%
   arrange(class, virus) %>%
   ungroup()
@@ -48,7 +49,7 @@ df <- expanded_df %>%
 # total count
 df_wide <- reshape2::dcast(df, class + date ~ virus) %>%
   rename(Neg = `-`) %>%
-  mutate(N = Neg + AdV + `Flu B` + HRV + MPV + PIV + `SARS-CoV-2`)
+  mutate(N = Neg + AdV + IFB + HRV + MPV + PIV + CoV)
 
 # add additional info
 df_wide <- df_wide %>%
