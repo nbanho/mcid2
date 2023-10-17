@@ -517,12 +517,12 @@ In addition, we analyze the association between the daily number of coughs $Y$ a
     Y | \beta_0, \theta_{[v]}, \theta, \tau &\sim \text{Negative-Binomial}(\mu,\phi) \\
     \log \mu &= \log T + \beta_0 + \sum_v \theta_{[v]} \cdot \text{Saliva}_v \\
     \beta_0 &\sim \text{Student-t}_5(0, 2.5) \\
-    \theta_{[\text{Flu~B}]}, \dots, \theta_{[\text{PIV}]} &\sim \text{Normal}\left(\theta, \tau\right) \\
+    \theta_{[\text{IFB}]}, \dots, \theta_{[\text{PIV}]} &\sim \text{Normal}\left(\theta, \tau\right) \\
     \theta &\sim \text{Student-t}_5\left(0, \frac{2.5}{s_{v}}\right) \\
     \tau &\sim \text{Half-Normal}\left(0, 1\right) \\
     \frac{1}{\sqrt{\phi}} &\sim \text{Half-Normal}(0,1),
 \end{align*}
-where $\theta_{[v]}$ is the partially pooled estimate for respiratory virus $v \in$ (Flu~B, HRV, AdV, CoV, MPV, PIV), $\tau$ estimates variation between viruses, and $s_v$ is the average standard deviation across the count variables of the respiratory viruses. 
+where $\theta_{[v]}$ is the partially pooled estimate for respiratory virus $v \in$ (IFB, HRV, AdV, CoV, MPV, PIV), $\tau$ estimates variation between viruses, and $s_v$ is the average standard deviation across the count variables of the respiratory viruses. 
 
 \section{Detailed results for risk of infection model}\label{sec:detailed-redcap}
 
@@ -609,7 +609,7 @@ There was a strong difference in particle concentrations between study condition
     \end{tabular}
 \end{table}
 
-In the main paper, we compared particle concentrations between study conditions. \Cref{fig:env-descriptives-other-vars} compares additional environmental variables, \ie CO$_2$, air change rate, relative humidity, and temperature. There are no considerable differences between in any of the variables between study conditions. Furthermore, numerical estimation results for the reduction in particle concentrations with air cleaners are shown in \Cref{tab:palas-est-results}.
+In the main paper, we compared particle concentrations between study conditions. \Cref{fig:env-descriptives-other-vars} compares additional environmental variables, \ie CO$_2$, air change rate, relative humidity, and temperature. The air change rate was estimated from indoor CO$_2$ levels using a transient mass balance model\cite{Batterman2017IJERPH}. There are no considerable differences between in any of the variables between study conditions. Furthermore, numerical estimation results for the reduction in particle concentrations with air cleaners are shown in \Cref{tab:palas-est-results}.
 
 \begin{figure}[!htb]
 \centering
@@ -622,7 +622,7 @@ In the main paper, we compared particle concentrations between study conditions.
 
 \section{Detailed results for cough frequency}\label{sec:detailed-results-coughing}
 
-Differences in the frequency of coughs between classes suggest an association with class-specific virus patterns. \Cref{fig:coughing-association} shows the relative risk of cough for each respiratory virus. Cough appeared more frequent for Flu~B and less frequent for AdV.  
+Differences in the frequency of coughs between classes suggest an association with class-specific virus patterns. \Cref{fig:coughing-association} shows the relative risk of cough for each respiratory virus. Cough appeared more frequent for IFB and less frequent for AdV.  
 
 \begin{figure}[!htpb]
     \centering
