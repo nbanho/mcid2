@@ -106,7 +106,7 @@ coughs_pl <- coughs %>%
                         textsize = 8 / cm(1), vjust = -.5) +
   scale_fill_manual(values = wes_palette("Royal1")) +
   scale_y_continuous(limits = c(0, NA), expand = expansion(add = c(0, .66))) +
-  labs(title = "b", y = "Number of coughs per min", x = "Air cleaner") +
+  labs(title = "d", y = "Number of coughs per min", x = "Air cleaner") +
   theme_custom() +
   theme(legend.position = "none",
         plot.title.position = "plot") 
