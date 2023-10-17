@@ -219,7 +219,7 @@ In addition, we used a Bayesian Negative Binomial hierarchical (random effects) 
 \noindent\textbf{Software} \smallskip
 
 \noindent All analyses were performed in R software (version 4.2.0)\cite{RCoreTeam2022} and modeling in Stan (version 2.21.0)\cite{Carpenter2017}. Model parameters were estimated with a Bayesian approach, using the Hamiltonian Monte Carlo algorithm with the No-U-Turn Sampler (NUTS)\cite{Hoffman2014}. %Each model is estimated with 4 Markov chains and 2,000 iterations of which the first 1,000 iterations are discarded as part of the warm-up. Estimation power is evaluated via the effective sample size (ESS) and convergence of the Markov chains is evaluated with the Gelman-Rubin convergence diagnostic ($\hat{R}$). 
-If not stated otherwise, we report posterior means and credible intervals (CrIs) based on the 50\%, 80\%, and 95\% quantiles of the posterior samples, respectively. The code is available from \url{https://osf.io/38j9g}.
+If not stated otherwise, we report the posterior probability (PP), mean, and 95\%credible interval (CrI) of the posterior samples. The code is available from \url{https://osf.io/38j9g}.
 
 
 \subsection{Ethics statement}
@@ -276,17 +276,17 @@ There was an equal number of positive saliva samples with and without air cleane
 
 Particle concentrations differed considerably between study conditions (\cref{fig:infection-risk}a). Aerosol number concentration with air cleaners were markedly lower (27$\pm$34\,1/cm$^3$) than without air cleaners (95$\pm$81\,1/cm$^3$), corresponding to an adjusted decrease of 76\% (95\%-CrI 63\% to 86\%). Similarly, particle mass concentrations were markedly lower with air cleaners and the decrease was greater for larger particles (PM$_{10}$) than for smaller particles (PM$_1$ to PM$_{4}$) (\supp~figure~\zref{fig:palas-results} and \supp~table~\zref{tab:palas-est-results}). There was no considerable difference in other environmental variables (\supp~figure~\zref{fig:env-descriptives-other-vars}). In particular, daily average CO$_2$ levels were 1,769$\pm$391\,ppm with and 1,636$\pm$341\,ppm without air cleaners, suggesting that ventilation was comparable between study conditions.
 
-Absences related to respiratory infections were less frequent with air cleaners (\cref{fig:infection-risk}c). Overall, there were 22~respiratory cases without and 13~cases with air cleaners. Based on our Bayesian latent variable hierarchical regression model, the posterior probability that air cleaners reduced the risk of infection was 90.8\%, suggesting a beneficial effect of air cleaners. However, the decrease in the risk of infection was small (adjusted relative risk 0.72, 95\%-CrI 0.44 to 1.15). As a result, the estimated number of infections would be 36 (95\%-CrI 21 to 64) if air cleaners had been installed throughout the study period, compared to 62 (95\%-CrI 29 to 141) infections if air cleaners had not been installed (\supp~\zref{fig:avoided-infections}). Detailed estimations are provided in the \supp~text~\zref{sec:detailed-redcap}. 
+Absences related to respiratory infections were less frequent with air cleaners (\cref{fig:infection-risk}c). Overall, there were 22~respiratory cases without and 13~cases with air cleaners. Based on our Bayesian latent variable hierarchical regression model, the posterior probability that air cleaners reduced the risk of infection was 91\%, suggesting a beneficial effect of air cleaners. However, the decrease in the risk of infection was small (adjusted relative risk 0.72, 95\%-CrI 0.44 to 1.15). As a result, the estimated number of infections would be 36 (95\%-CrI 21 to 64) if air cleaners had been installed throughout the study period, compared to 62 (95\%-CrI 29 to 141) infections if air cleaners had not been installed (\supp~\zref{fig:avoided-infections}). Detailed estimations are provided in the \supp~text~\zref{sec:detailed-redcap}. 
 
 Slightly fewer coughs were detected in audio recordings with air cleaners (\cref{fig:infection-risk}d). On average, there were 2.5~coughs/min with and 3.1~coughs/min without air cleaners ($\Delta=-$0.6~coughs/min; adjusted relative risk 0.93, 95\%-CrI 0.85 to 1.02). Significantly more coughs were detected in the room of class~B (adjusted relative risk 2.16, 95\%-CrI 1.90 to 2.46), suggesting an association with the observed variation in virus-specific transmission between classes. Indeed, cough was more frequent with Flu~B positivity (relative risk 1.25, 95\%-CrI 1.03 to 1.53) and slightly less frequent with AdV positivity (0.87, 95\%-CrI 0.49 to 1.12) (\supp~figure~\zref{fig:coughing-association}b). 
 
 \begin{figure}[!htpb]
 \centering
-    \includegraphics{../../results/mol-data/saliva-by-study-condition.pdf}\hspace{1.5cm}
+    \includegraphics{../../results/mol-data/saliva-by-study-condition.pdf}\hspace{.5cm}
     \includegraphics{../../results/env-data/aerosol-number-boxplot.pdf}
-    \includegraphics{../../results/epi-data/cases_by_condition.pdf}\hspace{1.5cm}
+    \includegraphics{../../results/epi-data/cases_by_condition.pdf}\hspace{.5cm}
     \includegraphics{../../results/cough-data/coughs-frequency-by-condition.pdf}
-    \caption{\textbf{Risk of infection by study condition}. \textbf{(a)}~Number of positive saliva samples. \textbf{(b)}~Daily average aerosol number concentrations as boxplots. \textbf{(c)}~Number of respiratory cases. \textbf{(d)}~Daily average number of detected coughs per minute.}
+    \caption{\textbf{Risk of infection by study condition}. \textbf{(a)}~Number of positive saliva samples. \textbf{(b)}~Daily average aerosol number concentrations as boxplots. \textbf{(c)}~Number of respiratory cases. \textbf{(d)}~Daily average number of detected coughs per minute. ``PP(Yes<No)'' is the posterior probability that the outcome is lower with air cleaners, which is computed based on the posterior samples of the Bayesian models adjusted for observed confounders.}
     \label{fig:infection-risk}
 \end{figure}
 
