@@ -123,29 +123,30 @@ pos_week_pl
 # positive samples by study condition
 df_pos_stud <- df_pos %>%
   group_by(aircleaner) %>%
-  summarize(n = sum(n)) %>%
+  summarize(n_pos = sum(n)) %>%
   ungroup() %>%
   mutate(aircleaner = factor(aircleaner, levels = c("No", "Yes")))
   
-pos_cond_pl <- ggplot(mapping = aes(x = aircleaner, y = n, fill = aircleaner)) +
-  geom_bar(data = df_pos_stud, stat = "identity", position = "stack", color = "black", width = .4) +
-  geom_text(data = subset(df_pos_stud, n != 0), mapping = aes(label = n), 
-            size = 8 / cm(1), vjust = -1) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.2))) +
+pos_cond_pl <- df_pos_stud %>%
+  ggplot(aes(x = aircleaner, y = n_pos)) +
+  geom_bar(mapping = aes(fill = aircleaner), stat = "identity", color = "black", width = .4) +
+  geom_text(mapping = aes(label = n_pos), size = 8 / cm(1), vjust = -1) +
+  geom_segment(data = data.frame(x = 1, xend = 1, y = 30, yend = 29), mapping = aes(x = x, xend = xend, y = y, yend = yend), color = "white") +
+  ggsignif::geom_signif(annotations = "PP(Yes<No) = 65%", y_position = 28, xmin = 1, xmax = 2, 
+                        textsize = 8 / cm(1), vjust = -.5) +
+  labs(x = "Air cleaner", y = "Number of positive saliva samples", title = "a") +
   scale_fill_manual(values = wes_palette("Royal1")[1:2]) +
-  labs(y = "Number of positive samples", x = "Air cleaner", fill = "Virus", title = "a") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1)), breaks = scales::pretty_breaks(4)) +
   theme_custom() +
-  theme(panel.grid = element_blank(),
-        plot.title.position = "plot",
-        legend.position = "none") +
-  guides(fill = guide_legend(nrow = 1))
+  theme(plot.title.position = "plot") +
+  guides(fill = "none")
 
 pos_cond_pl
 
 save_plot(pos_cond_pl, 
           "../results/mol-data/saliva-by-study-condition.pdf",
           "../results/mol-data/saliva-by-study-condition.eps",
-          w = 6, h = 6)
+          w = 7.25, h = 6)
 ```
 
 ```{r}
@@ -344,6 +345,10 @@ summary(multLogitMod, probs = c(0.025, 0.975), pars = c("beta0", "beta1", "beta2
 spread_draws(multLogitMod, beta1) %>%
   mutate(beta1 = exp(beta1)) %>%
   mean_qi()
+
+# posterior probability
+spread_draws(multLogitMod, beta1) %>%
+  summarize(round(sum(beta1 < 0) / n() * 100))
 ```
 
 

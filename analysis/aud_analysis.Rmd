@@ -98,31 +98,25 @@ coughs %>%
 
 # weekly coughs per min by class and condition
 coughs_pl <- coughs %>%
-  group_by(aircleaner) %>%
-  summarize(coughs_per_min = sum(n_coughs) / sum(TT)) %>%
-  ungroup() %>%
+  mutate(coughs_per_min = n_coughs / TT) %>%
   mutate(aircleaner = factor(aircleaner, levels = c("No", "Yes"))) %>%
-  ggplot(aes(x = aircleaner, y = coughs_per_min, fill = aircleaner)) +
-  geom_bar(stat = "identity", color = "black", width = .4) +
-  geom_text(mapping = aes(label = round(coughs_per_min, 1)),
-            size = 8 / cm(1), vjust = -1) +
-  labs(x = "Air cleaner", y = "Number of coughs per min", fill = "Air cleaner", title = "d") +
-  scale_fill_manual(values = wes_palette("Royal1")[1:2]) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.2))) +
+  ggplot(aes(x = aircleaner, fill = aircleaner, y = coughs_per_min)) +
+  geom_boxplot2(width.errorbar = .3, width = .4) +
+  ggsignif::geom_signif(annotations = "PP(Yes<No) = 93%", y_position = 6.25, xmin = 1, xmax = 2, 
+                        textsize = 8 / cm(1), vjust = -.5) +
+  scale_fill_manual(values = wes_palette("Royal1")) +
+  scale_y_continuous(limits = c(0, NA), expand = expansion(add = c(0, .66))) +
+  labs(title = "b", y = "Number of coughs per min", x = "Air cleaner") +
   theme_custom() +
   theme(legend.position = "none",
-        legend.direction = "horizontal",
-        legend.key.width = unit(0.5, "cm"),
-        legend.key.height = unit(0.3, "cm"),
-        plot.title.position = "plot") +
-  guides(fill = "none")
+        plot.title.position = "plot") 
 
 coughs_pl
 
 save_plot(coughs_pl, 
           pdf_file = "../results/cough-data/coughs-frequency-by-condition.pdf", 
           eps_file = "../results/cough-data/coughs-frequency-by-condition.eps", 
-          w = 6, h = 6)
+          w = 7.25, h = 6)
 ```
 
 
@@ -182,6 +176,12 @@ raw_res
 
 exp(raw_res["beta1",c("mean", "X2.5.", "X97.5.")])
 exp(raw_res["beta2",c("mean", "X2.5.", "X97.5.")])
+
+
+# posterior probability
+coughsMod %>%
+  spread_draws(beta1) %>%
+  summarize(round(sum(beta1 < 0) / n() * 100))
 ```
 
 ### Association with molecular data

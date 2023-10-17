@@ -74,22 +74,21 @@ boxpl_cn <- env_epi_data %>%
   dplyr::select(class, date, aircleaner, Cn) %>%
   ggplot(aes(x = aircleaner, fill = aircleaner, y = Cn)) +
   geom_boxplot2(width.errorbar = .3, width = .4) +
-  #geom_jitter(alpha = .3, width = .2, color = "grey") +
+  ggsignif::geom_signif(annotations = "PP(Yes<No) = 100%", y_position = 240, xmin = 1, xmax = 2, 
+                        textsize = 8 / cm(1), vjust = -.5) +
   scale_fill_manual(values = wes_palette("Royal1")) +
-  scale_shape_manual(values = c(2,20)) +
-  scale_y_continuous(expand = c(0,0), limits = c(0, NA)) +
+  scale_y_continuous(expand = expansion(add = c(0, 30)), limits = c(0, NA)) +
   labs(title = "b", y = expression("Aerosol concentration (1/cm"^3*")"), x = "Air cleaner") +
   theme_custom() +
   theme(legend.position = "none",
-        plot.title.position = "plot") +
-  guides(color = "none")
+        plot.title.position = "plot") 
 
 boxpl_cn
 
 save_plot(boxpl_cn, 
           pdf_file = "../results/env-data/aerosol-number-boxplot.pdf", 
           eps_file = "../results/env-data/aerosol-number-boxplot.eps", 
-          w = 6, h = 6)
+          w = 7.25, h = 6)
 ```
 
 ```{r}
@@ -154,7 +153,15 @@ for (i in 1:length(particle_vars)) {
 draws_filt <- lapply(draws, function(D) dplyr::select(D, `aircleanerYes`))
 draws_filt <- do.call(rbind, draws_filt) %>%
   mutate(outcome = factor(rep(particle_vars, each = nrow(draws[[i]])), levels = rev(particle_vars))) %>%
-  set_names(c("aircleaner", "outcome")) %>%
+  set_names(c("aircleaner", "outcome")) 
+
+# posterior probability
+draws_filt %>%
+  filter(outcome == "Cn") %>%
+  summarize(round(sum(aircleaner < 0) / n() * 100))
+
+# adjusted decrease
+draws_filt <- draws_filt %>%
   mutate(aircleaner = (-1) * 100 * (exp(aircleaner) - 1))
 
 # create estimation results table
