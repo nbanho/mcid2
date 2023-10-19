@@ -107,7 +107,7 @@ coughs_pl <- coughs %>%
   geom_boxplot2(width.errorbar = .3, width = .4) +
   ggsignif::geom_signif(annotations = "PP(Yes<No) = 93%", y_position = 6.25, xmin = 1, xmax = 2, 
                         textsize = 8 / cm(1), vjust = -.5) +
-  scale_fill_manual(values = wes_palette("Royal1")) +
+  scale_fill_manual(values = bluegrey) +
   scale_y_continuous(limits = c(0, NA), expand = expansion(add = c(0, .66))) +
   labs(title = "d", y = "Number of coughs per min", x = "Air cleaner") +
   theme_custom() +

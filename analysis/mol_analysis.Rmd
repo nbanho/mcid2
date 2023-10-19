@@ -133,8 +133,8 @@ pos_cond_pl <- df_pos_stud %>%
   geom_segment(data = data.frame(x = .5, xend = .5, y = 30, yend = 29), mapping = aes(x = x, xend = xend, y = y, yend = yend), color = "white") +
   ggsignif::geom_signif(annotations = "PP(Yes<No) = 65%", y_position = 30, xmin = 1, xmax = 2, 
                         textsize = 8 / cm(1), vjust = -.5, tip_length = .1) +
-  labs(x = "Air cleaner", y = "Number of positive saliva samples", title = "a") +
-  scale_fill_manual(values = wes_palette("Royal1")[1:2]) +
+  labs(x = "Air cleaner", y = "Number of positive saliva samples", title = "b") +
+  scale_fill_manual(values = bluegrey) +
   scale_y_continuous(expand = expansion(mult = c(0, 0.1)), breaks = scales::pretty_breaks(4)) +
   theme_custom() +
   theme(plot.title.position = "plot") +

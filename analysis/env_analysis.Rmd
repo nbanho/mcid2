@@ -76,9 +76,9 @@ boxpl_cn <- env_epi_data %>%
   geom_boxplot2(width.errorbar = .3, width = .4) +
   ggsignif::geom_signif(annotations = "PP(Yes<No) = 100%", y_position = 240, xmin = 1, xmax = 2, 
                         textsize = 8 / cm(1), vjust = -.5) +
-  scale_fill_manual(values = wes_palette("Royal1")) +
+  scale_fill_manual(values = bluegrey) +
   scale_y_continuous(expand = expansion(add = c(0, 30)), limits = c(0, NA)) +
-  labs(title = "b", y = expression("Aerosol concentration (1/cm"^3*")"), x = "Air cleaner") +
+  labs(title = "c", y = expression("Aerosol concentration (1/cm"^3*")"), x = "Air cleaner") +
   theme_custom() +
   theme(legend.position = "none",
         plot.title.position = "plot") 
@@ -102,13 +102,15 @@ boxpl_pc <- env_epi_data %>%
   facet_wrap(~ variable, scales = "free_y", nrow = 1, dir = "h", labeller = as_labeller(vars_labels, label_parsed)) +
   geom_boxplot2() +
   geom_jitter(aes(shape = Class), alpha = .3, width = .2) +
-  scale_color_manual(values = wes_palette("Royal1")) +
+  scale_color_manual(values = bluegrey) +
   scale_shape_manual(values = c(2,20)) +
   labs(title = "a") +
   theme_custom() +
   theme(axis.title.y = element_blank(), legend.position = "top",
         plot.title.position = "plot") +
   guides(color = "none")
+
+boxpl_pc
 
 save_plot(boxpl_pc, pdf_file = "../results/env-data/particles-boxplot.pdf", eps_file = "../results/env-data/particles-boxplot.eps", w = 16, h = 8)
 saveRDS(boxpl_pc, file = "../results/env-data/particles-boxplot.rds")
@@ -123,11 +125,14 @@ boxpl_oth <- env_epi_data %>%
   facet_wrap(~ variable, scales = "free_y", nrow = 1, dir = "h", labeller = as_labeller(vars_labels, label_parsed)) +
   geom_boxplot2() +
   geom_jitter(aes(shape = Class), alpha = .3, width = .2) +
-  scale_color_manual(values = wes_palette("Royal1")) +
+  scale_color_manual(values = bluegrey) +
   scale_shape_manual(values = c(2,20)) +
   theme_custom() +
   theme(axis.title.y = element_blank(), legend.position = "top") +
   guides(color = "none")
+
+boxpl_oth
+
 save_plot(boxpl_oth, pdf_file = "../results/env-data/otherVars-boxplot.pdf", w = 16, h = 8)
 ```
 
@@ -200,7 +205,7 @@ effects_env_main <- draws_filt %>%
   geom_segment(aes(x = aircleaner, xend = aircleaner, y = 75, yend = 125), size = 1.5 / cm(1)) +
   geom_point(aes(x = aircleaner, y = 100), size = 3, fill = "white", shape = 21) +
   facet_wrap(~ outcome, nrow = 1, labeller = as_labeller(vars_labels_no_units, label_parsed)) +
-  scale_fill_manual(values = wes_palette("Royal1")[c(3,4,2)]) +
+  scale_fill_brewer() +
   scale_y_continuous(expand = expansion(mult = c(0.25, 0.25))) +
   scale_x_continuous(limits = c(50, 100), expand = expansion(mult = c(0.1, 0.1)), breaks = c(50, 75, 100)) +
   labs(x = "Estimated reduction (%)", y = "Type", fill = "CrI", title = "b") +
@@ -213,6 +218,9 @@ effects_env_main <- draws_filt %>%
         panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
         plot.title.position = "plot",
         panel.spacing = unit(20, units = "pt")) 
+
+effects_env_main
+
 save_plot(effects_env_main, 
           pdf_file = "../results/env-data/estimation-results-figure.pdf",
           eps_file = "../results/env-data/estimation-results-figure.eps",

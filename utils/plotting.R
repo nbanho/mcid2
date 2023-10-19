@@ -7,6 +7,9 @@ require(gg.layers)
 require(kunstomverse)
 require(wesanderson) # https://github.com/karthik/wesanderson
 
+# default colors
+bluegrey <- c(wes_palette("Royal1")[1], wes_palette("Darjeeling1")[5])
+
 # ggplot theme for Nature style
 text_size = 8
 update_geom_defaults("text", list(size = text_size))
