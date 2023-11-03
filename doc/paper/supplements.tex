@@ -246,7 +246,7 @@
 \newcommand{\supp}{SI Appendix}
 
 \title{\LARGE\singlespacing{\textbf{S1 Appendix} \\ \medskip
-Transmission of respiratory viral infections with and without air cleaners in a Swiss school under non-pandemic conditions in 2023: A modeling study of epidemiological, environmental, and molecular data}}
+Impact of air cleaners in schools on respiratory viral infections: \\ A modeling study using epidemiological, environmental, and molecular data}}
 
 % author list
 \author[1$\ddag$,2]{Nicolas Banholzer}
@@ -255,17 +255,18 @@ Transmission of respiratory viral infections with and without air cleaners in a 
 \author[1]{Kathrin Zürcher}
 \author[4]{Lavinia Furrer}
 \author[1]{Simon Bertschinger}
+\author[5]{Ernest Weingartner}
 \author[2,4]{Alban Ramette}
-\author[2,4]{Ronald Dijkman}
 \author[1]{Matthias Egger}
-\author[5]{Tina Hascher}
+\author[6]{Tina Hascher}
 \author[1*,2]{Lukas Fenner}
 
 \affil[1]{Institute of Social and Preventive Medicine, University of Bern, Bern, Switzerland}
 \affil[2]{Multidisciplinary Center for Infectious Diseases, University of Bern, Bern, Switzerland}
 \affil[3]{Department of Infectious Diseases, Inselspital, Bern University Hospital, University of Bern, Bern, Switzerland}
 \affil[4]{Institute for Infectious Diseases, University of Bern, Bern, Switzerland}
-\affil[5]{Institute of Educational Science, University of Bern, Bern, Switzerland}
+\affil[5]{Institute for Sensors and Electronics, University of Applied Sciences and Arts Northwestern Switzerland, Windisch, Switzerland}
+\affil[6]{Institute of Educational Science, University of Bern, Bern, Switzerland}
 
 \affil[*]{Corresponding author: lukas.fenner@ispm.unibe.ch }
 
@@ -298,6 +299,34 @@ Transmission of respiratory viral infections with and without air cleaners in a 
 %\listoftables
 
 \newpage
+
+\section{Experimental determination of the clean air delivery rate}\label{sec:cadr}
+
+The Clean Air Delivery Rate (CADR) is typically used as a measure to quantify the cleaning efficiency of air purifiers\cite{Nelson1993IndoorEnv}. The CADR is expressed in m$^3$/s and describes the volumetric flow rate of particle-free, clean air that an air purifier delivers into the room. The CADR is equal to the product of the filtration efficiency and the volumetric flow rate passing through the device.
+
+We followed the approach by K\"{u}pper et al.\cite{Kuepper20199AAQR} to determine the CADR value of the air purifier. It is based on the release of fine aerosols ($D < 1 \mu m$) in a closed, unventilated room and the subsequent measurement of the decay rates $k$ of the particle concentration $N(t)$ caused by the air cleaner, \ie
+\begin{align}
+    N(t) = N_0 \cdot e^{-k\cdot t}
+\end{align}
+Since the surfaces in the room (\eg walls and furniture) are also sinks for aerosol particles, measurements were carried out with the air cleaner turned off ($k_\mathrm{background}$) and on ($k_\mathrm{cleaner}$). The CADR can then be derived as
+\begin{align}
+    \mathrm{CADR} = V \cdot k_\mathrm{cleaner} - V \cdot k_\mathrm{background},
+\end{align}
+where $V = 233 m^3$ is the volume of the classroom.
+
+We ensured that the particle concentrations in the experiments were not too high, thereby preventing bias due to coagulation (\ie the formation of a few large particles from many small particles). At the beginning of an experiment, fine aerosol particles were released for a few minutes by ultrasonic nebulization of an aqueous NaCl solution of 5\,g/l. The generated dehydrated salt particles have a broad size distribution in the range of 0.02-1\,$\mu$m. Decay rates were measured using 11~fine dust sensors (SPS30, Sensirion AG), which were placed at head height of the students. These sensors measured the number concentration of individual particles by counting the scattered light pulses they produce when passing through a laser beam. Because of their scattering properties, these sensors measure the number of particles larger than $\sim$0.3\,$\mu$m.
+
+Figure~\ref{fig:experiment} shows the particle number concentration with and without without the air purifier. The exponential decrease is clearly visible as a linear curve in the logarithmic plot.
+
+\begin{figure}
+    \centering
+    %\includegraphics{}
+    \caption{Measured concentration curves with the air purifier on and off. The red dot shows the average concentration measured by the 11 distributed sensors of particles with $0.3\mu m < D < 1 \mu m$. The standard deviation is shown in gray as an error bar. The increase in concentration at the beginning of these experiments is due to the release of the NaCl particles during approximately 15-20\,min. The inhomogeneity of the concentration during the nebulization period is seen in larger error bars. Afterwards, the aerosol source is turned off, the concentration homogenizes quickly, and the concentration drop follows an exponential decay, which is used for the CADR calculation.}
+    \label{fig:experiment}
+\end{figure}
+
+Based on these experiments, we were able to determine the net CADR values of the air purifier as 420\,m$^3$/h with an uncertainty of $\pm$10\% due to systematic differences in the measurement setup and measurement errors of the instruments. Our estimated CADR is lower than the CADR reported by the manufacturer of 600-700 m³/h. The reported CADR was determined with comparably large particles (pollen in the super micrometer size range). Thus, we explain the lower filtration efficiency determined here with the fact that CADR is strongly dependent on the particle size, \ie large particles are easier to filter than fine aerosols.
+
 
 \section{Data collection}\label{sec:data-collection}
 
