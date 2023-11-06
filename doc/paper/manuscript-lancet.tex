@@ -21,7 +21,7 @@
 
 \doublespacing
 
-\title{\bfseries\LARGE\singlespacing{Impact of air cleaners in schools on respiratory viral infections: A modeling study using epidemiological, environmental, and molecular data}}
+\title{\bfseries\LARGE\singlespacing{Air cleaners and respiratory infections in schools: A modeling study using epidemiological, environmental, and molecular data}}
 
 % Alternative title: SARS-CoV-2 transmission in schools based on molecular and epidemiological data: potential effects of mask wearing and air cleaners
 
@@ -34,8 +34,8 @@
 \author[1]{Simon Bertschinger}
 \author[5]{Ernest Weingartner}
 \author[2,4]{Alban Ramette}
-\author[1]{Matthias Egger}
-\author[6]{Tina Hascher}
+\author[1,6,7]{Matthias Egger}
+\author[8]{Tina Hascher}
 \author[1*,2]{Lukas Fenner}
 
 \affil[1]{Institute of Social and Preventive Medicine, University of Bern, Bern, Switzerland}
@@ -43,7 +43,9 @@
 \affil[3]{Department of Infectious Diseases, Inselspital, Bern University Hospital, University of Bern, Bern, Switzerland}
 \affil[4]{Institute for Infectious Diseases, University of Bern, Bern, Switzerland}
 \affil[5]{Institute for Sensors and Electronics, University of Applied Sciences and Arts Northwestern Switzerland, Windisch, Switzerland}
-\affil[6]{Institute of Educational Science, University of Bern, Bern, Switzerland}
+\affil[6]{Population Health Sciences, University of Bristol, Bristol, UK}
+\affil[7]{Centre for Infectious Disease Epidemiology and Research, University of Cape Town, Cape Town, South Africa}
+\affil[8]{Institute of Educational Science, University of Bern, Bern, Switzerland}
 
 
 \affil[*]{Corresponding author: lukas.fenner@unibe.ch }
@@ -63,13 +65,15 @@
 
 %TC:ignore
 \begin{abstract}\normalfont
-\noindent\textbf{Background:} Infection control measures can reduce airborne transmission. Using a multiple-measurement approach, we aimed to evaluate the real-world effectiveness of portable HEPA-air filtration devices (air cleaners) in reducing transmission of respiratory viral infections in schools. \medskip
+\noindent\textbf{Background:} Infection control measures can reduce airborne transmission of respiratory infections. Using a multiple-measurement approach, we examined the real-world effectiveness of portable HEPA-air filtration devices (air cleaners) in a school setting.\medskip
 
-\noindent\textbf{Methods:} We collected epidemiological data (absences related to respiratory infections), environmental data (CO$_2$ and particle concentrations), audio recordings (coughs), and molecular data (bioaerosol and saliva samples) over seven weeks during winter 2023 in two classes of a Swiss secondary school. Using a cross-over study design, we compared particle concentrations, coughing, and the risk of infection with and without air cleaners.  \medskip
+\noindent\textbf{Methods:} We collected epidemiological data (absences related to respiratory infections), environmental data (CO$_2$ and particle concentrations), audio recordings (coughing), and molecular data (bioaerosol and saliva samples) over seven weeks during winter 2022/2023 in two Swiss secondary school classes. Using a cross-over study design, we compared particle concentrations, coughing, and the risk of infection with vs without air cleaners.\medskip
 
-\noindent\textbf{Results:} Molecular analysis detected several viruses in saliva (50/448 positive: 15~influenza B, 15~rhinovirus, 14~adenovirus, 3~SARS-CoV-2, 2~metapneumovirus, and 1~parainfluenza), but rarely in bioaerosol samples (2/105 positive) and on filters of air cleaners (4/160~positive). Spatiotemporal analysis of positive saliva samples suggested within-classroom transmission. Positive saliva tests were equally likely with air cleaners than without (adjusted relative risk [ARR] 0.93 95\%-credible interval [CrI] 0.49 to 1.61). CO$_2$ levels were similar (1,769$\pm$391\,ppm with vs. 1,636$\pm$341\,ppm without air cleaners), but particle concentrations decreased by 77\%, (95\%-CrI 63\% to 86\%) and coughing was slightly less frequent (ARR 0.93, 95\%-CrI 0.85 to 1.02). Infection risk was also lower (posterior probability 91\%), but the association was small (ARR 0.73, 95\%-CrI 0.44 to 1.18). \medskip 
+\noindent\textbf{Findings:} All 38~students (age 13$-$15 years) participated. With air cleaners, mean particle concentration decreased by 77\% (95\% credible interval 63\%$-$86\%). There were no differences in CO$_2$ levels. Absences related to respiratory infections were 13 with vs 22 without air cleaners, and the risk of infection was slightly reduced (relative risk 0.73, 95\% credible interval 0.44$-$1.18), with a 91\% posterior probability for a reduction. Coughing also tended to be less frequent (posterior probability 93\%). Molecular analysis detected mainly non-SARS-CoV-2 viruses in saliva (50/448 positive). The detection rate was similar with vs without air cleaners. Positive samples in bioaerosols (2/105 positive) and HEPA-filters (4/160~positive) were rare, but spatiotemporal analysis of saliva samples suggested within-classroom transmission.\medskip 
 
-\noindent\textbf{Conclusions:} A wide range of non-SARS-CoV-2 respiratory viruses were detected in student saliva. Although airborne detection was rare, transmission seemed likely to be occurring in schools, suggesting that close contact is required for transmission of most respiratory viruses. Air cleaners improved air quality, were associated with lower symptom intensity, and showed a potential benefit in reducing infections.
+\noindent\textbf{Interpretation:} Air cleaners improved air quality, were associated with less coughing, and showed a potential benefit in reducing respiratory infections. Future studies should examine their cost-effectiveness. Airborne detection of non-SARS-CoV-2 viruses was rare, necessitating further research on the importance of close contact vs long-range airborne transmission.\medskip
+
+\noindent\textbf{Funding:} This study was funded by the Multidisciplinary Center for Infectious Diseases, University of Bern, Bern, Switzerland. NB, LF, and ME are supported by the National Institute of Allergy and Infectious Diseases (NIAID) through cooperative agreement 5U01-AI069924-05. ME is supported by special project funding from the Swiss National Science Foundation (grant 32FP30-189498).
 
 \par
 \end{abstract}
@@ -94,15 +98,16 @@
 
 \noindent \textbf{Evidence before this study} \smallskip
 
-\noindent We searched Scopus on October 19, 2023, for all publications from inception using the terms ("air filt" OR "air clean") AND ("infection" OR "transmission"). Several studies have shown that air cleaners reduce particle concentrations in indoor air. Studies also showed that air cleaners effectively removed SARS-CoV-2 bioaerosols. One study reported a lower incidence of SARS-CoV-2 in schools using different ventilation strategies, with or without additional air filtration devices. While simulation studies have demonstrated the efficacy of air cleaners in reducing the risk of indoor transmission, a real-world study during the pandemic was inconclusive. \medskip
+\noindent We searched Scopus on October 19, 2023, for all publications from inception using the terms ("air filt" OR "air clean") AND ("infection" OR "transmission"). Several studies have shown that air cleaners reduce particle concentrations in indoor air. Studies also showed that air cleaners effectively removed SARS-CoV-2 bioaerosols. One study reported a lower incidence of SARS-CoV-2 in schools using different ventilation strategies, with or without additional air filtration devices. Several simulation studies have demonstrated the efficacy of air cleaners in reducing the risk of indoor transmission. One real-world study during the COVID-19 pandemic was inconclusive regarding the effectiveness of air cleaners in a school setting. \medskip
 
 \noindent \textbf{Added value of this study} \smallskip
 
-\noindent To date, it remains unclear whether the reduction in particle concentrations with air cleaners also translates into lower risks of respiratory infection. This study used a multiple-measurement approach to estimate the risk of respiratory virus infection in a Swiss school and assessed the effectiveness of air cleaners in a cross-over study design. Schools are particularly important because students spend much of their time indoors and may introduce infections from and into their household. We collected molecular, epidemiological, environmental, and audio data over seven weeks during non-pandemic conditions in winter 2023 in a Swiss school. We found a wide range of respiratory viruses in human saliva samples, mainly adenovirus, influenza B, and rhinovirus. Although airborne detection was rare, spatiotemporal analysis of students' saliva samples indicated that transmission seemed likely in school rooms, suggesting that prolonged close contact is required for transmission. Air cleaners improved air quality (lower particle concentrations), were associated with lower symptom intensity (fewer coughs), and showed a potential benefit in reducing cases (fewer absences related to respiratory infections).\medskip
+\noindent To date, it remains unclear whether the reduction in particle concentrations with air cleaners also translates into lower risks of respiratory infection. This study used a multiple-measurement approach to estimate the risk of respiratory virus infection in a Swiss school and assessed the effectiveness of air cleaners in a cross-over study design. Schools are particularly important because students spend much of their time indoors and may introduce infections from and into their households. We collected molecular, epidemiological, environmental, and audio data over seven weeks during non-pandemic conditions in winter 2022/2023 in a Swiss school. Air cleaners in classrooms improved air quality (lower particle concentrations), were associated with fewer symptoms (less coughing), and showed a potential benefit in reducing absences related to respiratory infections. We found many respiratory viruses in human saliva samples, mainly adenovirus, influenza B, and rhinovirus. Although airborne detection of viruses was rare, spatiotemporal analysis of students' saliva samples indicated that transmission was likely in school rooms. \medskip
 
 \noindent \textbf{Implications of all the available evidence} \smallskip
 
-\noindent Good ventilation can improve indoor air quality and reduce the risk of infection under non-pandemic conditions. Greater emphasis should be given to ventilation systems in schools in the long term. Seasonal respiratory viruses other than SARS-CoV-2 may require  close contact for transmission. Future studies should examine the relative importance of close contact vs long-distance transmission of respiratory viruses in schools and other congregate settings.
+\noindent Air cleaners have a tangible positive impact on air quality, significantly reducing particle concentrations. While the individual-level reduction in the risk of respiratory infections due to air cleaners may be relatively modest, the collective benefit at the population level, in terms of reducing illnesses and preventing school absences, is likely to be substantial. Future research should examine the cost-effectiveness and feasibility of implementing air cleaners in school and other communal settings.  
+ 
 
 \thispagestyle{empty}
 \sloppy
@@ -113,21 +118,21 @@
 
 \setcounter{page}{1}
 
-\section{Introduction} 
+\section*{Introduction} 
 
-Transmission of respiratory infections such as SARS-CoV-2 and influenza are difficult to mitigate and control. Person-to-person transmission occurs primarily through the release of respiratory particles containing the viruses. Recent focus has been on small respiratory particles called aerosols, which have been found to carry the majority of viruses during respiratory activities\cite{Fennelly2020}. Unlike larger respiratory droplets, which tend to settle quickly, aerosols can remain suspended in the air for several hours and travel long distances\cite{Coleman2022,Wang2020,Heneghan2021}.
+Transmission of respiratory infections such as SARS-CoV-2 and influenza are difficult to mitigate and control. Person-to-person transmission occurs primarily through the release of respiratory particles containing the viruses. Recently, the focus has been on small respiratory particles called aerosols, which have been found to carry the majority of viruses during respiratory activities\cite{Fennelly2020}. Unlike larger respiratory droplets, which tend to settle quickly, aerosols can remain suspended in the air for several hours and travel long distances\cite{Coleman2022,Wang2020,Heneghan2021}.
 
-Improved ventilation systems are critical for a healthy indoor environment, especially in schools where students spend much of their time indoors during the week, and can reduce the risk of respiratory transmission\cite{Wang2021,Morawska2021}. Portable HEPA-air filtration devices (air cleaners) may be another cost-effective alternative to upgrading ventilation systems. Still, the effects of air cleaners on the transmission of respiratory infections are less clear. Several studies have shown that air cleaners reduce particle concentrations in indoor air\cite{Park2020Build,Buising2022InfContr,Banholzer2023PLoSMed}, which is associated with a reduced risk of respiratory infection and mortality\cite{Gordon2014Resp,Kelly2023Atmos,DeAngelis2021EnvRes}. In line with this, a population-level study reported a lower incidence of SARS-CoV-2 in US elementary schools using different ventilation strategies, with or without additional air filtration devices\cite{Gettings2021}. Although some studies could not find an association between particle concentrations and viral RNA load in airborne samples\cite{Nor2021SciRep,Hanna2023PONE}, recent studies showed that air cleaners effectively removed SARS-CoV-2 from the air\cite{Morris2022,Ueki2022mSphere,Myers2022IndoorAir,Rodriguez2021SOTE}. Simulation studies have further demonstrated the efficacy of air cleaners in reducing the risk of indoor transmission of SARS-CoV-2\cite{Lindsley2021} and other respiratory viruses\cite{Cortellessa2023Build}. However, most simulation studies assume that the detection of RNA equals transmissible virus, despite recent data showing a relevant loss of viral infectivity in respiratory particles over time\cite{Oswin2022PNAS}. To date, it remains unclear whether reducing particle concentrations and removing bioaerosols from the air will reduce indoor transmission of respiratory infections. 
+Improved ventilation systems are critical for a healthy indoor environment, especially in schools where students spend much of their time indoors during the week, and can reduce the risk of respiratory transmission\cite{Wang2021,Morawska2021}. Portable HEPA-air filtration devices (air cleaners) may be another cost-effective alternative to upgrading ventilation systems. Still, the effects of air cleaners on the transmission of respiratory infections are less clear. Several studies have shown that air cleaners reduce particle concentrations in indoor air\cite{Park2020Build,Buising2022InfContr,Banholzer2023PLoSMed}, which is associated with a reduced risk of respiratory infection and mortality\cite{Gordon2014Resp,Kelly2023Atmos,DeAngelis2021EnvRes}. In line with this, a population-level study reported a lower incidence of SARS-CoV-2 in US elementary schools using different ventilation strategies, with or without additional air filtration devices\cite{Gettings2021}. Although some studies could not find an association between particle concentrations and viral RNA load in airborne samples\cite{Nor2021SciRep,Hanna2023PONE}, recent studies showed that air cleaners effectively removed SARS-CoV-2 from the indoor air\cite{Morris2022,Ueki2022mSphere,Myers2022IndoorAir,Rodriguez2021SOTE}. Simulation studies have further demonstrated the efficacy of air cleaners in reducing the risk of indoor transmission of SARS-CoV-2\cite{Lindsley2021} and other respiratory viruses\cite{Cortellessa2023Build}. However, most simulation studies assume that the detection of RNA equals transmissible virus, despite recent data showing a relevant loss of viral infectivity in respiratory particles over time\cite{Oswin2022PNAS}. To date, it remains unclear whether reducing particle concentrations and removing bioaerosols will reduce indoor transmission of respiratory infections. 
 
 We used a multiple-measurement approach to study the transmission of respiratory viruses under non-pandemic conditions and the effect of air cleaners in schools with a cross-over study design in the winter of 2022/2023. We collected epidemiological data (absences likely related to respiratory infections), environmental data (CO$_2$, particle concentrations), audio recordings (coughs), and molecular data (detection of viruses in bioaerosol and human saliva samples) during a seven-week study period from January to March 2023 in two classes of a secondary school in Switzerland. We determined changes in absences related to respiratory infections, positivity rates of saliva samples, particle concentrations, and coughing.
 
 \newpage
 
-\section{Methods}
+\section*{Methods}
 
-\subsection{Study setting and design} 
+\subsection*{Study setting and design} 
 
-\noindent We collected data in two classrooms of a secondary school (age of students 14-17~years) in the canton of Solothurn, Switzerland, for seven weeks from January~16 to March~11, 2023. Figure~\ref{fig:study-setup} shows the schematic study setup, and \supp~table~\zref{tab:data} provides an overview of the types of data collected.
+\noindent We collected data in two classrooms of a secondary school (age of students 14-17~years) in the canton of Solothurn, Switzerland, for seven weeks from January~16 to March~11, 2023. Figure~\ref{fig:study-setup} shows the schematic study setup. 
 
 \begin{figure}[!htpb]
     \centering
@@ -136,14 +141,14 @@ We used a multiple-measurement approach to study the transmission of respiratory
     \label{fig:study-setup}
 \end{figure}
 
-\subsection{Study intervention} 
+\subsection*{Study intervention} 
 
-\noindent We used a cross-over design to study the effectiveness of air cleaners, with two study conditions: weeks with and weeks without air cleaners being installed in each classroom (\cref{tab:study_design}). Air cleaners refer to commercially available portable HEPA-filtration devices (Xiaomi Mi Air Pro 70m², Shenzhen, China). According to the manufacturer, these air cleaners run at clean air delivery rates of 2$\,\times\,$600 m$^{3}$/h. When testing the devices in an empty classroom with sub-micrometer sized particles, we measured a lower effective clean air delivery rate of 2$\,\times\,$420 m$^{3}$/h (\supp~text~\zref{sec:cadr}). Window ventilation was done at the discretion of the teachers, as there were no specific recommendations from the national health authorities at the time.
+\noindent We used a cross-over design to study the effectiveness of air cleaners, with two study conditions: weeks with and weeks without air cleaners being installed in each classroom (\cref{tab:study_design}). Air cleaners refer to commercially available portable HEPA-filtration devices (Xiaomi Mi Air Pro 70m², Shenzhen, China). According to the manufacturer, these air cleaners run at clean air delivery rates of 2$\,\times\,$600 m$^{3}$/h. When testing the devices in an empty classroom with sub-micrometer sized particles, we measured a lower effective clean air delivery rate of 2$\,\times\,$420 m$^{3}$/h (\supp~text~\zref{sec:cadr}). Window ventilation was done at the discretion of the teachers.
 
 \begin{table}[!htpb]
     \footnotesize
     \centering
-    \caption{\textbf{Study design.} Cross-over design describing when portable air cleaners (PAC) were installed in the rooms of classes A and B during a seven-week study period from January~16 to March~11, 2023, excluding a week of vacation from February 6 to 11.}\label{tab:study_design}
+    \caption{\textbf{Cross-over study design.} Description of when portable air cleaners (PAC) were installed in the rooms of classes A and B during a seven-week study period from January~16 to March~11, 2023, excluding a week of vacation from February 6 to 11.}\label{tab:study_design}
     \begin{tabular}{l l l l l l l l l}
     \toprule
       & \textbf{Week 1} & \textbf{Week 2} & \textbf{Week 3} & Vacation & \textbf{Week 4} & \textbf{Week 5} & \textbf{Week 6} & \textbf{Week 7} \\
@@ -156,69 +161,71 @@ We used a multiple-measurement approach to study the transmission of respiratory
     \end{tabular}
 \end{table}
  
-\subsection{Data collection}
+\subsection*{Data collection}
+
+An overview of the collected data types is provided in \supp~table~\zref{tab:data}. \medskip
 
 \noindent\textbf{Epidemiological data} \smallskip
 
-\noindent At the beginning of the study, we collected aggregated data on age, sex, COVID-19 vaccination, and COVID-19 recovery status in the participating classes. Daily, we collected data on each absent student, \ie the absence and return dates and reason for the absence (illness, career days, or other). For absences due to illness, we recorded symptoms and the date of symptom onset. We defined a case of respiratory infection as an absence in which the student reported an illness with at least one respiratory symptom (\supp~text~\zref{sec:case-data}). The line list data is shown in \supp~table~\zref{tab:epi-data-line-list}. \medskip
+\noindent At the beginning of the study, we collected aggregated data on age, sex, COVID-19 vaccination, and COVID-19 recovery status in the participating classes. Daily, we collected data on each absent student, \ie the absence and return dates and reason for the absence (illness, career days, or other). For absences due to illness, we recorded symptoms and the date of symptom onset. We defined a case of respiratory infection as an absence in which the student reported an illness with at least one respiratory symptom (\supp~text~\zref{sec:case-data}). The list of absences by date of symptom onset, absence and return is shown in \supp~table~\zref{tab:epi-data-line-list}. \medskip
 
 \noindent\textbf{Molecular data} \smallskip
 
-\noindent Both classes participated in repetitive bi-weekly saliva testing (Tuesdays and Thursdays; see \nameref{sec:mol_analyses} below). Samples were transported to the laboratory and stored at $-$80°C until further processing\cite{Galar2021,To2019,Huber2021}. The line list data is shown in \supp~table~\zref{tab:mol-data-line-list}. Furthermore, we collected airborne respiratory viruses in both classrooms with a cyclonic bioaerosol sampling device (Coriolis Micro Air, Bertin Instruments Montigny-le-Bretonneux, France), running at 200\,l/min and collecting into 15\,mL Phosphate-Buffered Saline (PBS). The Coriolis Micro Air ran shortly before and during break times (approximately 60\,min/day) to prevent unacceptable noise exposure. In one class, we also sampled with the BioSpot-VIVAS condensation particle growth collection device (Aerosol Devices Inc., Ft. Collins, CO, USA) \cite{Pan2016JAM,Lednicky2016AST}. BioSpot-VIVAS operated throughout the lessons. The removable parts of both sampling devices were regularly autoclaved. At the end of the day, samples were transported to the Institute of Infectious Diseases (IFIK) and stored at $-$80°C. Finally, we collected swabs from the HEPA filters of the air cleaners after each intervention phase (see \cref{tab:study_design}). The HEPA filters were removed from the air cleaners and divided into 20~fields. One sterile PBS-moistened swab per field was then taken for a total of 20~swabs per filter. \medskip
+\noindent Both classes participated in repetitive bi-weekly saliva testing (Tuesdays and Thursdays; see \nameref{sec:mol_analyses} below). Samples were transported to the laboratory and stored at $-$80°C until further processing\cite{Galar2021,To2019,Huber2021}. The list of positive samples is shown in \supp~table~\zref{tab:mol-data-line-list}. Furthermore, we collected airborne respiratory viruses in both classrooms with a cyclonic bioaerosol sampling device (Coriolis Micro Air, Bertin Instruments Montigny-le-Bretonneux, France), running at 200\,l/min and collecting into 15\,mL Phosphate-Buffered Saline (PBS). The Coriolis Micro Air ran shortly before and during break times (approximately 60\,min/day) to minimize noise. In one class, we also sampled with the BioSpot-VIVAS condensation particle growth collection device (Aerosol Devices Inc., Ft. Collins, CO, USA) \cite{Pan2016JAM,Lednicky2016AST}. BioSpot-VIVAS operated throughout the lessons. The removable parts of both sampling devices were regularly autoclaved. At the end of the day, samples were transported to the Institute of Infectious Diseases (IFIK) and stored at $-$80°C. Finally, we collected swabs from the HEPA filters of the air cleaners after each intervention phase (see \cref{tab:study_design}). The HEPA filters were removed from the air cleaners and divided into 20~fields. One sterile PBS-moistened swab per field was then taken for a total of 20~swabs per filter. \medskip
 
 \noindent\textbf{Environmental data} \smallskip
 
-\noindent An air quality device (AQ Guard, Palas GmbH, Karlsruhe, Germany) continuously measured indoor CO$_2$ levels, aerosol number concentrations (particle diameter between 175~nm to 20~$\mu$m) and particle mass concentrations (PM; PM$_1$, PM$_{2.5}$, PM$_4$, PM$_{10}$) by minute. This device was used in previous work\cite{DiGilio2021,Duill2021,Banholzer2023PLoSMed}. 
+\noindent An air quality device (AQ Guard, Palas GmbH, Karlsruhe, Germany) continuously measured indoor CO$_2$ levels, aerosol number concentrations (particle diameter between 175~nm to 20~$\mu$m) and particle mass concentrations (PM; PM$_1$, PM$_{2.5}$, PM$_4$, PM$_{10}$) by minute. This device was used in previous work\cite{DiGilio2021,Duill2021,Banholzer2023PLoSMed}. The device did \emph{not} alert teachers when CO$_2$ levels or particle concentrations were too high.
 
-\subsection{Laboratory and molecular analyses}\label{sec:mol_analyses}
+\subsection*{Laboratory and molecular analyses}\label{sec:mol_analyses}
 
 \noindent Prior to the real-time (RT)-PCR analysis, daily bioaerosol samples were combined for each sampling device and filtered using Amicon Ultra-15 Centrifugal Filters with Ultracel 10,000 Dalton molecular weight cutoffs filters (UFC9010; MilliporeSigma, Burlington, USA) to a volume of 1\,mL. The human saliva samples were analyzed directly without prior filtration. The Allplex RV Master Assay (Seegene, Seoul, South Korea) detects a panel of 19 major respiratory viruses and viral subtypes, including SARS-CoV-2 (CoV), influenza (IF), respiratory syncytial (RSV), metapneumovirus (MPV), adenovirus (AdV), rhinovirus (HRV), and parainfluenza (PIV). 
 
-\subsection{Molecular genotyping}
+\subsection*{Molecular genotyping}
 
-We performed molecular genotyping for positive saliva, bioaerosol, air filter samples of AdV and IF. For AdV, we used a PCR procedure to amplify three hypervariable regions (hexon, fiber, penton) of the viral genome and then sequenced the PCR products\cite{Akello2021SciRep}. For IF, we tried to determine the molecular transmission network using whole genome sequencing\cite{Kelly2022FrontiersImmuno}.
+We performed molecular genotyping for positive saliva, bioaerosol, air filter samples of adenovirus and influenza. For adenovirus, we used a PCR procedure to amplify three hypervariable regions (hexon, fiber, penton) of the viral genome and then sequenced the PCR products\cite{Akello2021SciRep}. For influenza, we tried to determine the molecular transmission network using whole genome sequencing\cite{Kelly2022FrontiersImmuno}.
 
-\subsection{Cough detection}
+\subsection*{Cough detection}
 
 We installed a portable audio recorder (ZOOM H6; New York, USA) in each classroom to record sounds continuously. We determined the number of coughs per minute using an AI algorithm\cite{Bertschinger2023IEEE}. A recent study has shown a significant correlation between coughing and the positivity rate of virus detection in airborne samples\cite{Hanna2023PONE}.
 
-\subsection{Statistical analyses and modeling}
+\subsection*{Statistical analyses and modeling}
 
-All statistical analyses were described in the statistical analysis plan (SAP)\cite{Banholzer2023SAP}, which was published prior to the analyses. Contrary to the SAP, bioaerosol samples and viral load concentrations could not be analyzed because there were too few positive samples. Otherwise, there were no major deviations from the SAP. Minor deviations are documented in \supp~text~\zref{sec:transmission-model}-\zref{sec:env-regression-model}, including detailed descriptions of the models. \medskip
+All statistical analyses were described in a statistical analysis plan (SAP)\cite{Banholzer2023SAP}, which was published prior to the analyses. Contrary to the SAP, bioaerosol samples and viral load concentrations could not be analyzed because there were too few positive samples. Otherwise, there were no major deviations from the SAP. Minor deviations are documented in \supp~text~\zref{sec:transmission-model}-\zref{sec:env-regression-model}, including detailed descriptions of the models. \medskip
 
 \noindent\textbf{Risk of infection} \smallskip
 
-\noindent We estimated the relative risk of infection with air cleaners using a Bayesian latent variable hierarchical regression model. The observed outcome of this model is the number of new respiratory cases $C$ (absences related to respiratory infections by date of symptom onset) on day $t$ in class $j$, which are modeled with a Negative Binomial distribution. The expected number of new cases is the weighted sum of the number of new infections $I_{js}$ (unobserved/latent outcome) in the previous days $s<t$, with the weights corresponding to the probability distribution of the incubation period. The number of new infections is related to the presence of air cleaners using a regression-like log-link
+\noindent We estimated the relative risk of infection with air cleaners using a Bayesian latent variable hierarchical regression model. The observed outcome of this model is the number of new respiratory cases $C$ (absences related to respiratory infections by date of symptom onset) on day $t$ in class $j$, which are modeled with a Negative Binomial distribution. The expected number of new cases is the weighted sum of the number of new infections $I_{js}$ (unobserved/latent outcome) in the previous days $s<t$, with the weights corresponding to the probability distribution of the incubation period. The number of new infections is related to the presence of air cleaners as follows
 \begin{align}
     \log I_{js} = \log F_{js} - \log N_{js} + \beta_0 + \beta_1 \cdot \text{AirCleaner}_{js},
 \end{align}
-where $F_{js}$ is the number of infections in the previous week (a proxy for the number of infectious students), $N_{js}$ is the cumulative number of infections (a proxy for the number of susceptible students), $\beta_0$ is the infection rate without air cleaners, and $\beta_1$ is the effect of air cleaners. Furthermore, the effect of air cleaners is adjusted for class-specific effects, the number of students in class, the daily air change rate, and the weekly positivity rate for COVID-19 and the consultations for influenza-like illnesses in the community (\ie the canton of Solothurn). A detailed description of the model and choice of priors for all model parameters are provided in \supp~text~\zref{sec:transmission-model}. \medskip
+where $F_{js}$ is the number of infections in the previous week (a proxy for the number of infectious students), $N_{js}$ is the cumulative number of infections (a proxy for the number of susceptible students), $\beta_0$ is the infection rate without air cleaners, and $\beta_1$ is the effect of air cleaners. Furthermore, the effect of air cleaners is adjusted for class-specific effects, the number of students in class, the daily air change rate, and the weekly positivity rate for COVID-19 and the consultations for influenza-like illnesses in the canton. A detailed description of the model and choice of priors for all model parameters are provided in \supp~text~\zref{sec:transmission-model}. \medskip
 
-\noindent\textbf{Number of positive saliva samples} \smallskip
+\noindent\textbf{Saliva samples} \smallskip
 
 \noindent We analyzed the number of positive saliva samples with a Bayesian Multinomial logistic regression model (\supp~text~\zref{sec:multinomial-model}) and linked the expected number of positive samples to the presence of air cleaners, adjusting for the cumulative number of positive tests. \medskip
 
-\noindent\textbf{Aerosol and particle concentrations} \smallskip
+\noindent\textbf{Particle concentrations} \smallskip
 
-\noindent We computed the average particle concentrations per day and compared them between study conditions. We estimated the reduction in particle concentrations using Bayesian log-linear regression models, adjusting for class and weekday effects, the number of students in class, the air change rate, and the cumulative number of respiratory cases (\supp~text~\zref{sec:env-regression-model}). \medskip
+\noindent We computed mean particle concentrations per day and compared them between study conditions. We estimated the reduction in particle concentrations using Bayesian log-linear regression models, adjusting for class and weekday effects, the number of students in class, the air change rate, and the cumulative number of respiratory cases (\supp~text~\zref{sec:env-regression-model}). \medskip
 
-\noindent\textbf{Number of coughs} \smallskip
+\noindent\textbf{Coughing} \smallskip
 
 \noindent We computed the daily number of detected coughs and compared it between study conditions. We estimated the reduction in the number of coughs using a Bayesian Negative Binomial regression model, using time in class as the model offset and adjusting for class and weekday effects, the number of students in class, the air change rate, and the cumulative number of respiratory cases (\supp~text~\zref{sec:aud-regression-model}). In addition, we used a Bayesian Negative Binomial hierarchical (random effects) regression model to estimate the association between the number of coughs and the number of positive saliva test results. For this analysis, we used only days on which saliva samples were collected (Tuesdays and Thursdays, for a total of 27~days).  \medskip
 
-\noindent\textbf{Software} \smallskip
+\noindent\textbf{Software}\smallskip
 
-\noindent All analyses were performed in R software (version 4.2.0)\cite{RCoreTeam2022} and modeling in Stan (version 2.21.0)\cite{Carpenter2017}. Model parameters were estimated with a Bayesian approach, using the Hamiltonian Monte Carlo algorithm with the No-U-Turn Sampler (NUTS)\cite{Hoffman2014}. If not stated otherwise, we report for each outcome the posterior probability (PP) that the adjusted relative risk (ARR) was lower with air cleaners (ARR<1). ARR is reported with mean and 95\%credible interval (CrI) based on 4,000 samples from the posterior distribution of each model. The code is available from \url{https://osf.io/38j9g}.
+\noindent All analyses were performed in R software (version 4.2.0)\cite{RCoreTeam2022} and modeling in Stan (version 2.21.0)\cite{Carpenter2017}. Model parameters were estimated with a Bayesian approach, using the Hamiltonian Monte Carlo algorithm with the No-U-Turn Sampler (NUTS)\cite{Hoffman2014}. For each outcome, we report the posterior probability of a reduction with air cleaners. The estimated reduction is reported with the posterior mean and 95\%credible interval (CrI). The code is available from \url{https://osf.io/38j9g}.
 
 
-\subsection{Ethics statement}
+\subsection*{Ethics statement}
 
 \noindent The Ethics Committee of the canton of Bern, Switzerland, approved the study (reference no. 2021-02377). For the saliva samples, we included all students who were willing to participate and obtained written informed consent from their caregivers.
 
 
 \newpage
 
-\section{Results}
+\section*{Results}
 
 The study population consisted of 38~students (19~female, 19~male; Table~\ref{tab:cases-overview-school}). Seven~students had been vaccinated or recovered from a SARS-CoV-2 infection within the last four months. During the seven-week study period (total of 1,330 student-days), students were absent from school for 220~days (18\% of the total) of which 129~days (59\% of absences) were due to illness.  
 
@@ -245,12 +252,35 @@ The study population consisted of 38~students (19~female, 19~male; Table~\ref{ta
     \end{tabular} 
 \end{table}
 
-\subsection{Molecular analyses of saliva and air samples}
+\subsection*{Air quality}
 
-We analyzed a total of 448~saliva samples. We detected 15~influenza B~(IFB), 15~rhinovirus~(HRV), 14~adenovirus~(AdV), 3~SARS-CoV-2~(CoV), 2~metapneumovirus~(MPV), and 1~parainfluenza virus~(PIV), respectively (\cref{fig:molecular-descriptives}a). The distribution of positive saliva samples varied between classes. For example, during the first three study weeks, all but one sample was positive for AdV in class~A, while the vast majority of positive IFB samples were found in class~B. To illustrate possible transmission chains within classes, we linked positive saliva samples of the same virus that were less than one week apart. Based on this spatiotemporal analysis, we identified 10~possible transmission chains (\cref{fig:molecular-descriptives}b). The longest potential transmission chains occurred in January, referring to a cluster of AdV infections in class~A and IFB infections in class~B. 
+The mean aerosol number concentration was 95\,1/cm$^3$ (standard deviation [SD] 81\,1/cm$^3$) without and 27\,1/cm$^3$ (SD 34\,1/cm$^3$) with air cleaners (\cref{fig:infection-risk}a). The Bayesian regression model suggested a clear reduction in the aerosol concentration with air cleaners, with a posterior probability of 100\%. The estimated decrease was 76\% (95\%-CrI 63\% to 86\%), which was greater for larger than for smaller particles (\supp~figure~\zref{fig:palas-results}). There was little change in other environmental variables (\supp~figure~\zref{fig:env-descriptives-other-vars}). In particular, daily average CO$_2$ levels were 1,769\,ppm (SD 391\,ppm) with and 1,636\,ppm (SD 341\,ppm) without air cleaners, suggesting that ventilation was comparable between study conditions.
 
-Molecular genotyping to verify the proposed transmission network was unsuccessful because we could not amplify and sequence any of the gene targets. Furthermore, the rate of positive bioaerosol samples was low. We analyzed 105~bioaerosol samples and detected only in two of them viral RNA (1~HRV in class~A and 1~AdV in class~B). Similarly, we detected only 1~IFB, 1~HRV, 1~AdV, and 1~CoV in the 20~swabs taken from each filter of an air cleaner after each intervention phase (160~swabs in total). However, the virus-specific variation between classes and the temporal distribution of positive samples still suggest that transmission occurred within classes. 
+\begin{figure}[!htpb]
+\centering
+    \includegraphics{../../results/env-data/aerosol-number-boxplot.pdf}\hspace{.5cm}
+    \includegraphics{../../results/mol-data/saliva-by-study-condition.pdf}
+    \includegraphics{../../results/cough-data/coughs-frequency-by-condition.pdf}\hspace{.5cm}
+    \includegraphics{../../results/epi-data/cases_by_condition.pdf}
+    \caption{\textbf{Comparison of outcomes with vs without air cleaners.} At the top of each plot, the posterior probability for a reduction with air cleaners is shown, based on the Bayesian model. \textbf{(a)}~Daily average aerosol number concentrations as boxplots. \textbf{(b)}~Number of respiratory cases. \textbf{(c)}~Daily average number of detected coughs per minute as boxplots. \textbf{(d)}~Number of positive saliva samples.}
+    \label{fig:infection-risk}
+\end{figure}
 
+\subsection*{Risk of infection}
+
+Absences related to respiratory infections included 22~cases without vs 13~cases with air cleaners (\cref{fig:infection-risk}b). The Bayesian latent variable hierarchical regression model suggested that air cleaners reduced the risk of infection, with an estimated posterior probability of 91\%. The adjusted relative risk of infection with air cleaners was 0.73 (95\%-CrI 0.44 to 1.18). Based on that, the estimated number of infections would have been 36 (95\%-CrI 21 to 64) if air cleaners had been installed throughout the study period, compared to 62 (95\%-CrI 29 to 141) infections if air cleaners had not been installed. Detailed estimation results are provided in the \supp~text~\zref{sec:detailed-redcap}. 
+
+\subsection*{Coughing}
+
+On average, we detected 3.1\,coughs/min (SD 1.2\,coughs/min) without vs 2.6\,coughs/min (SD 1.1\,coughs/min) with air cleaners (\cref{fig:infection-risk}c). The Bayesian model suggested that coughing was less frequent with air cleaners, with a posterior probability of 93\%. The adjused relative risk of coughing with air cleaners was 0.93 (95\%-CrI 0.85 to 1.02). Coughing was also associated with virus-specific transmission (\supp~figure~\zref{fig:coughing-association}).
+
+\subsection*{Molecular analyses}
+
+We analyzed a total of 448~saliva samples. We detected 15~influenza B, 15~rhinovirus, 14~adenovirus, 3~SARS-CoV-2, 2~metapneumovirus, and 1~parainfluenza virus, respectively (\cref{fig:molecular-descriptives}a). The distribution of positive saliva samples varied between classes. For example, during the first three study weeks, all but one sample was positive for adenvovirus in class~A, while the vast majority of positive influenza~B samples were found in class~B. To illustrate possible transmission chains within classes, we linked positive saliva samples of the same virus that were less than one week apart. Based on this spatiotemporal analysis, we identified 10~possible transmission chains (\cref{fig:molecular-descriptives}b). The longest potential transmission chains occurred in January, referring to a cluster of adenovirus infections in class~A and influenza~B infections in class~B. 
+
+Molecular genotyping to verify the proposed transmission network was unsuccessful because we could not amplify and sequence any of the gene targets. Furthermore, the rate of positive bioaerosol samples was low. We analyzed 105~bioaerosol samples and detected in two of them viral RNA (1~rhinovirus in class~A and 1~adenovirus in class~B). Similarly, we detected 1~influenza~B, 1~rhinovirus, 1~adenovirus, and 1~SARS-CoV-2 in the 20~swabs taken from each filter of an air cleaner after each intervention phase (160~swabs in total). 
+
+There was an equal number of 25~positive saliva samples in both study conditions (\cref{fig:infection-risk}d). Based on our Bayesian Multinomial logistic regression model, the positivity rate remained comparable between study conditions (ARR 0.93, 95\%-CrI 0.49 to 1.61; PP 65\%). The estimated ARR was not sensitive to infection to testing delays (\supp~figure~\zref{fig:mol-estimation-results-sensitivity}). Nevertheless, these estimates are subject to unmeasured confounding because the delay may be sample-specific and repeated positive tests from the same person could not be precluded because testing was anonymized.
 
 \begin{figure}[!htpb]
     \centering
@@ -260,31 +290,11 @@ Molecular genotyping to verify the proposed transmission network was unsuccessfu
     \label{fig:molecular-descriptives}
 \end{figure}
 
-\subsection{Risk of infection with and without air cleaners}
-
-Absences related to respiratory infections were 22~respiratory cases without and 13~cases with air cleaners (\cref{fig:infection-risk}a). Our Bayesian latent variable hierarchical regression model suggested that air cleaners reduced the risk of infection (PP 91\%). However, the reduction was small and subject to uncertainty (ARR 0.73, 95\%-CrI 0.44 to 1.18). The estimated number of infections would be 36 (95\%-CrI 21 to 64) if air cleaners had been installed throughout the study period, compared to 62 (95\%-CrI 29 to 141) infections if air cleaners had not been installed (\supp~\zref{fig:avoided-infections}). Detailed estimation results are provided in the \supp~text~\zref{sec:detailed-redcap}. 
-
-There was an equal number of 25~positive saliva samples in both study conditions (\cref{fig:infection-risk}b). Based on our Bayesian Multinomial logistic regression model, the positivity rate remained comparable between study conditions (ARR 0.93, 95\%-CrI 0.49 to 1.61; PP 65\%). The estimated ARR was not sensitive to infection to testing delays (\supp~figure~\zref{fig:mol-estimation-results-sensitivity}). Nevertheless, these estimates are subject to unmeasured confounding because the delay may be sample-specific and repeated positive tests from the same person could not be precluded because testing was anonymized.
-
-The aerosol number concentration was 95$\pm$81\,1/cm$^3$ without and 27$\pm$34\,1/cm$^3$ with air cleaners (\cref{fig:infection-risk}c). The adjusted decrease in the aerosol concentration with air cleaners was 76\% (95\%-CrI 63\% to 86\%; PP 100\%). This decrease was greater for larger (PM$_{10}$) than for smaller (PM$_1$ to PM$_{4}$) particle matter mass concentrations  (\supp~figure~\zref{fig:palas-results} and \supp~table~\zref{tab:palas-est-results}). There was little change in other environmental variables (\supp~figure~\zref{fig:env-descriptives-other-vars}). In particular, daily average CO$_2$ levels were 1,769$\pm$391\,ppm with and 1,636$\pm$341\,ppm without air cleaners, suggesting that ventilation was comparable between study conditions.
-
-We detected 3.1$\pm$1.2~coughs/min in audio recordings without and 2.6$\pm$1.1~coughs/min with air cleaners (\cref{fig:infection-risk}d). Based on our Bayesian Negative Binomial regression model, the risk of coughing was slightly lower with air cleaners (ARR 0.93, 95\%-CrI 0.85 to 1.02; PP 93\%). Significantly more coughs were detected in the room of class~B (ARR 2.16, 95\%-CrI 1.90 to 2.46), suggesting an association with the observed variation in virus-specific transmission between classes. Indeed, cough was more frequent with IFB positivity (ARR 1.25, 95\%-CrI 1.03 to 1.53) and slightly less frequent with AdV positivity (ARR 0.87, 95\%-CrI 0.49 to 1.12) (\supp~figure~\zref{fig:coughing-association}b). 
-
-\begin{figure}[!htpb]
-\centering
-    \includegraphics{../../results/epi-data/cases_by_condition.pdf}\hspace{.5cm}
-    \includegraphics{../../results/mol-data/saliva-by-study-condition.pdf}
-    \includegraphics{../../results/env-data/aerosol-number-boxplot.pdf}\hspace{.5cm}
-    \includegraphics{../../results/cough-data/coughs-frequency-by-condition.pdf}
-    \caption{\textbf{Risk of infection by study condition}. Comparison of raw outcomes with and without air cleaners. Atop of each plot the posterior probability (PP) is shown that the outcome was lower with air cleaners (Yes<No), which was computed based on the posterior samples of the Bayesian model used to estimate the effect of air cleaners after adjusting for observed confounders. \textbf{(a)}~Number of respiratory cases. \textbf{(b)}~Number of positive saliva samples. \textbf{(c)}~Daily average aerosol number concentrations as boxplots. \textbf{(d)}~Daily average number of detected coughs per minute as boxplots. }
-    \label{fig:infection-risk}
-\end{figure}
-
 \FloatBarrier
 
 \newpage
 
-\section{Discussion}
+\section*{Discussion}
 
 % summary
 
@@ -317,9 +327,6 @@ In conclusion, using epidemiological, environmental, and molecular data, our stu
 \newpage
 
 %TC:ignore
-
-\section*{Funding}
-This study was funded by the Multidisciplinary Center for Infectious Diseases, University of Bern, Bern, Switzerland. NB, LF, and ME are supported by the National Institute of Allergy and Infectious Diseases (NIAID) through cooperative agreement 5U01-AI069924-05. ME is supported by special project funding from the Swiss National Science Foundation (grant 32FP30-189498). \medskip
 
 \section*{Author contributions}
 Conception and design: NB, KZ, LF, PB, PJ, TS. Epidemiological and environmental data collection: EW, NB, PJ, KZ, TS, LF. Laboratory data collection: PB, LFu. Additional data collection: TH. Cough detection: SB. Molecular genotyping: AR, PB, LFu. Statistical analysis: NB. Paper draft: NB, LF, ME. All authors reviewed and approved the final version of the manuscript.
