@@ -132,7 +132,7 @@ cases_by_cond_pl <- epi_data %>%
   ggplot(aes(x = aircleaner, y = cases, fill = aircleaner)) +
   geom_bar(stat = "identity", color = "black", width = .4) +
   geom_text(mapping = aes(label = cases), size = 8 / cm(1), vjust = -1) +
-  ggsignif::geom_signif(annotations = "PP(Yes<No) = 91%", y_position = 27, xmin = 1, xmax = 2, 
+  ggsignif::geom_signif(annotations = "Posterior prob. = 91%", y_position = 27, xmin = 1, xmax = 2, 
                         textsize = 8 / cm(1), vjust = -.5, tip_length = .075) +
   labs(x = "Air cleaner", y = "Number of respiratory cases", fill = "Air cleaner", title = "a") +
   scale_fill_manual(values = bluegrey) +

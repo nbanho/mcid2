@@ -74,11 +74,11 @@ boxpl_cn <- env_epi_data %>%
   dplyr::select(class, date, aircleaner, Cn) %>%
   ggplot(aes(x = aircleaner, fill = aircleaner, y = Cn)) +
   geom_boxplot2(width.errorbar = .3, width = .4) +
-  ggsignif::geom_signif(annotations = "PP(Yes<No) = 100%", y_position = 240, xmin = 1, xmax = 2, 
+  ggsignif::geom_signif(annotations = "Posterior prob. = 100%", y_position = 240, xmin = 1, xmax = 2, 
                         textsize = 8 / cm(1), vjust = -.5) +
   scale_fill_manual(values = bluegrey) +
   scale_y_continuous(expand = expansion(add = c(0, 30)), limits = c(0, NA)) +
-  labs(title = "c", y = expression("Aerosol concentration (1/cm"^3*")"), x = "Air cleaner") +
+  labs(title = "a", y = expression("Aerosol concentration (1/cm"^3*")"), x = "Air cleaner") +
   theme_custom() +
   theme(legend.position = "none",
         plot.title.position = "plot") 
