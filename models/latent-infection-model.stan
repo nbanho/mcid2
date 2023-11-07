@@ -173,7 +173,7 @@ generated quantities {
   real cum_infections_ac[D+S,C,3]; // cum infections depending by installation of air cleaners
   real log_infections_ac[D+S,C,3]; // log infections depending by installation of air cleaners
   real infections_ac[D+S,C,3]; // infections depending by installation of air cleaners
-  real mu_cases_ac[D+SS,C,3]; // log infections depending by installation of air cleaners
+  real mu_cases_ac[D+SS,C,3]; // expected cases depending by installation of air cleaners
 
   for (a in 1:3) {
     for (c in 1:C) {

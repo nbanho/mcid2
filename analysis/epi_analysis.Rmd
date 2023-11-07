@@ -419,6 +419,13 @@ types <- c("Air cleaners partially installed",
            "Scenario 1: Air cleaners installed throughout the study")
 
 avoid_infections <- spread_draws(latInfMod, mu_cases_ac[day,class,type]) %>%
+  mutate(day = day - stan_data$S) %>%
+  filter(day > 0) %>%
+  left_join(data.frame(day = 1:length(stan_data$weekend),
+                       weekend = stan_data$weekend,
+                       vacation = stan_data$vacation)) %>%
+  filter(weekend == 0,
+         vacation == 0) %>%
   group_by(.draw, type) %>%
   summarize(infections = sum(mu_cases_ac)) %>%
   ungroup() %>%
@@ -430,6 +437,8 @@ avoid_infections <- spread_draws(latInfMod, mu_cases_ac[day,class,type]) %>%
   arrange(desc(.width)) %>%
   mutate(`.width` = factor(`.width`, levels = rev(c(.5, .8, .95)))) %>%
   filter(type != types[1])
+
+avoid_infections
 
 avoid_infections_pl <- avoid_infections  %>%
   ggplot() +
