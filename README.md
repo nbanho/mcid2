@@ -8,4 +8,5 @@ The repository is structured as follows:
 - *preprocessing:* code used to preprocess the raw data files
 - *analysis*: code used to analyze the different data sources
 - *models*: Bayesian models as implemented in Stan
+- *tests*: code files used for testing the models on simultated data before analysis of the empirical data
 - *utils*: auxiliary code for analysis, plotting, reporting, etc.
