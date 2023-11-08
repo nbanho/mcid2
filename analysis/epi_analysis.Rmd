@@ -438,7 +438,8 @@ avoid_infections <- spread_draws(latInfMod, mu_cases_ac[day,class,type]) %>%
   mutate(`.width` = factor(`.width`, levels = rev(c(.5, .8, .95)))) %>%
   filter(type != types[1])
 
-avoid_infections
+avoid_infections %>%
+  mutate_if(is.numeric, round, 0)
 
 avoid_infections_pl <- avoid_infections  %>%
   ggplot() +
