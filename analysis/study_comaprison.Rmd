@@ -26,12 +26,12 @@ source("../utils/tex.r")
 ```{r}
 saliva <- data.frame(
     year_num = c(rep(2022, 6), rep(2023, 6)),
-    virus = rep(c("Flu", "HRV", "AdV", "CoV", "MPV", "PIV"), 2),
+    virus = rep(c("IF", "HRV", "AdV", "CoV", "MPV", "PIV"), 2),
     n = c(c(1, NA, 1, 19, NA, NA), c(15, 15, 14, 3, 2, 1))
   ) %>%
   mutate(year = ifelse(year_num == 2022, "Winter 2021/2022", "Winter 2022/2023"),
          year = factor(year, levels = c("Winter 2021/2022", "Winter 2022/2023")),
-         virus = factor(virus, levels = c("Flu", "HRV", "AdV", "CoV", "MPV", "PIV"))) %>%
+         virus = factor(virus, levels = c("IF", "HRV", "AdV", "CoV", "MPV", "PIV"))) %>%
   filter(!is.na(n)) %>%
   group_by(year) %>%
   arrange(virus) %>%
@@ -43,7 +43,7 @@ saliva <- data.frame(
          label = paste0(virus, ": ", n)) %>%
   ungroup() %>%
   mutate(labelPosition = ifelse(year == "Winter 2022/2023" & virus == "MPV", labelPosition - .015, labelPosition),
-         labelPosition = ifelse(year == "Winter 2021/2022" & virus == "Flu", ymin, labelPosition),
+         labelPosition = ifelse(year == "Winter 2021/2022" & virus == "IF", ymin, labelPosition),
          labelPosition = ifelse(year == "Winter 2021/2022" & virus == "AdV", ymax, labelPosition))
 
 saliva_pl <- saliva %>%
@@ -56,8 +56,8 @@ saliva_pl <- saliva %>%
             size = 8/cm(1), fontface = 2) +
   scale_x_continuous(limits = c(1, 5.25), expand = c(0,0)) +
   scale_y_continuous(expand = c(0,0),  position = "top") +
-  scale_fill_manual(values = RColorBrewer::brewer.pal(9, "BuPu")[4:9]) +
-  scale_color_manual(values = RColorBrewer::brewer.pal(9, "BuPu")[4:9]) +
+  scale_fill_manual(values = wes_palette("IsleofDogs1")) +
+  scale_color_manual(values = wes_palette("IsleofDogs1")) +
   ggtitle("a") +
   theme_void() +
   theme(legend.position = "none",
@@ -94,8 +94,8 @@ pos_samples_pl <- pos_samples %>%
   geom_text(aes(label = value, color = year), size = 8 / cm(1), vjust = -1) +
   facet_wrap(~ type, nrow = 1) +
   scale_y_continuous(expand = expansion(add = c(0,5))) +
-  scale_fill_manual(values = RColorBrewer::brewer.pal(11, "BrBG")[c(4,8)]) +
-  scale_color_manual(values = RColorBrewer::brewer.pal(11, "BrBG")[c(4,8)]) +
+  scale_fill_manual(values = RColorBrewer::brewer.pal(9, "PuBu")[c(4,9)]) +
+  scale_color_manual(values = RColorBrewer::brewer.pal(9, "PuBu")[c(4,9)]) +
   labs(y = "Frequency of positive samples", title = "b") +
   theme_custom() +
   theme(legend.position = "none",
