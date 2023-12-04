@@ -89,6 +89,25 @@ save_plot(boxpl_cn,
           pdf_file = "../results/env-data/aerosol-number-boxplot.pdf", 
           eps_file = "../results/env-data/aerosol-number-boxplot.eps", 
           w = 7.25, h = 6)
+
+ggsave(plot = env_epi_data %>%
+  dplyr::select(class, date, aircleaner, Cn) %>%
+  ggplot(aes(x = aircleaner, fill = aircleaner, y = Cn)) +
+  geom_boxplot2(width.errorbar = .3, width = .4) +
+  ggsignif::geom_signif(annotations = "Posterior prob. = 100%", y_position = 240, xmin = 1, xmax = 2, 
+                        textsize = 40 / cm(1), vjust = -.5) +
+  scale_fill_manual(values = c(bluegrey[1], "#E4003C")) +
+  scale_y_continuous(expand = expansion(add = c(0, 30)), limits = c(0, NA)) +
+  labs(title = "a", y = expression("Aerosol concentration (1/cm"^3*")"), x = "Air cleaner") +
+  theme_custom() +
+  theme(legend.position = "none",
+        plot.title.position = "plot") +
+  theme(plot.title.position = "plot",
+        axis.text = element_text(size = 40),
+        axis.title = element_text(size = 40)) +
+  guides(fill = "none"),
+  filename = "../results/env-data/aerosol-number-boxplot-large.png",
+  width = 4 * 7.25 / cm(1), height = 4 * 6 / cm(1) )
 ```
 
 ```{r}

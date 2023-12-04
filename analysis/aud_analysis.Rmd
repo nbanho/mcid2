@@ -120,6 +120,23 @@ save_plot(coughs_pl,
           pdf_file = "../results/cough-data/coughs-frequency-by-condition.pdf", 
           eps_file = "../results/cough-data/coughs-frequency-by-condition.eps", 
           w = 7.25, h = 6)
+
+ggsave(plot = coughs %>%
+            mutate(coughs_per_min = n_coughs / TT) %>%
+            mutate(aircleaner = factor(aircleaner, levels = c("No", "Yes"))) %>%
+            ggplot(aes(x = aircleaner, fill = aircleaner, y = coughs_per_min)) +
+            geom_boxplot2(width.errorbar = .3, width = .4) +
+            ggsignif::geom_signif(annotations = "Posterior prob. = 93%", y_position = 6.25, xmin = 1, xmax = 2, 
+                                  textsize = 40 / cm(1), vjust = -.5) +
+            scale_fill_manual(values = c(bluegrey[1], "#E4003C")) +
+            scale_y_continuous(limits = c(0, NA), expand = expansion(add = c(0, .66))) +
+            labs(y = "Number of coughs per min", x = "Air cleaner") +
+            theme_custom() +
+            theme(legend.position = "none",
+                  axis.text = element_text(size = 40),
+                  axis.title = element_text(size = 40)), 
+          filename = "../results/cough-data/coughs-frequency-by-condition-large.png", 
+          width = 4 * 7.25 / cm(1), height = 4 * 6  / cm(1))
 ```
 
 
