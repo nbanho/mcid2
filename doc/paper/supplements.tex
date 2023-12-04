@@ -245,8 +245,10 @@
 
 \newcommand{\supp}{SI Appendix}
 
-\title{\LARGE\singlespacing{\textbf{Appendix} \\ \medskip
-Air cleaners and respiratory infections in schools: \\ A modeling study using epidemiological, environmental, and molecular data}}
+\title{\LARGE\singlespacing{\textbf{Supplmenetary Material} \\ \medskip
+Air cleaners and respiratory infections in schools: \\ A multi-measurement observational study}}
+
+% long: Air cleaners and respiratory infections in schools: \\ A modeling study using epidemiological, environmental, and molecular data
 
 % author list
 \author[1$\ddag$,2]{Nicolas Banholzer}
@@ -304,9 +306,9 @@ Air cleaners and respiratory infections in schools: \\ A modeling study using ep
 
 \section{Experimental determination of the CADR}\label{sec:cadr}
 
-The clean air delivery rate (CADR) is typically used to quantify the cleaning efficiency of air cleaners.\cite{Nelson1993IndoorEnv} It is expressed in m$^3$/s and describes the volumetric flow rate of particle-free, clean air that an air cleaner delivers into the room. The CADR is equal to the product of the filtration efficiency and the volumetric flow rate passing through the device.
+The clean air delivery rate (CADR) is typically used to quantify the cleaning efficiency of air cleaners\cite{Nelson1993IndoorEnv}. It is expressed in m$^3$/s and describes the volumetric flow rate of particle-free, clean air that an air cleaner delivers into the room. The CADR is equal to the product of the filtration efficiency and the volumetric flow rate passing through the device.
 
-We followed the approach by K\"{u}pper et al. to determine the CADR.\cite{Kuepper20199AAQR} The approach is based on the release of fine aerosols (particle diameter $D$<1$\mu$m) in a closed, unventilated room by measuring the decay rate $k$ of the particle concentration $N(t)$ caused by the air cleaner, \ie
+We followed the approach by K\"{u}pper et al. to determine the CADR\cite{Kuepper20199AAQR}. The approach is based on the release of fine aerosols (particle diameter $D$<1$\mu$m) in a closed, unventilated room by measuring the decay rate $k$ of the particle concentration $N(t)$ caused by the air cleaner, \ie
 \begin{align}
     N(t) = N_0 \cdot e^{-k\cdot t}
 \end{align}
@@ -366,7 +368,7 @@ Figure~\ref{fig:experiment} shows the particle number concentration with and wit
 
 \section{Epidemiological line list data}\label{sec:case-data}
 
-Reports about absences were entered electronically into a REDcap database.\cite{Harris2009,Harris2019} \Cref{tab:epi-data-line-list} shows the line list data for respiratory cases based on epidemiological data. For each class and case, it shows the date when the student was absent, s/he reported symptoms, and returned to school. We also collected data on laboratory tests but none of the students reported a test result during the study. A case of respiratory infection was defined as an absence where the student reported a sickness with at least one of the following symptoms: fever, coughing, tiredness, loss of test or smell, sore throat, headache, aches and pains, diarrhea, difficulty breathing or shortness of breath, stomach. Students were asked to report the first date they experienced symptoms, so that a student absent on Monday could report Saturday or Sunday as the day when symptoms began to be felt. We will refer respiratory cases by their dates of symptom onset, which usually corresponded to the absence date, unless the student attended the school while experiencing symptoms. Informed consent for one student could not be obtained and the single absence of this student was considered unrelated to a respiratory infection. 
+Reports about absences were entered electronically into a REDcap database\cite{Harris2009,Harris2019} \Cref{tab:epi-data-line-list}. shows the line list data for respiratory cases based on epidemiological data. For each class and case, it shows the date when the student was absent, s/he reported symptoms, and returned to school. We also collected data on laboratory tests but none of the students reported a test result during the study. A case of respiratory infection was defined as an absence where the student reported a sickness with at least one of the following symptoms: fever, coughing, tiredness, loss of test or smell, sore throat, headache, aches and pains, diarrhea, difficulty breathing or shortness of breath, stomach. Students were asked to report the first date they experienced symptoms, so that a student absent on Monday could report Saturday or Sunday as the day when symptoms began to be felt. We will refer respiratory cases by their dates of symptom onset, which usually corresponded to the absence date, unless the student attended the school while experiencing symptoms. Informed consent for one student could not be obtained and the single absence of this student was considered unrelated to a respiratory infection. 
 
 {\footnotesize\begin{longtable}{l l l l}
     \caption[Line list of respiratory cases over the study period]{Line list of respiratory cases over the study period.}\label{tab:epi-data-line-list} \\
@@ -457,7 +459,7 @@ The virus of each respiratory infection could not be identified from the epidemi
     p_{\text{IN}}^w(s) = \sum_{v} p_{\text{IN}}^{v}(s) \cdot pp_{vw} \quad \forall s.
 \end{align}
 
-The prior distributions for the virus-specific incubation periods are based on estimates published in the literature.\cite{McAloon2020,Lessler2009LancetID} The distributions are shown in \Cref{fig:prior-pin}. Since we could not obtain prior estimates for the incubation period of metapneumovirus (MPV) from the literature, we instead formed a distribution by using the equally weighted average of the parameters from the other distributions. 
+The prior distributions for the virus-specific incubation periods are based on estimates published in the literature\cite{McAloon2020,Lessler2009LancetID}. The distributions are shown in \Cref{fig:prior-pin}. Since we could not obtain prior estimates for the incubation period of metapneumovirus (MPV) from the literature, we instead formed a distribution by using the equally weighted average of the parameters from the other distributions. 
 
 We estimate the virus-specific distributions from our data as part of fitting the overall model. Furthermore, note that $p_\text{IN}$ is discretized via $p_\text{IN}(s) = \int_0^{0.5} p_\text{IN}(\tau) \;\text{d}\tau$ for $s = 0$ and $p_\text{IN}(s) = \int_{s-0.5}^{s+0.5} p_\text{IN}(\tau) \;\text{d}\tau$ for $s > 0$, where $p_\text{IN}(\tau) \sim \textrm{Lognormal}(\mu, \sigma)$ is the density of the lognormal distribution. 
 
@@ -504,7 +506,7 @@ Note that we deviated from the statistical analysis plan by changing the paramet
 
 \subsection{Priors for modeling parameters}
 
-We use weakly informative priors for all modeling parameters following recommendations on the choice of priors.\cite{Gelman2008StatMed,Gelman2008StatAnnals,Gelman2020RegOther,Stan2020Priors,Gabry2023Priors} The continuous adjustment variables are standardized to have zero mean and a standard deviation of 0.5. 
+We use weakly informative priors for all modeling parameters following recommendations on the choice of priors\cite{Gelman2008StatMed,Gelman2008StatAnnals,Gelman2020RegOther,Stan2020Priors,Gabry2023Priors}. The continuous adjustment variables are standardized to have zero mean and a standard deviation of 0.5. 
 \begin{align*}
     \alpha &\sim \text{Student-t}_5(0, 10) \\
     \beta_2, \dots, \beta_6 &\sim \text{Student-t}_5(0, 2.5) \\
@@ -583,7 +585,7 @@ There was a strong difference in particle concentrations between study condition
     \end{tabular}
 \end{table}
 
-In the main paper, we compared particle concentrations between study conditions. \Cref{fig:env-descriptives-other-vars} compares additional environmental variables, \ie CO$_2$, air change rate, relative humidity, and temperature. The air change rate was estimated from indoor CO$_2$ levels using a transient mass balance model.\cite{Batterman2017IJERPH} There are no considerable differences between in any of the variables between study conditions. Furthermore, numerical estimation results for the reduction in particle concentrations with air cleaners are shown in \Cref{tab:palas-est-results}.
+In the main paper, we compared particle concentrations between study conditions. \Cref{fig:env-descriptives-other-vars} compares additional environmental variables, \ie CO$_2$, air change rate, relative humidity, and temperature. The air change rate was estimated from indoor CO$_2$ levels using a transient mass balance model\cite{Batterman2017IJERPH}. There are no considerable differences between in any of the variables between study conditions. Furthermore, numerical estimation results for the reduction in particle concentrations with air cleaners are shown in \Cref{tab:palas-est-results}.
 
 \begin{figure}[!htb]
 \centering
@@ -616,7 +618,7 @@ The overdispersion parameter ($\phi$) cannot be precisely estimated, but the cre
     \input ../../results/epi-data/estimation-results
     \bottomrule
     \multicolumn{6}{p{13cm}}{\scriptsize
-        ESS is the effective sample size, \ie the number of independent MCMC samples with estimation power equivalent to the total number of autocorrelated samples,\cite{Stan2022} and $\hat{R}$ is the Gelman-Rubin convergence diagnostic.\cite{Gelman1992} Low ESS or $\hat{R}$ or $\hat{R}>1.10$ indicate bad convergence of the model.\cite{Gelman2013}}
+        ESS is the effective sample size, \ie the number of independent MCMC samples with estimation power equivalent to the total number of autocorrelated samples\cite{Stan2022}, and $\hat{R}$ is the Gelman-Rubin convergence diagnostic\cite{Gelman1992}. Low ESS or $\hat{R}$ or $\hat{R}>1.10$ indicate bad convergence of the model\cite{Gelman2013}.}
     \end{tabular}
 \end{table}
 
