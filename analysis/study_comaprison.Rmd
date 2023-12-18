@@ -282,7 +282,8 @@ vent <- left_join(
     dplyr::select(year_num, class, date, co2.max) 
 ) %>%
   group_by(year_num, class, week) %>%
-  summarize(co2.max = mean(co2.max, na.rm = T)) %>%
+  summarize(maxCO2_imputed = ifelse(is.na(co2.max), T, F), 
+            co2.max = mean(co2.max, na.rm = T)) %>%
   ungroup() %>%
   group_by(year_num) %>%
   mutate(co2.max = ifelse(is.na(co2.max), mean(co2.max, na.rm = T), co2.max)) %>%
@@ -290,6 +291,15 @@ vent <- left_join(
   rename(maxCO2 = co2.max) 
 
 pair_df <- left_join(pair_df, vent) 
+
+pair_df %>%
+  group_by(year_num, class, week) %>%
+  slice(1) %>%
+  ungroup() %>%
+  filter(!maxCO2_imputed) %>%
+  group_by(year_num) %>%
+  summarize(mean(maxCO2), sd(maxCO2)) %>%
+  mutate_if(is.numeric, round, 0)
 
 # create stan data file
 stanDF <- list(
@@ -310,12 +320,11 @@ stanDF <- list(
 
 ```{r}
 # add prior scales
-stanDF$s_saliva <- 1 / sd(stanDF$saliva)
-stanDF$s_cov <- 1 / sd(stanDF$cov)
-stanDF$s_masks <- .25 #/ sd(stanDF$masks)
-stanDF$s_air <- .25 #/ sd(stanDF$air_cleaners)
-stanDF$s_co2 <- .25
-stanDF$s_cov <- 1
+stanDF$s_saliva <- sd(stanDF$bioaerosol) / sd(stanDF$saliva)
+stanDF$s_cov <- sd(stanDF$bioaerosol) / sd(stanDF$cov)
+stanDF$s_masks <- .5 * sd(stanDF$bioaerosol) / sd(stanDF$masks)
+stanDF$s_air <- .5 * sd(stanDF$bioaerosol) / sd(stanDF$air_cleaners)
+stanDF$s_co2 <- sd(stanDF$bioaerosol)
 
 # add prior skew
 stanDF$t_masks <- .75
@@ -397,7 +406,8 @@ summary(mod, pars = c("alpha",
 mod %>%
   spread_draws(beta_cov) %>%
   mutate(beta_cov = exp(beta_cov)) %>%
-  median_qi()
+  median_qi() %>%
+  mutate_if(is.numeric, round, 1)
 
 pred_prob <- mod %>%
   spread_draws(logit_cov, logit_nonCov) %>%
