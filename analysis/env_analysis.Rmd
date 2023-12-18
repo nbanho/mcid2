@@ -51,9 +51,9 @@ names(vars_labels_no_units) <- vars
 ```{r}
 # overall
 env_epi_data %>%
-  summarize(across(c(CO2, AER, Cn, PM1), .fns = list(mean = mean, sd = sd), .names = "{.col}_{.fn}")) %>%
-  mutate(across(c(CO2_mean, CO2_sd, Cn_mean, Cn_sd), round),
-         across(c(AER_mean, AER_sd, PM1_mean, PM1_sd), round, 2))
+  summarize(across(c(CO2, AER, Cn, PM1, rH, Temp), .fns = list(mean = mean, sd = sd), .names = "{.col}_{.fn}")) %>%
+  mutate(across(c(CO2_mean, CO2_sd, Cn_mean, Cn_sd, rH_mean, Temp_mean), round),
+         across(c(AER_mean, AER_sd, PM1_mean, PM1_sd, rH_sd, Temp_sd), round))
 
 tt_co2 <- t.test(env_epi_data$CO2[env_epi_data$aircleaner=="Yes"], env_epi_data$CO2[env_epi_data$aircleaner=="No"])
 

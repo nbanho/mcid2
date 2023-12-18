@@ -14,6 +14,12 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(tidyverse)
 library(reshape2)
+
+library(rstan)
+library(brms)
+library(tidybayes)
+library(modelr)
+
 source("../utils/epi.r")
 source("../utils/bayes.r")
 source("../utils/plotting.r")
@@ -21,14 +27,44 @@ source("../utils/tex.r")
 ```
 
 
+## Data
+
+```{r}
+# saliva
+saliva_2022 <- readxl::read_xlsx("../data-clean/comparison/mcid-1-molecular-results.xlsx", "Saliva")
+saliva_2023 <- readxl::read_xlsx("../data-clean/comparison/mcid-2-molecular-results.xlsx", "Saliva")
+
+saliva <- rbind(saliva_2022 %>% mutate(year_num = 2022),
+                saliva_2023 %>% mutate(year_num = 2023))
+
+# bioaerosols
+air_2022 <- readxl::read_xlsx("../data-clean/comparison/mcid-1-molecular-results.xlsx", "Bioaerosols")
+air_2023 <- readxl::read_xlsx("../data-clean/comparison/mcid-2-molecular-results.xlsx", "Bioaerosols")
+
+air <- rbind(air_2022 %>% mutate(year_num = 2022),
+             air_2023 %>% mutate(year_num = 2023))
+
+# air filters
+# TODO: just list
+
+# other data
+odf <- readRDS("../data-clean/comparison/merged-data-both-years-all-classes.rds")
+```
+
+
 ## Virus distribution
 
 ```{r}
-saliva <- data.frame(
-    year_num = c(rep(2022, 6), rep(2023, 6)),
-    virus = rep(c("IF", "HRV", "AdV", "CoV", "MPV", "PIV"), 2),
-    n = c(c(1, NA, 1, 19, NA, NA), c(15, 15, 14, 3, 2, 1))
-  ) %>%
+saliva_sum <- saliva %>%
+  mutate(IF = IFA + IFB) %>%
+  dplyr::select(year_num, IF, HRV, AdV, CoV, MPV, PIV) %>%
+  melt("year_num") %>%
+  rename(virus = variable,
+         n = value) %>%
+  group_by(year_num, virus) %>%
+  summarize(n = sum(n)) %>%
+  ungroup() %>%
+  filter(n > 0) %>%
   mutate(year = ifelse(year_num == 2022, "Winter 2021/2022", "Winter 2022/2023"),
          year = factor(year, levels = c("Winter 2021/2022", "Winter 2022/2023")),
          virus = factor(virus, levels = c("IF", "HRV", "AdV", "CoV", "MPV", "PIV"))) %>%
@@ -46,7 +82,7 @@ saliva <- data.frame(
          labelPosition = ifelse(year == "Winter 2021/2022" & virus == "IF", ymin, labelPosition),
          labelPosition = ifelse(year == "Winter 2021/2022" & virus == "AdV", ymax, labelPosition))
 
-saliva_pl <- saliva %>%
+saliva_pl <- saliva_sum %>%
   ggplot() +
   facet_wrap(~ year_num, nrow = 1) +
   geom_rect(mapping = aes(ymax = ymax, ymin = ymin, xmax = 4, xmin = 3, fill = virus)) +
@@ -72,47 +108,411 @@ saliva_pl <- saliva %>%
 saliva_pl
 ```
 
-
-## No. of positive samples
+## Time distribution
 
 ```{r}
-pos_samples <- data.frame(
-  year_num = factor(c(rep(2022, 3), rep(2023, 3)), levels = c(2022, 2023)),
-  type = factor(rep(c("Saliva", "Bioaerosols", "HEPA-filter"), times = 2), levels = c("Saliva", "Bioaerosols", "HEPA-filter")),
-  n_pos = c(c(21, 10, 8), c(50, 2, 4)),
-  n_tot = c(c(262, 130, 40), c(448, 105, 160))
-) %>%
-  mutate(n_neg = n_tot - n_pos,
-         year = ifelse(year_num == 2022, "Winter 2021/2022", "Winter 2022/2023"),
-         year = factor(year, levels = c("Winter 2021/2022", "Winter 2022/2023"))) %>%
-  dplyr::select(-n_tot,-n_neg) %>%
-  reshape2::melt(c("year_num", "year", "type"))
+saliva_week <- saliva %>%
+  mutate(IF = IFA + IFB,
+         class = ifelse(year_num == 2022, ifelse(class == "D", "B", "A"), class)) %>%
+  dplyr::select(year_num, week, class, intervention, IF, HRV, AdV, CoV, MPV, PIV) %>%
+  melt(c("year_num", "week", "class", "intervention")) %>%
+  rename(virus = variable) %>%
+  group_by(year_num, class, week, intervention, virus) %>%
+  summarize(n = sum(value, na.rm = T)) %>%
+  ungroup() 
 
-pos_samples_pl <- pos_samples %>%
-  ggplot(aes(y = value, x = year_num, fill = year)) +
-  geom_bar(stat = "identity") +
-  geom_text(aes(label = value, color = year), size = 8 / cm(1), vjust = -1) +
-  facet_wrap(~ type, nrow = 1) +
-  scale_y_continuous(expand = expansion(add = c(0,5))) +
-  scale_fill_manual(values = RColorBrewer::brewer.pal(9, "PuBu")[c(4,9)]) +
-  scale_color_manual(values = RColorBrewer::brewer.pal(9, "PuBu")[c(4,9)]) +
-  labs(y = "Frequency of positive samples", title = "b") +
+air_week <- air %>%
+  mutate(IF = IFA + IFB,
+         class = ifelse(year_num == 2022, ifelse(class == "D", "B", "A"), class)) %>%
+  dplyr::select(year_num, week, class, intervention, IF, HRV, AdV, CoV, MPV, PIV) %>%
+  melt(c("year_num", "week", "class", "intervention")) %>%
+  rename(virus = variable) %>%
+  group_by(year_num, class, week, intervention, virus) %>%
+  summarize(n = sum(value, na.rm = T)) %>%
+  ungroup()
+
+saliva_air_week <- rbind(saliva_week %>% mutate(type = "Saliva"),
+                         air_week %>% mutate(type = "Bioaerosol")) %>%
+  slice(rep(1:n(), times = n)) %>%
+  mutate(year = ifelse(year_num == 2022, "Winter 2021/2022", "Winter 2022/2023"),
+         year = factor(year, levels = c("Winter 2021/2022", "Winter 2022/2023")),
+         virus = factor(virus, levels = c("IF", "HRV", "AdV", "CoV", "MPV", "PIV")),
+         type = factor(type, levels = c("Bioaerosol", "Saliva")),
+         type_num = ifelse(type == "Bioaerosol", 1, 2),
+         classroom = factor(paste("Room", class), levels = c("Room A", "Room B"))) 
+
+backgrd_y <- saliva_air_week %>%
+  group_by(year, classroom, week) %>%
+  summarize(type_num = 1) %>%
+  ungroup() %>%
+  complete(year, classroom, week)
+
+time_pl <- ggplot(mapping = aes(x = week, y = type_num)) +
+  facet_grid(classroom ~ year) +
+  geom_rect(data = backgrd_y,
+            mapping = aes(xmin = week - 0.5, xmax = week + 0.5, ymin = -Inf, ymax = Inf),
+            fill = ifelse(backgrd_y$week %% 2 == 0, "lightgray", "white"),
+            alpha = 0.5) +
+  geom_hline(data = data.frame(y = 1.5), mapping = aes(yintercept = y), linetype = "dashed") +
+  geom_point(data = saliva_air_week %>%
+               mutate(ps = .17) %>%
+               group_by(year, classroom, week, virus, type) %>%
+               mutate(type_num = type_num + cumsum(ps) - .3) %>%
+               ungroup(),
+             mapping = aes(color = virus),
+             position = position_dodge(width = .75)) +
+  scale_color_manual(values = wes_palette("IsleofDogs1")) +
+  scale_x_continuous(breaks = 1:7, limits = c(0.5, 7.5), expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0), limits = c(0, 3)) +
+  annotate("text", y = 2.8, x = 0.65, label = "Saliva", hjust = 0, size = 8 / cm(1)) +
+  annotate("text", y = 0.2, x = 0.65, label = "Bioaerosol", hjust = 0, size = 8 / cm(1)) +
+  labs(x = "Study week", title = "b") +
+  theme_bw2() +
+  theme(axis.title.y = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.text = element_text(face = 2, size = 8),
+        text = element_text(size = 8),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
+  guides(shape = "none",
+         color = "none")
+
+time_pl
+```
+
+## Modeling saliva-air pairs
+
+### Checks
+
+Look at the difference in days between positive air and saliva samples. 
+* Are air samples detected later or earlier than a positive saliva samples?
+
+```{r}
+air_pos <- air %>%
+  mutate(IF = IFA + IFB) %>%
+  dplyr::select(-IFA, -IFB) %>%
+  melt(c("year_num", "school", "class", "week", "date", "sampler", "intervention")) %>%
+  filter(!is.na(value), value > 0) %>%
+  mutate(class = ifelse(year_num == 2022, ifelse(class == "A/B", "A", "B"), class)) %>%
+  dplyr::select(-school, -value, -intervention) %>%
+  rename(date_air = date) %>%
+  mutate(sample_id = 1:n())
+
+sal_pos <- saliva %>%
+  mutate(IF = IFA + IFB) %>%
+  dplyr::select(-IFA, -IFB) %>%
+  melt(c("year_num", "school", "class", "week", "date", "intervention")) %>%
+  filter(!is.na(value), value > 0) %>%
+  mutate(class = ifelse(year_num == 2022, ifelse(school == 1, "A", "B"), class)) %>%
+  dplyr::select(-school, -value, -intervention) %>%
+  rename(date_sal = date)
+
+air_sal_pos <- air_pos %>% 
+  dplyr::select(-week) %>%
+  left_join(sal_pos %>% dplyr::select(-week)) %>%
+  mutate(tdays = difftime(date_air, date_sal, units = "days")) %>%
+  group_by(sample_id) %>%
+  arrange(abs(tdays)) %>%
+  slice(1) %>%
+  ungroup()
+
+hist(air_sal_pos$tdays %>% as.numeric, bre = 30)
+```
+
+Consider the issue of the missing VIVAS sampler in class B in 2023.
+* How many weeks were there when VIVAS detected something but not Coriolis?
+
+```{r}
+air_pos_weeks <- air %>%
+  mutate(IF = IFA + IFB) %>%
+  dplyr::select(-IFA, -IFB) %>%
+  melt(c("year_num", "school", "class", "week", "date", "sampler", "intervention")) %>%
+  rename(virus = variable) %>%
+  mutate(class = ifelse(year_num == 2022, ifelse(class == "A/B", "A", "B"), class)) %>%
+  group_by(year_num, class, week, sampler, virus) %>%
+  summarise(detected = ifelse(sum(value, na.rm = T) > 0, 1, 0)) %>%
+  ungroup() %>%
+  group_by(year_num, class, week, virus) %>%
+  filter(any(detected == 1)) %>%
+  ungroup() %>%
+  filter(!(year_num == 2023 & class == "B")) %>%
+  arrange(year_num, class, week, virus, sampler) %>%
+  dcast(year_num + class + week + virus ~ sampler)
+
+table(air_pos_weeks$Coriolis, air_pos_weeks$Vivas)
+
+3 / 7
+```
+
+### Data
+
+```{r}
+# saliva bioaerosol pairs weekly
+pair_df <- rbind(saliva_week %>% mutate(type = "Saliva"),
+                 air_week %>% mutate(type = "Bioaerosol")) %>%
+  group_by(year_num, class, virus, week, intervention, type) %>%
+  summarize(n = sum(n)) %>%
+  ungroup() %>%
+  dcast(year_num + class + virus + week + intervention ~ type) %>%
+  mutate(is_cov = ifelse(virus == "CoV", "yes", "no"),
+         across(c(Bioaerosol, Saliva), ~ ifelse(.x > 0, "yes", "no")),
+         across(c(Bioaerosol, Saliva, is_cov), ~ factor(.x, levels = c("no", "yes"))),
+         year = ifelse(year_num == 2022, "Winter 2021/2022", "Winter 2022/2023"),
+         year = factor(year, levels = c("Winter 2021/2022", "Winter 2022/2023")),
+         virus = factor(virus, levels = c("IF", "HRV", "AdV", "CoV", "MPV", "PIV")),
+         intervention = factor(intervention, levels = c("none", "masks", "air cleaners"))) 
+
+# add ventilation
+vent <- left_join(
+  air %>% 
+    mutate(date = as.Date(date),
+           class = ifelse(class == "A/B", "A", ifelse(class == "D", "B", class))) %>%
+    group_by(year_num, class, week, date) %>%
+    slice(1) %>%
+    ungroup() %>%
+    dplyr::select(year_num, class, week, date),
+  odf %>%
+    group_by(school, classroom, date) %>%
+    slice(1) %>%
+    ungroup() %>%
+    mutate(year_num = lubridate::year(date),
+           class = ifelse(classroom == "AB", "A",
+                          ifelse(year_num == 2022 & school == "School 2" & classroom == "A", "B", classroom))) %>%
+    dplyr::select(year_num, class, date, co2.max) 
+) %>%
+  group_by(year_num, class, week) %>%
+  summarize(co2.max = mean(co2.max, na.rm = T)) %>%
+  ungroup() %>%
+  group_by(year_num) %>%
+  mutate(co2.max = ifelse(is.na(co2.max), mean(co2.max, na.rm = T), co2.max)) %>%
+  ungroup() %>%
+  rename(maxCO2 = co2.max) 
+
+pair_df <- left_join(pair_df, vent) 
+
+# create stan data file
+stanDF <- list(
+  N = nrow(pair_df),
+  K_virus = n_distinct(pair_df$virus),
+  bioaerosol = ifelse(pair_df$Bioaerosol == "yes", 1, 0),
+  saliva = ifelse(pair_df$Saliva == "yes", 1, 0),
+  cov = ifelse(pair_df$is_cov == "yes", 1, 0),
+  virus = as.integer(pair_df$virus),
+  masks = ifelse(pair_df$intervention == "masks", 1, 0),
+  air_cleaners = ifelse(pair_df$intervention == "air cleaners", 1, 0),
+  co2max = (pair_df$maxCO2 - mean(pair_df$maxCO2)) / sd(pair_df$maxCO2) 
+)
+```
+
+
+### Priors
+
+```{r}
+# add prior scales
+stanDF$s_saliva <- 1 / sd(stanDF$saliva)
+stanDF$s_cov <- 1 / sd(stanDF$cov)
+stanDF$s_masks <- .25 #/ sd(stanDF$masks)
+stanDF$s_air <- .25 #/ sd(stanDF$air_cleaners)
+stanDF$s_co2 <- .25
+stanDF$s_cov <- 1
+
+# add prior skew
+stanDF$t_masks <- .75
+stanDF$t_air <- .75
+stanDF$t_co2 <- .25
+
+# add offset
+stanDF$offsets = ifelse(pair_df$year_num == 2022, ifelse(pair_df$class == "A", log(2), log(1)), 
+                        ifelse(pair_df$class == "A", log(1), log(.5)))
+
+# informative priors
+#' positive effect of saliva based on conditional frequencies
+
+table(pair_df$Saliva, pair_df$Bioaerosol) 
+# 5/3 odds of positive bioaerosol for positive saliva
+stanDF$m_saliva <- sum(pair_df$Saliva[pair_df$Bioaerosol == "yes"] == "yes") / sum(pair_df$Saliva[pair_df$Bioaerosol == "yes"] == "no")
+
+#' 80% prior prob. for a negative effect of interventions
+#' smaller effects sizes expected for interventions 
+
+stanDF$m_masks <- optim(par = 0, 
+                 fn = function(l, s, k, p) {
+                   q <- qasym_laplace(p, l, s, k)
+                   abs(q)
+                   }, 
+                 s = stanDF$s_masks, k = stanDF$t_masks, p = 0.9)$par[1] 
+stanDF$m_air <- optim(par = 0, 
+                 fn = function(l, s, k, p) {
+                   q <- qasym_laplace(p, l, s, k)
+                   abs(q)
+                   }, 
+                 s = stanDF$s_air, k = stanDF$t_air, p = 0.9)$par[1] 
+
+#' same prior for co2 as for intervention effects, but positive
+
+stanDF$m_co2 <- optim(par = 0, 
+                 fn = function(l, s, k, p) {
+                   q <- qasym_laplace(p, l, s, k)
+                   abs(q)
+                   }, 
+                 s = stanDF$s_co2, k = stanDF$t_co2, p = 0.1)$par[1] 
+
+
+#' uninformative prior for mean of cov
+stanDF$m_cov <- 1
+```
+
+```{r}
+a  <- seq(-5, 5, .1)
+plot(a, dasym_laplace(a, stanDF$m_masks, stanDF$s_masks, stanDF$t_masks))
+```
+
+
+### Model
+
+```{r}
+# fit model
+mod <- stan(file = "../models/comparison/air-detection-model.stan",
+            data = stanDF,
+            cores = 4, chains = 4, iter = 2000,
+            seed = 12345)
+
+summary(mod, pars = c("alpha", 
+                      # "tau_virus", paste0("beta_virus[", 1:stanDF$K_virus, "]"), 
+                      "beta_saliva", 
+                      "beta_cov", 
+                      "beta_masks", 
+                      "beta_air_cleaners", "beta_co2max"))$summary %>%
+  data.frame() %>%
+  add_rownames() %>%
+  as_data_frame() %>%
+  mutate_if(is.numeric, round, 2)
+```
+
+### Results
+
+```{r}
+# adjusted OR of mask wearing
+mod %>%
+  spread_draws(beta_cov) %>%
+  mutate(beta_cov = exp(beta_cov)) %>%
+  median_qi()
+
+pred_prob <- mod %>%
+  spread_draws(logit_cov, logit_nonCov) %>%
+  mutate(CoV = invlogit(logit_cov),
+         `non-Cov` = invlogit(logit_nonCov)) %>%
+  dplyr::select(-logit_cov, -logit_nonCov) %>%
+  melt(c(".chain", ".iteration", ".draw"))
+
+prob_pl <- ggplot(mapping = aes(x = variable, y = value, color = variable)) +
+  geom_errorbar(data = pred_prob %>% group_by(variable) %>% median_qi(value),
+                mapping = aes(ymin = .lower, ymax = .upper, color = variable),
+                width = .25) +
+  geom_boxplot(data = pred_prob,
+               position = position_dodge(width = .5), outlier.shape = NA, coef = 0, width = 0.25) +
+  stat_summary(data = pred_prob %>% dplyr::select(value, variable),
+               mapping = aes(x = variable, y = value, color = variable), geom = "point", fun = "median", 
+               position = position_dodge2(width = .5), size = 2, shape = 23, fill = "white") +
+  scale_y_continuous(expand = c(0,0), limits = c(0, NA), labels = function(x) x * 100) +
+  scale_color_manual(values = c(wes_palette("IsleofDogs1")[4], "darkred")) +
+  #scale_fill_manual(values = c(wes_palette("IsleofDogs1")[4], "darkred")) +
+  labs(y = "Prob. of airborne detection (%)", title = "c") +
   theme_custom() +
   theme(legend.position = "none",
-        plot.title.position = "plot",
-        strip.text = element_text(face = 2, vjust = 2, margin = margin(t = 10, b = 10)),
-        panel.spacing.x = unit(1, "cm"),
-        axis.title.x = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank())
+        axis.title.x = element_blank())
 
-pos_samples_pl
+prob_pl
+
+# CoV vs non-CoV
+pred_prob %>%
+  group_by(variable) %>%
+  median_qi() %>%
+  mutate_if(is.numeric, function(x) round(x * 100) )
 ```
 
 ```{r}
-comparison <- grid.arrange(saliva_pl, pos_samples_pl, nrow = 2, heights = c(6, 8), widths = 11)
-ggsave(plot = comparison, file = "../results/comparison.pdf", width = 11.5 / cm(1), height = 14 / cm(1))
+design <- "12
+33"
+comparison <- saliva_pl + prob_pl + time_pl + plot_layout(design = design, widths = c(11, 5), heights = c(6, 9))
+ggsave(plot = comparison, file = "../results/comparison.pdf", width = 16 / cm(1), height = 15 / cm(1))
 ```
+
+
+<!-- ## No. of positive samples -->
+
+<!-- ```{r} -->
+<!-- pos_samples <- data.frame( -->
+<!--   year_num = factor(c(rep(2022, 3), rep(2023, 3)), levels = c(2022, 2023)), -->
+<!--   type = factor(rep(c("Saliva", "Bioaerosols", "HEPA-filter"), times = 2), levels = c("Saliva", "Bioaerosols", "HEPA-filter")), -->
+<!--   n_pos = c(c(21, 10, 8), c(50, 2, 4)), -->
+<!--   n_tot = c(c(262, 130, 40), c(448, 105, 160)) -->
+<!-- ) %>% -->
+<!--   mutate(n_neg = n_tot - n_pos, -->
+<!--          year = ifelse(year_num == 2022, "Winter 2021/2022", "Winter 2022/2023"), -->
+<!--          year = factor(year, levels = c("Winter 2021/2022", "Winter 2022/2023"))) %>% -->
+<!--   dplyr::select(-n_tot,-n_neg) %>% -->
+<!--   reshape2::melt(c("year_num", "year", "type")) -->
+
+<!-- pos_samples_pl <- pos_samples %>% -->
+<!--   ggplot(aes(y = value, x = year_num, fill = year)) + -->
+<!--   geom_bar(stat = "identity") + -->
+<!--   geom_text(aes(label = value, color = year), size = 8 / cm(1), vjust = -1) + -->
+<!--   facet_wrap(~ type, nrow = 1) + -->
+<!--   scale_y_continuous(expand = expansion(add = c(0,5))) + -->
+<!--   scale_fill_manual(values = RColorBrewer::brewer.pal(9, "PuBu")[c(4,9)]) + -->
+<!--   scale_color_manual(values = RColorBrewer::brewer.pal(9, "PuBu")[c(4,9)]) + -->
+<!--   labs(y = "Frequency of positive samples", title = "b") + -->
+<!--   theme_custom() + -->
+<!--   theme(legend.position = "none", -->
+<!--         plot.title.position = "plot", -->
+<!--         strip.text = element_text(face = 2, vjust = 2, margin = margin(t = 10, b = 10)), -->
+<!--         panel.spacing.x = unit(1, "cm"), -->
+<!--         axis.title.x = element_blank(), -->
+<!--         panel.grid.major = element_blank(), -->
+<!--         panel.grid.minor = element_blank()) -->
+
+<!-- pos_samples_pl -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- comparison <- grid.arrange(saliva_pl, pos_samples_pl, nrow = 2, heights = c(6, 8), widths = 11) -->
+<!-- ggsave(plot = comparison, file = "../results/comparison.pdf", width = 11.5 / cm(1), height = 14 / cm(1)) -->
+<!-- ``` -->
+
+<!-- ## Absences ## -->
+
+<!-- ```{r} -->
+<!-- mcid_2 <- readRDS("../data-clean/redcap-long.rds") %>% -->
+<!--   filter(respiratory_infection == "yes") %>% -->
+<!--   mutate(absent_days = date_back - date_absent) -->
+
+<!-- # 35 absences related to respiratory infection among 38 students -->
+
+<!-- summary(as.numeric(mcid_2$absent_days)) -->
+
+<!-- # on average 3.0 days out of school per absence (but weekends should be kept in mind) -->
+
+<!-- mcid_1 <- read_csv("../data-clean/mcid-1-redcap-cases.csv") %>% -->
+<!--   filter(!is_teacher, -->
+<!--          school_class == "School 1 (A)" | school_class == "School 2 (D)") %>% -->
+<!--   mutate(absent_days = date_end - date_start) -->
+
+<!-- # 40 absences related to respiratory infection among 44 students -->
+
+<!-- summary(as.numeric(mcid_1$absent_days)) -->
+
+<!-- #' on average 4.1 days out of school per absence (but weekends should be kept in mind) -->
+<!-- #' there is also an outlier with 30 days, but the median is still higher  -->
+
+<!-- rbind(mcid_1 %>% mutate(year = 2022) %>% dplyr::select(year, absent_days), -->
+<!--       mcid_2 %>% mutate(year = 2023) %>% dplyr::select(year, absent_days)) %>% -->
+<!--   mutate(absent_days = as.numeric(absent_days)) %>% -->
+<!--   ggplot(aes(fill = factor(year), x = year, y = absent_days)) + -->
+<!--   geom_boxplot() + -->
+<!--   scale_y_sqrt(breaks = c(0, 1:7, 10, 20, 30), limits = c(1,30)) -->
+<!-- ``` -->
 
 
 <!-- ## Particle reduction -->
