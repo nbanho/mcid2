@@ -65,8 +65,8 @@ saliva_sum <- saliva %>%
   summarize(n = sum(n)) %>%
   ungroup() %>%
   filter(n > 0) %>%
-  mutate(year = ifelse(year_num == 2022, "Winter 2021/2022", "Winter 2022/2023"),
-         year = factor(year, levels = c("Winter 2021/2022", "Winter 2022/2023")),
+  mutate(year = ifelse(year_num == 2022, "2021/22", "2022/23"),
+         year = factor(year, levels = c("2021/22", "2022/23")),
          virus = factor(virus, levels = c("IF", "HRV", "AdV", "CoV", "MPV", "PIV"))) %>%
   filter(!is.na(n)) %>%
   group_by(year) %>%
@@ -78,17 +78,17 @@ saliva_sum <- saliva %>%
          labelPosition = (ymax + ymin) / 2,
          label = paste0(virus, ": ", n)) %>%
   ungroup() %>%
-  mutate(labelPosition = ifelse(year == "Winter 2022/2023" & virus == "MPV", labelPosition - .015, labelPosition),
-         labelPosition = ifelse(year == "Winter 2021/2022" & virus == "IF", ymin, labelPosition),
-         labelPosition = ifelse(year == "Winter 2021/2022" & virus == "AdV", ymax, labelPosition))
+  mutate(labelPosition = ifelse(year == "2022/23" & virus == "MPV", labelPosition - .015, labelPosition),
+         labelPosition = ifelse(year == "2021/22" & virus == "IF", ymin, labelPosition),
+         labelPosition = ifelse(year == "2021/22" & virus == "AdV", ymax, labelPosition))
 
 saliva_pl <- saliva_sum %>%
   ggplot() +
-  facet_wrap(~ year_num, nrow = 1) +
+  facet_wrap(~ year, nrow = 1) +
   geom_rect(mapping = aes(ymax = ymax, ymin = ymin, xmax = 4, xmin = 3, fill = virus)) +
   geomtextpath::coord_curvedpolar(theta = "y", start = 1.9*pi) +
   geom_text(mapping = aes(x = 5.25, y=labelPosition, label=label, color=virus), size = 8/cm(1)) +
-  geom_text(data = data.frame(x = 1, y = 1, year_num = c(2022, 2023), label = c(2022, 2023)), mapping = aes(x = x, label = label, y = y), 
+  geom_text(data = data.frame(x = 1, y = 1, year = c("2021/22", "2022/23"), label = c("2021/22", "2022/23")), mapping = aes(x = x, label = label, y = y), 
             size = 8/cm(1), fontface = 2) +
   scale_x_continuous(limits = c(1, 5.25), expand = c(0,0)) +
   scale_y_continuous(expand = c(0,0),  position = "top") +
@@ -139,7 +139,8 @@ saliva_air_week <- rbind(saliva_week %>% mutate(type = "Saliva"),
          virus = factor(virus, levels = c("IF", "HRV", "AdV", "CoV", "MPV", "PIV")),
          type = factor(type, levels = c("Bioaerosol", "Saliva")),
          type_num = ifelse(type == "Bioaerosol", 1, 2),
-         classroom = factor(paste("Room", class), levels = c("Room A", "Room B"))) 
+         classroom = ifelse(class == "A", "Classroom 1", "Classroom 2"),
+         classroom = factor(classroom, levels = c("Classroom 1", "Classroom 2")))
 
 backgrd_y <- saliva_air_week %>%
   group_by(year, classroom, week) %>%
