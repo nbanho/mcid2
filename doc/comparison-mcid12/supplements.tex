@@ -245,20 +245,21 @@
 
 \newcommand{\supp}{SI Appendix}
 
-\title{\LARGE\singlespacing{\textbf{Supplmenetary Material} \\ \medskip
-Molecular detection of SARS-CoV-2 and other respiratory viruses in saliva and bioaerosols}}
+\title{\LARGE\singlespacing{\textbf{Supplementary Material} \\ \medskip
+Molecular detection of SARS-CoV-2 and other respiratory viruses in saliva, air, and filter samples from schools during and after the pandemic}}
 
 % long: Air cleaners and respiratory infections in schools: \\ A modeling study using epidemiological, environmental, and molecular data
 
 % author list
+% author list
 \author[1,2]{Nicolas Banholzer}
-\author[2,3]{Philipp Jent}
 \author[2,4]{Pascal Bittel}
-\author[1]{Kathrin Zürcher}
+\author[2,3]{Philipp Jent}
 \author[4]{Lavinia Furrer}
-\author[1]{Simon Bertschinger}
-\author[5]{Ernest Weingartner}
-\author[2,4]{Alban Ramette}
+\author[1]{Kathrin Zürcher}
+%\author[1]{Simon Bertschinger}
+%\author[5]{Ernest Weingartner}
+%\author[2,4]{Alban Ramette}
 \author[1,6,7]{Matthias Egger}
 \author[2,8]{Tina Hascher}
 \author[1*,2]{Lukas Fenner}
@@ -267,10 +268,10 @@ Molecular detection of SARS-CoV-2 and other respiratory viruses in saliva and bi
 \affil[2]{Multidisciplinary Center for Infectious Diseases, University of Bern, Bern, Switzerland}
 \affil[3]{Department of Infectious Diseases, Inselspital, Bern University Hospital, University of Bern, Bern, Switzerland}
 \affil[4]{Institute for Infectious Diseases, University of Bern, Bern, Switzerland}
-\affil[5]{Institute for Sensors and Electronics, University of Applied Sciences and Arts Northwestern Switzerland, Windisch, Switzerland}
-\affil[6]{Population Health Sciences, University of Bristol, Bristol, UK}
-\affil[7]{Centre for Infectious Disease Epidemiology and Research, University of Cape Town, Cape Town, South Africa}
-\affil[8]{Institute of Educational Science, University of Bern, Bern, Switzerland}
+%\affil[5]{Institute for Sensors and Electronics, University of Applied Sciences and Arts Northwestern Switzerland, Windisch, Switzerland}
+\affil[5]{Population Health Sciences, University of Bristol, Bristol, UK}
+\affil[6]{Centre for Infectious Disease Epidemiology and Research, University of Cape Town, Cape Town, South Africa}
+\affil[7]{Institute of Educational Science, University of Bern, Bern, Switzerland}
 
 %\begin{abstract}\normalfont
 %The supplementary material contains (1)~the detailed method, (2)~the simulation-based study, (3)~further descriptives, and (4)~the results from the sensitivity analysis.
@@ -298,13 +299,13 @@ Molecular detection of SARS-CoV-2 and other respiratory viruses in saliva and bi
         \toprule
         & \textbf{2022 (during pandemic)} & \textbf{2023 (after pandemic)} \\
         \midrule
-        Participants & 2~classes from School~1 sharing one classroom (half-class teaching) and 1~class from School~2 & two classes from School~2 \\
-        Duration & 7 weeks per class (January 16 to March 11, 2023) & 7 weeks per class (January 24 to March 26, 2023) \\
-        Saliva testing & weekly (Wednesday) & bi-weekly (Tuesday and Thursday) \\
+        Participants & 2~classes from School~1 sharing one classroom (half-class teaching) and 1~class from School~2 with a separate classroom & two classes from School~2 with separate classrooms \\
+        Duration & 7 weeks per class (January 16 to March 11, 2023), excluding vacation & 7 weeks per class (January 24 to March 26, 2023), excluding vacation \\
+        Saliva testing & weekly (Wednesdays) & bi-weekly (Tuesdays and Thursdays) \\
         Bioaerosol sampling & daily with BioSpot-VIVAS and Coriolis in both classrooms & daily with BioSpot-VIVAS and Coriolis in one classroom and only Coriolis in the other classroom \\
-        HEPA-filters sampling & once at the end of the study per filter and classroom & two times per filter and classroom \\
-        Interventions & compulsory face mask wearing as mandated by the public health authorities at that time from the start of the study for a total of 6 study weeks ; and installation of portable air cleaners towards the end of the study in the study classrooms for a total of 4 study weeks & installation of portable air cleaners in the study classrooms using a cross-over design for a total of 7 weeks \\
-        Ventilation conditions & passive window ventilation as per recommendations of the national public health authorities; in School~1 ventilation was additionally assisted by a CO$_2$ guided opener of a small window at the top & passive window ventilation solely at the discretion of the teachers \\
+        HEPA-filters samples & collected once at the end of the study & collected twice after the phases where the air cleaner intervention was in place \\
+        Interventions & compulsory face mask wearing as mandated by the public health authorities at that time from the start of the study for a total of 6 out of 14 study weeks; and installation of portable air cleaners towards the end of the study in the study classrooms for a total of 4 out of 14 study weeks & installation of portable air cleaners in the study classrooms using a cross-over design for a total of 7 out of 14 study weeks\\
+        Ventilation conditions & all classrooms were not equipped with an active HVAC (heating, ventilation, air conditioning) system; passive window ventilation as per recommendations of the national public health authorities; in School~1 ventilation was additionally assisted by a CO$_2$ guided opener of a small window at the top  & all classrooms were not equipped with an active HVAC (heating, ventilation, air conditioning) system; passive window ventilation solely at the discretion of the teachers \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -313,51 +314,44 @@ Molecular detection of SARS-CoV-2 and other respiratory viruses in saliva and bi
 
 \section{Model to estimate differences in airborne detection}\label{sec:model}
 
-Our outcome is a binary variable $Y_{tcv}$ which is $1$ if any respiratory virus $v$ was detected in the air of classroom $c$ during study week $t$. We model this outcome with a Bayesian logistic regression model
+Our outcome is the binary variable $Y_{tcv}$ which is $1$ if any respiratory virus $v$ was detected in the air of classroom $c$ during study week $t$. We model this outcome with a Bayesian logistic regression model
 \begin{align}
     \text{Bernoulli-Logit}(y|\mu) = \begin{cases}
         \text{logit}^{-1}(\mu) & \text{if }y=1\text{, and} \\
         1-\text{logit}^{-1}(\mu) & \text{if }y=0.
     \end{cases}
 \end{align}
-The parameter $\mu$ is related to the type of respiratory virus and differences in the study setting (see \Cref{tab:comp_study}) as follows
+The parameter $\mu$ is related to the type of respiratory virus detected (SARS-CoV-2 vs non-SARS-CoV-2) and takes into account differences in the study setting (see \Cref{tab:comp_study}) as follows
 \begin{align}
-    \mu_{tcv} = \log(\text{offset}_c) + \alpha + \beta_1\,\cdot\text{saliva}_{tcv} + \beta_2\,\cdot\text{CoV}_{tcv} + \beta_3\,\cdot\text{mask}_{tcv} + \beta_4\,\cdot\text{aircl}_{tcv} + 
+    \mu_{tcv} = \log(\text{offset}_c) + \alpha + \beta_1\,\cdot\text{saliva}_{tcv} + \beta_2\,\cdot\text{CoV}_{tcv} + \beta_3\,\cdot\text{mask}_{tcv} + \beta_4\,\cdot\text{aircl}_{tcv} + \beta_5\,\cdot\text{CO}_{2,tcv}.
 \end{align}
-where
-\begin{itemize}
-    \item \textbf{offset}: Since one classroom in 2022 was shared by two classes, we set the offset of this classroom to 2 (double odds for airborne detection in this classroom). Conversely, since one classroom in 2023 only had one instead of two sampling devices in place, we set the offset of this classroom to 0.5 (half odds for airborne detection in this classroom). 
-    \item  \textbf{saliva}: Binary variable indicating if there was a positive saliva sample in the same week. Airborne detection is more likely if the same virus was found in student saliva.
-    \item \textbf{CoV}: Binary variable indicating if virus $v$ in classroom $c$ in week $t$ was SARS-CoV-2. Parameter $\beta_2$ models the log odds of detecting any SARS-CoV-2 vs non-SARS-CoV-2 in bioaerosols. This is our parameter of interest.
-    \item \textbf{masks}: Binary variable indicating if face mask wearing was mandated. Masks possibly reduce the probability of airborne detection.
-    \item \textbf{aircl}: Binary variable indicating if portable air cleaners were installed in the classroom. Air cleaners possibly reduce the probability of airborne detection.
-    \item \textbf{CO}$_2$: Weekly average of the daily maximum CO$_2$ levels in each classroom. Higher CO$_2$ levels are a proxy of worse ventilation (outdoor air exchange) and possibly increase the probability of airborne detection.
-\end{itemize}
+Since one classroom in 2022 was shared by two classes, we set the \textbf{offset} of this classroom to 2 (double odds for airborne detection in this classroom). Conversely, since one classroom in 2023 only had one instead of two sampling devices in place, we set the \textbf{offset} of this classroom to 0.5 (half odds for airborne detection in this classroom). Other classrooms have an offset of 1. The binary variable \textbf{saliva} indicates if there was a positive saliva sample in the same week, considering with $\beta_1$ that airborne detection was more frequent if the same virus was already detected in saliva. The binary variable \textbf{CoV} indicates if the detected virus was SARS-CoV-2, thus our parameter of interest $\beta_2$ is the estimated log odds for detecting any SARS-CoV-2 versus non-SARS-CoV-2 in bioaerosols. The binary variables \textbf{masks} and \textbf{aircl} indicate if compulsory face mask wearing was mandated or the portable air cleaners were installed in the classroom, respectively, considering with $\beta_3$ and $\beta_4$ that these interventions possibly reduce the probability of airborne detection. The continuous variable \textbf{CO}$_2$ is the weekly average of the maximum daily CO$_2$ levels per classroom, considering with $\beta_5$ that higher CO$_2$ levels (a proxy for ventilation through greater outdoor air exchange) possibly increase the probability of airborne detection.
 
-We model the intercept with a diffuse prior
+We model the effects of the aforementioned variables with a mix of  non-informative and informative priors. The intercept is modeled with a non-informative prior
 \begin{align}
     \alpha \sim \text{Student}(\nu=5, \mu = 0, \sigma = 2.5) ~.
 \end{align}
-Bioaerosols were more frequently found in weeks with a positive saliva sample. Therefore, we model $\beta_1$ with an informative prior
+Since bioaerosols were more frequently detected in weeks with a positive saliva sample, we model $\beta_1$ with an informative prior
 \begin{align}
     \beta_1 \sim \text{Normal}(\mu = 5/3, \sigma = s_y / s_{\text{saliva}}),
 \end{align}
-where 5 is the number of weeks with paired samples and 3 is the number of weeks with a positive bioaerosol but without a positive saliva sample. The prior's standard deviation is computed as the ratio of the standard deviation of the outcome $s_y$ and the variable $s_{\text{saliva}}$. \\
-Our parameter of interest is modeled with a non-informative prior
+where 5 is the number of weeks with paired samples and 3 is the number of weeks with a positive bioaerosol but without a positive saliva sample. The prior's hyperparameter for the standard deviation is computed as the ratio of the standard deviation of the outcome $s_y$ and the variable $s_{\text{saliva}}$. \\
+Our parameter of interest $\beta_2$ is modeled with a non-informative prior
 \begin{align}
     \beta_2 \sim \text{Normal}(\mu = 0, \sigma = s_y / s_\text{CoV})~.
 \end{align}
-Masks and air cleaners possibly reduce the odds molecular airborne detection. To incorporate this prior believe into $\beta_3$ and $\beta_4$, we used an informative asymmetric Laplace prior 
+Since masks and air cleaners possibly reduce the odds of molecular airborne detection, we used an informative asymmetric Laplace prior for $\beta_3$ and $\beta_4$ as follows
 \begin{align}
     \beta_3 &\sim \text{Asymmetric-Laplace}(\mu = -0.32, \sigma = 0.5\cdot s_y / s_{\text{masks}}, \tau = 0.75) \\
     \beta_4 &\sim \text{Asymmetric-Laplace}(\mu = -0.27, \sigma = 0.5\cdot s_y / s_{\text{aircl}}, \tau = 0.75),
 \end{align}
-which has a 90\% prior probability for a negative intervention effect and is skewed towards smaller effects. \\
+which both place 90\% prior probability on negative intervention effects and are skewed towards smaller effect sizes. \\
 Similarly, we incorporate our prior belief that higher CO$_2$ levels possibly increase the odds of airborne detection with the converse prior for $\beta_5$ as
 \begin{align}
     \beta_3 &\sim \text{Asymmetric-Laplace}(\mu = 0.21, \sigma = 0.5\cdot s_y / s_{\text{masks}}, \tau = 0.25)~.
 \end{align}
-To summarize, we estimate the odd ratio for airborne detection of SARS-CoV-2, adjusting for differences in the setup of the classrooms (offset), positive saliva sample in the same week (saliva), the effects of interventions (masks and aircl), and differences in ventilation conditions (CO$_2$). We use informative priors because the sample size is small and insufficient to identify the effects of the confounders. 
+
+To summarize, we estimate the odd ratio for airborne detection of SARS-CoV-2, adjusting for differences in the setup of the classrooms (offset), positive saliva sample in the same week (saliva), the effects of interventions (masks and aircl), and differences in ventilation conditions (CO$_2$). We use informative priors for the adjustments because the sample size and between-years comparison otherwise make it difficult to identify their effects. 
 
 \clearpage
 
