@@ -538,22 +538,22 @@ In addition, we analyze the association between the daily number of coughs $Y$ a
 \end{align*}
 where $\theta_{[v]}$ is the partially pooled estimate for respiratory virus $v \in$ (IFB, HRV, AdV, CoV, MPV, PIV), $\tau$ estimates variation between viruses, and $s_v$ is the average standard deviation across the count variables of the respiratory viruses. 
 
-\section{Modeling positivity rate of human saliva samples}\label{sec:multinomial-model}
+% \section{Modeling positivity rate of human saliva samples}\label{sec:multinomial-model}
 
-Molecular analysis determined which saliva samples were positive for a respiratory virus. Let $p = 0, 1, \dots, P$ denote the virus, where $0$ refers to negative samples and $P$ is the number of different viruses detected over the study. The number of positive bioaerosol and saliva samples $y_p$ in samples of sizes $n$ is analyzed with a Multinomial logistic regression model
-\begin{align*}
-    y_0, y_1, \cdots, y_P | n, \beta_0, \beta_1, \beta_2, \beta_3 &\sim \text{Multinomial-Logit}(\theta_0, \theta_1, \dots \theta_P) \\
-    \theta &= \text{softmax}(\mu) \\
-    \mu &= \begin{cases}
-                0, & \text{if } p=0, \\
-                \beta_{0p} + \beta_{1} \cdot \text{AirCleaner} + \beta_2 \cdot \text{Class} + \beta_3 \cdot \text{Susceptibles}_p, & \text{if } p>0.
-            \end{cases} \\
-    \beta_{0p} &\sim \text{Normal}(0, 2.5) \quad \forall p \\
-    \beta_1, \beta_2, \beta_3 &\sim \text{Student-t}_5\left(0, \frac{2.5}{s_{x}}\right) 
-\end{align*}
-where $\text{softmax}(\mu) = \exp(\mu)/\sum\exp(\mu)$ and $s_{x}$ is the empirical standard deviation of each input variable.  The negative test is set as the reference category. Overall variation in positive samples by virus will be modeled with $\beta_{0p}$ and the effect of air cleaners will be modeled with $\beta_1$. The effect of air cleaners is adjusted for class-specific effects and the decreasing number of susceptibles over time (for each virus computed as the number of students minus the total number of positive samples).
+% Molecular analysis determined which saliva samples were positive for a respiratory virus. Let $p = 0, 1, \dots, P$ denote the virus, where $0$ refers to negative samples and $P$ is the number of different viruses detected over the study. The number of positive bioaerosol and saliva samples $y_p$ in samples of sizes $n$ is analyzed with a Multinomial logistic regression model
+% \begin{align*}
+%     y_0, y_1, \cdots, y_P | n, \beta_0, \beta_1, \beta_2, \beta_3 &\sim \text{Multinomial-Logit}(\theta_0, \theta_1, \dots \theta_P) \\
+%     \theta &= \text{softmax}(\mu) \\
+%     \mu &= \begin{cases}
+%                 0, & \text{if } p=0, \\
+%                 \beta_{0p} + \beta_{1} \cdot \text{AirCleaner} + \beta_2 \cdot \text{Class} + \beta_3 \cdot \text{Susceptibles}_p, & \text{if } p>0.
+%             \end{cases} \\
+%     \beta_{0p} &\sim \text{Normal}(0, 2.5) \quad \forall p \\
+%     \beta_1, \beta_2, \beta_3 &\sim \text{Student-t}_5\left(0, \frac{2.5}{s_{x}}\right) 
+% \end{align*}
+% where $\text{softmax}(\mu) = \exp(\mu)/\sum\exp(\mu)$ and $s_{x}$ is the empirical standard deviation of each input variable.  The negative test is set as the reference category. Overall variation in positive samples by virus will be modeled with $\beta_{0p}$ and the effect of air cleaners will be modeled with $\beta_1$. The effect of air cleaners is adjusted for class-specific effects and the decreasing number of susceptibles over time (for each virus computed as the number of students minus the total number of positive samples).
 
-Note that we deviated from the statistical analysis plan by estimating $\beta_{0p}$ and $\beta_1$ without a hierarchical prior. First, there was considerable variation in the overall positivity rate of each virus, so that we decided to use unpooled intercepts $\beta_{0p}$ instead of partially pooled intercepts $\beta_{0[p]}$ for each virus. Second, there was insufficient variation in the data to inform partially pooled estimates $\beta_{1[p]}$ for the effects of air cleaners. Therefore, we decided to only estimate the average effect across viruses, \ie the completely pooled estimate $\beta_1$.  
+% Note that we deviated from the statistical analysis plan by estimating $\beta_{0p}$ and $\beta_1$ without a hierarchical prior. First, there was considerable variation in the overall positivity rate of each virus, so that we decided to use unpooled intercepts $\beta_{0p}$ instead of partially pooled intercepts $\beta_{0[p]}$ for each virus. Second, there was insufficient variation in the data to inform partially pooled estimates $\beta_{1[p]}$ for the effects of air cleaners. Therefore, we decided to only estimate the average effect across viruses, \ie the completely pooled estimate $\beta_1$.  
 
 \clearpage
 
@@ -652,15 +652,29 @@ Differences in the frequency of coughs between classes suggest an association wi
 
 \clearpage
 
-\section{Detailed results for positivity rate in saliva samples}
-\label{sec:detailed-molecular}
+% \section{Detailed results for positivity rate in saliva samples}
+% \label{sec:detailed-molecular}
 
-There can be unknown delay between when students were infected and when they tested positive. Therefore, we performed a sensitivity analysis where we lagged the molecular test results (number of positive saliva samples) by one test date (\ie from Tuesday to last Thursday and from Thursday to Tuesday) and one test week (\ie from Tuesday to last Tuesday and Thursday to last Thursday). The results are shown in \Cref{fig:mol-estimation-results-sensitivity}. The estimated effect of air cleaners remains indistinguishable from zero regardless of the considered lag.  
-\begin{figure}[!htb]
-\centering
-    \includegraphics[width=10cm]{../../results/mol-data/model-results.pdf}
-    \caption[Sensitivity analysis for the estimated effect of air cleaners on the positivity rate of saliva samples]{Sensitivity analysis for the estimated effect of air cleaners on the positivity rate of saliva samples. Shown is the adjusted relative risk (posterior mean as dot and 50\%-, 80\%, and 95\%-CrIs as lines) for air cleaners by lag of the molecular test results.}
-    \label{fig:mol-estimation-results-sensitivity}
+% There can be unknown delay between when students were infected and when they tested positive. Therefore, we performed a sensitivity analysis where we lagged the molecular test results (number of positive saliva samples) by one test date (\ie from Tuesday to last Thursday and from Thursday to Tuesday) and one test week (\ie from Tuesday to last Tuesday and Thursday to last Thursday). The results are shown in \Cref{fig:mol-estimation-results-sensitivity}. The estimated effect of air cleaners remains indistinguishable from zero regardless of the considered lag.  
+% \begin{figure}[!htb]
+% \centering
+%     \includegraphics[width=10cm]{../../results/mol-data/model-results.pdf}
+%     \caption[Sensitivity analysis for the estimated effect of air cleaners on the positivity rate of saliva samples]{Sensitivity analysis for the estimated effect of air cleaners on the positivity rate of saliva samples. Shown is the adjusted relative risk (posterior mean as dot and 50\%-, 80\%, and 95\%-CrIs as lines) for air cleaners by lag of the molecular test results.}
+%     \label{fig:mol-estimation-results-sensitivity}
+% \end{figure}
+
+\clearpage
+
+\section{Possible transmission networks}\label{sec:transmission-networks}
+
+The distribution of positive saliva samples varied between classes. For example, all but one sample was positive for adenvovirus in class~A during the first three study weeks, while the vast majority of positive influenza~B samples were found in class~B. To illustrate possible transmission chains within classes, we linked positive saliva samples of the same virus that were less than one week apart. Based on this spatiotemporal analysis, we identified 10~possible transmission chains (\Cref{fig:molecular-descriptives}). The longest potential transmission chains occurred in January, referring to a cluster of adenovirus infections in class~A and influenza~B infections in class~B. Molecular genotyping to verify the proposed transmission network was unsuccessful because we could not amplify and sequence any of the gene targets. We also analyzed 105~bioaerosol samples and detected in two of them viral RNA (1~rhinovirus in class~A and 1~adenovirus in class~B). Similarly, we detected 1~influenza~B, 1~rhinovirus, 1~adenovirus, and 1~SARS-CoV-2 in the 20~swabs taken from each filter of an air cleaner after each intervention phase (160~swabs in total). 
+
+\begin{figure}[!htpb]
+    \centering
+    \includegraphics{../../results/mol-data/saliva-distribution.pdf}\hspace{.5cm}
+    \includegraphics{../../results/mol-data/network-plot.pdf}
+    \caption{\textbf{Molecular detection of respiratory viruses and transmission network based on spatiotemporal analysis of students' saliva samples}. \textbf{(a)}~Number of positive saliva samples by virus. \textbf{(b)}~Daily number of positive saliva samples (colored circles) and possible transmission chains within classes (directed arrows). Positive samples are linked if they belong to the same virus and are less than 1~week apart. Positive samples from the air and filters as blank squares aligned. IFB: influenza~B, HRV: human rhinovirus, AdV: adenovirus, CoV: SARS-CoV-2, MPV: human metapneumovirus, PIV: parainfluenza virus.}
+    \label{fig:molecular-descriptives}
 \end{figure}
 
 \clearpage
