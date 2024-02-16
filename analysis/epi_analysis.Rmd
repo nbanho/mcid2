@@ -146,7 +146,7 @@ cases_by_cond_pl
 save_plot(cases_by_cond_pl,
           pdf_file = "../results/epi-data/cases_by_condition.pdf",
           eps_file = "../results/epi-data/cases_by_condition.eps",
-          w = 7.25, h = 6) 
+          w = 5.25, h = 6) 
 
 ggsave(plot = epi_data %>%
   group_by(aircleaner) %>%

@@ -88,7 +88,7 @@ boxpl_cn
 save_plot(boxpl_cn, 
           pdf_file = "../results/env-data/aerosol-number-boxplot.pdf", 
           eps_file = "../results/env-data/aerosol-number-boxplot.eps", 
-          w = 7.25, h = 6)
+          w = 5.25, h = 6)
 
 ggsave(plot = env_epi_data %>%
   dplyr::select(class, date, aircleaner, Cn) %>%

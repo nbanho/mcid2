@@ -44,6 +44,13 @@ air_2023 <- readxl::read_xlsx("../data-clean/comparison/mcid-2-molecular-results
 air <- rbind(air_2022 %>% mutate(year_num = 2022),
              air_2023 %>% mutate(year_num = 2023))
 
+# viral loads
+vl_2022 <- readxl::read_xlsx("../data-clean/comparison/mcid-1-molecular-results.xlsx", "Viral Loads")
+vl_2023 <- readxl::read_xlsx("../data-clean/comparison/mcid-2-molecular-results.xlsx", "Viral Loads")
+
+vl <- rbind(vl_2022 %>% mutate(year_num = 2022),
+            vl_2023 %>% mutate(year_num = 2023))
+
 # air filters
 # TODO: just list
 
@@ -134,26 +141,34 @@ air_week <- air %>%
 saliva_air_week <- rbind(saliva_week %>% mutate(type = "Saliva"),
                          air_week %>% mutate(type = "Bioaerosol")) %>%
   slice(rep(1:n(), times = n)) %>%
-  mutate(year = ifelse(year_num == 2022, "Winter 2021/2022", "Winter 2022/2023"),
-         year = factor(year, levels = c("Winter 2021/2022", "Winter 2022/2023")),
+  mutate(year = ifelse(year_num == 2022, "2021/22", "2022/23"),
+         year = factor(year, levels = c("2021/22", "2022/23")),
          virus = factor(virus, levels = c("IF", "HRV", "AdV", "CoV", "MPV", "PIV")),
          type = factor(type, levels = c("Bioaerosol", "Saliva")),
          type_num = ifelse(type == "Bioaerosol", 1, 2),
          classroom = ifelse(class == "A", "Classroom 1", "Classroom 2"),
          classroom = factor(classroom, levels = c("Classroom 1", "Classroom 2")))
 
-backgrd_y <- saliva_air_week %>%
-  group_by(year, classroom, week) %>%
-  summarize(type_num = 1) %>%
+backgrd_y <- saliva %>%
+  group_by(school, class, week, year_num) %>%
+  slice(1) %>%
   ungroup() %>%
-  complete(year, classroom, week)
+  mutate(
+    classroom = ifelse(school == 1, "Classroom 1", ifelse(class == "A", "Classroom 1", "Classroom 2")),
+    year = ifelse(year_num == 2022, "2021/22", "2022/23")
+  ) %>%
+  dplyr::select(year, classroom, week, intervention) %>%
+  group_by(year, classroom, week) %>%
+  slice(1) %>%
+  ungroup() %>%
+  mutate(
+    intervention = fct_recode(intervention, !!! c("Mask wearing" = "masks", "Air cleaners" = "air cleaners", "No intervention" = "none")),
+    intervention = factor(intervention, levels = c("No intervention", "Mask wearing", "Air cleaners")),
+    type_num = 1) 
 
 time_pl <- ggplot(mapping = aes(x = week, y = type_num)) +
   facet_grid(classroom ~ year) +
-  geom_rect(data = backgrd_y,
-            mapping = aes(xmin = week - 0.5, xmax = week + 0.5, ymin = -Inf, ymax = Inf),
-            fill = ifelse(backgrd_y$week %% 2 == 0, "lightgray", "white"),
-            alpha = 0.5) +
+  geom_vline(data = backgrd_y, mapping = aes(xintercept = week + .5), alpha = .1) +
   geom_hline(data = data.frame(y = 1.5), mapping = aes(yintercept = y), linetype = "dashed") +
   geom_point(data = saliva_air_week %>%
                mutate(ps = .17) %>%
@@ -162,17 +177,26 @@ time_pl <- ggplot(mapping = aes(x = week, y = type_num)) +
                ungroup(),
              mapping = aes(color = virus),
              position = position_dodge(width = .75)) +
+  geom_rect(data = backgrd_y,
+            mapping = aes(xmin = week - 0.5, xmax = week + 0.5, ymin = -Inf, ymax = Inf, fill = intervention),
+            alpha = 0.2) +
   scale_color_manual(values = wes_palette("IsleofDogs1")) +
+  scale_fill_manual(values = c("grey", wes_palette("Zissou1")[1], wes_palette("GrandBudapest1")[2])) +
   scale_x_continuous(breaks = 1:7, limits = c(0.5, 7.5), expand = c(0,0)) +
   scale_y_continuous(expand = c(0,0), limits = c(0, 3)) +
   annotate("text", y = 2.8, x = 0.65, label = "Saliva", hjust = 0, size = 8 / cm(1)) +
   annotate("text", y = 0.2, x = 0.65, label = "Bioaerosol", hjust = 0, size = 8 / cm(1)) +
-  labs(x = "Study week", title = "b") +
+  labs(x = "Study week", title = "b", fill = "Intervention") +
   theme_bw2() +
   theme(axis.title.y = element_blank(),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         strip.text = element_text(face = 2, size = 8),
+        panel.background = element_rect(fill = "white"),
+        plot.background = element_rect(fill = "white"),
+        legend.position = "bottom",
+        legend.key.width = unit(0.4, "cm"),
+        legend.key.height = unit(0.5, "cm"),
         text = element_text(size = 8),
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank()) +
@@ -410,6 +434,15 @@ mod %>%
   median_qi() %>%
   mutate_if(is.numeric, round, 1)
 
+# posterior probability
+post_prob_p <- mod %>%
+  spread_draws(beta_cov) %>%
+  ungroup() %>%
+  summarize(p = round(sum(beta_cov > 1) / n() * 100)) %>%
+  dplyr::select(p) %>% unlist()
+
+
+# predicted probabilities
 pred_prob <- mod %>%
   spread_draws(logit_cov, logit_nonCov) %>%
   mutate(CoV = invlogit(logit_cov),
@@ -417,15 +450,23 @@ pred_prob <- mod %>%
   dplyr::select(-logit_cov, -logit_nonCov) %>%
   melt(c(".chain", ".iteration", ".draw"))
 
-prob_pl <- ggplot(mapping = aes(x = variable, y = value, color = variable)) +
+prob_pl <- ggplot(pred_prob, aes(x = variable, y = value)) +
   geom_errorbar(data = pred_prob %>% group_by(variable) %>% median_qi(value),
-                mapping = aes(ymin = .lower, ymax = .upper, color = variable),
+                mapping = aes(x = variable, ymin = .lower, ymax = .upper, color = variable),
                 width = .25) +
   geom_boxplot(data = pred_prob,
+               mapping = aes(color = variable),
                position = position_dodge(width = .5), outlier.shape = NA, coef = 0, width = 0.25) +
   stat_summary(data = pred_prob %>% dplyr::select(value, variable),
                mapping = aes(x = variable, y = value, color = variable), geom = "point", fun = "median", 
                position = position_dodge2(width = .5), size = 2, shape = 23, fill = "white") +
+  ggsignif::geom_signif(
+    annotations = paste0("Pr.=", post_prob_p, "%"), 
+    y_position = .55, 
+    xmin = 1, xmax = 2, 
+    textsize = 8 / cm(1), 
+    vjust = -.5, 
+    tip_length = .075) +
   scale_y_continuous(expand = c(0,0), limits = c(0, NA), labels = function(x) x * 100) +
   scale_color_manual(values = c(wes_palette("IsleofDogs1")[4], "darkred")) +
   #scale_fill_manual(values = c(wes_palette("IsleofDogs1")[4], "darkred")) +
@@ -443,155 +484,56 @@ pred_prob %>%
   mutate_if(is.numeric, function(x) round(x * 100) )
 ```
 
+## Viral Loads
+
+```{r}
+vl_saliva <- vl %>%
+  filter(type == "saliva") %>%
+  mutate(virus = ifelse(virus == "IFA" | virus == "IFB", "IF", virus), 
+         virus_type = ifelse(virus == "CoV", "CoV", "non-CoV"),
+         virus_type = factor(virus_type, levels = c("CoV", "non-CoV")),
+         year = ifelse(year_num == 2022, "2021/22", "2022/23"),
+         year = factor(year, levels = c("2021/22", "2022/23")),
+         virus = factor(virus, levels = c("IF", "HRV", "AdV", "CoV", "MPV", "PIV"))) 
+
+vl_test <- t.test(
+  vl_saliva$ct[vl_saliva$virus_type == "CoV"],
+  vl_saliva$ct[vl_saliva$virus_type == "non-CoV"])
+
+vl_saliva_pl <- vl_saliva %>%
+  ggplot(aes(x = virus_type, y = ct)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(aes(shape = year, color = virus), width = .25, height = 0) +
+  ggsignif::geom_signif(
+    annotations = paste0("p=", round(vl_test$p.value, 2)), 
+    y_position = 44, 
+    xmin = 1, xmax = 2, 
+    textsize = 8 / cm(1), 
+    vjust = -.5, 
+    tip_length = .075) +
+  scale_color_manual(values = wes_palette("IsleofDogs1")) +
+  scale_shape_manual(values = c(1, 17)) +
+  scale_y_continuous(limits = c(NA, 46)) +
+  labs(y = "Ct value") +
+  theme_bw2() +
+  theme(axis.title.x = element_blank(),
+        legend.position = c(0.1, 0.87),
+        legend.background = element_rect(color = "black"),
+        plot.title.position = "plot",
+        legend.title = element_blank()) +
+  guides(color = "none")
+
+save_plot(vl_saliva_pl,
+          "../results/comparison-viral-loads.png",
+          w = 12, h = 8)
+```
+
+## Summary plot
+
 ```{r}
 design <- "12
 33"
-comparison <- saliva_pl + prob_pl + time_pl + plot_layout(design = design, widths = c(11, 5), heights = c(6, 9))
-ggsave(plot = comparison, file = "../results/comparison.pdf", width = 16 / cm(1), height = 15 / cm(1))
+comparison <- saliva_pl + prob_pl + time_pl + plot_layout(design = design, widths = c(11, 5), heights = c(6, 11))
+ggsave(plot = comparison, file = "../results/comparison.pdf", width = 16 / cm(1), height = 17 / cm(1))
+ggsave(plot = comparison, file = "../results/comparison.png", width = 16 / cm(1), height = 17 / cm(1))
 ```
-
-
-<!-- ## No. of positive samples -->
-
-<!-- ```{r} -->
-<!-- pos_samples <- data.frame( -->
-<!--   year_num = factor(c(rep(2022, 3), rep(2023, 3)), levels = c(2022, 2023)), -->
-<!--   type = factor(rep(c("Saliva", "Bioaerosols", "HEPA-filter"), times = 2), levels = c("Saliva", "Bioaerosols", "HEPA-filter")), -->
-<!--   n_pos = c(c(21, 10, 8), c(50, 2, 4)), -->
-<!--   n_tot = c(c(262, 130, 40), c(448, 105, 160)) -->
-<!-- ) %>% -->
-<!--   mutate(n_neg = n_tot - n_pos, -->
-<!--          year = ifelse(year_num == 2022, "Winter 2021/2022", "Winter 2022/2023"), -->
-<!--          year = factor(year, levels = c("Winter 2021/2022", "Winter 2022/2023"))) %>% -->
-<!--   dplyr::select(-n_tot,-n_neg) %>% -->
-<!--   reshape2::melt(c("year_num", "year", "type")) -->
-
-<!-- pos_samples_pl <- pos_samples %>% -->
-<!--   ggplot(aes(y = value, x = year_num, fill = year)) + -->
-<!--   geom_bar(stat = "identity") + -->
-<!--   geom_text(aes(label = value, color = year), size = 8 / cm(1), vjust = -1) + -->
-<!--   facet_wrap(~ type, nrow = 1) + -->
-<!--   scale_y_continuous(expand = expansion(add = c(0,5))) + -->
-<!--   scale_fill_manual(values = RColorBrewer::brewer.pal(9, "PuBu")[c(4,9)]) + -->
-<!--   scale_color_manual(values = RColorBrewer::brewer.pal(9, "PuBu")[c(4,9)]) + -->
-<!--   labs(y = "Frequency of positive samples", title = "b") + -->
-<!--   theme_custom() + -->
-<!--   theme(legend.position = "none", -->
-<!--         plot.title.position = "plot", -->
-<!--         strip.text = element_text(face = 2, vjust = 2, margin = margin(t = 10, b = 10)), -->
-<!--         panel.spacing.x = unit(1, "cm"), -->
-<!--         axis.title.x = element_blank(), -->
-<!--         panel.grid.major = element_blank(), -->
-<!--         panel.grid.minor = element_blank()) -->
-
-<!-- pos_samples_pl -->
-<!-- ``` -->
-
-<!-- ```{r} -->
-<!-- comparison <- grid.arrange(saliva_pl, pos_samples_pl, nrow = 2, heights = c(6, 8), widths = 11) -->
-<!-- ggsave(plot = comparison, file = "../results/comparison.pdf", width = 11.5 / cm(1), height = 14 / cm(1)) -->
-<!-- ``` -->
-
-<!-- ## Absences ## -->
-
-<!-- ```{r} -->
-<!-- mcid_2 <- readRDS("../data-clean/redcap-long.rds") %>% -->
-<!--   filter(respiratory_infection == "yes") %>% -->
-<!--   mutate(absent_days = date_back - date_absent) -->
-
-<!-- # 35 absences related to respiratory infection among 38 students -->
-
-<!-- summary(as.numeric(mcid_2$absent_days)) -->
-
-<!-- # on average 3.0 days out of school per absence (but weekends should be kept in mind) -->
-
-<!-- mcid_1 <- read_csv("../data-clean/mcid-1-redcap-cases.csv") %>% -->
-<!--   filter(!is_teacher, -->
-<!--          school_class == "School 1 (A)" | school_class == "School 2 (D)") %>% -->
-<!--   mutate(absent_days = date_end - date_start) -->
-
-<!-- # 40 absences related to respiratory infection among 44 students -->
-
-<!-- summary(as.numeric(mcid_1$absent_days)) -->
-
-<!-- #' on average 4.1 days out of school per absence (but weekends should be kept in mind) -->
-<!-- #' there is also an outlier with 30 days, but the median is still higher  -->
-
-<!-- rbind(mcid_1 %>% mutate(year = 2022) %>% dplyr::select(year, absent_days), -->
-<!--       mcid_2 %>% mutate(year = 2023) %>% dplyr::select(year, absent_days)) %>% -->
-<!--   mutate(absent_days = as.numeric(absent_days)) %>% -->
-<!--   ggplot(aes(fill = factor(year), x = year, y = absent_days)) + -->
-<!--   geom_boxplot() + -->
-<!--   scale_y_sqrt(breaks = c(0, 1:7, 10, 20, 30), limits = c(1,30)) -->
-<!-- ``` -->
-
-
-<!-- ## Particle reduction -->
-
-<!-- ```{r} -->
-<!-- vars <- c("CO2", "rH", "Temp", "AER", "Cn", "PM1", "PM25", "PM4", "PM10") -->
-<!-- vars_labels_no_units <- c("CO[2]", "Relative~humidity", "Temperature", "Air~exchange~rate", -->
-<!--                           "CN", "PM[1]", "PM[2.5]", "PM[4]", "PM[10]") -->
-<!-- names(vars_labels_no_units) <- vars -->
-
-<!-- particle <- data.frame( -->
-<!--   year = factor(c(rep(2022, 15), rep(2023, 15)), levels = c(2022, 2023)), -->
-<!--   variable = factor(c(rep(c("Cn", "PM1", "PM25", "PM4", "PM10"), each = 3, times = 2)), levels = c("Cn", "PM1", "PM25", "PM4", "PM10")), -->
-<!--   interval = rep(c("Mean", "Lower", "Upper"), times = 5), -->
-<!--   estimate = c(c(39.24, 3.88, 68.80,  -->
-<!--                  41.05, 6.62, 67.98, -->
-<!--                  45.12, 19.66, 63.16, -->
-<!--                  46.49, 27.26, 61.72, -->
-<!--                  46.60, 29.99, 59.49), -->
-<!--                c(76.83, 63.20, 86.28, -->
-<!--                  76.79, 64.84, 85.46, -->
-<!--                  72.86, 64.24, 79.66, -->
-<!--                  70.77, 63.46, 76.97, -->
-<!--                  99.99, 99.94, 100.00)) -->
-<!-- ) %>% -->
-<!--   dcast(year + variable ~ interval) %>% -->
-<!--   ggplot(aes(y = year, color = year)) + -->
-<!--   facet_wrap(~ variable, nrow = 1, dir = "h", labeller = as_labeller(vars_labels_no_units, label_parsed)) + -->
-<!--   geom_errorbar(mapping = aes(xmin = Lower, xmax = Upper), lineend = "square", size = 1, width = .05) + -->
-<!--   geom_point(mapping = aes(x = Mean), shape = 23, size = 2, fill = "white") + -->
-<!--   scale_color_manual(values = wes_palette("Darjeeling2")[c(2, 5)]) + -->
-<!--   scale_x_continuous(expand = expansion(mult = c(0, 0.1)), breaks = c(0, 50, 100), limits = c(0, 100)) + -->
-<!--   labs(y = "Study year", x = "Estimated reduction in particle concentration (%)", title = "c") +  -->
-<!--   theme_custom() + -->
-<!--   theme(legend.position = "none", -->
-<!--         plot.title.position = "plot", -->
-<!--         panel.spacing = unit(.5, "lines")) -->
-
-<!-- particle -->
-<!-- ``` -->
-
-
-<!-- ## Risk ratio -->
-
-<!-- ```{r} -->
-<!-- rr <- data.frame( -->
-<!--   year = factor(c(rep(2022, 3), rep(2023, 3)), levels = c(2022, 2023)), -->
-<!--   interval = rep(c("Mean", "Lower", "Upper"), times = 2), -->
-<!--   estimate = c(c(1.00, 0.22, 2.067), c(0.72, 0.44, 1.15)) -->
-<!-- ) %>% -->
-<!--   dcast(year ~ interval) %>% -->
-<!--   ggplot(aes(y = year, color = year)) + -->
-<!--   geom_vline(aes(xintercept = 1), linetype = "dashed") + -->
-<!--   geom_errorbar(mapping = aes(xmin = Lower, xmax = Upper), lineend = "square", size = 1, width = .05) + -->
-<!--   geom_point(mapping = aes(x = Mean), shape = 23, size = 2, fill = "white") + -->
-<!--   labs(y = "Study year", x = "ARR of infection with air cleaners (%)", title = "d") +  -->
-<!--   scale_color_manual(values = wes_palette("Darjeeling2")[c(2, 5)]) + -->
-<!--   theme_custom() + -->
-<!--   theme(legend.position = "none", -->
-<!--         plot.title.position = "plot") -->
-
-<!-- rr   -->
-<!-- ``` -->
-
-
-<!-- ## Combined  -->
-
-<!-- ```{r} -->
-<!-- comparison <- grid.arrange(saliva, pos_samples, particle, rr, ncol = 2, nrow = 2, heights = c(6, 4), widths = c(10,6)) -->
-<!-- ggsave(plot = comparison, file = "../results/comparison.pdf", width = 16 / cm(1), height = 10 / cm(1)) -->
-<!-- ``` -->

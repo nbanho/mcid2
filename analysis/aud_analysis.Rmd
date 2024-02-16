@@ -119,7 +119,7 @@ coughs_pl
 save_plot(coughs_pl, 
           pdf_file = "../results/cough-data/coughs-frequency-by-condition.pdf", 
           eps_file = "../results/cough-data/coughs-frequency-by-condition.eps", 
-          w = 7.25, h = 6)
+          w = 5.25, h = 6)
 
 ggsave(plot = coughs %>%
             mutate(coughs_per_min = n_coughs / TT) %>%
