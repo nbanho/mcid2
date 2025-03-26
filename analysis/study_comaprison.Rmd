@@ -535,4 +535,5 @@ design <- "12
 comparison <- saliva_pl + prob_pl + time_pl + plot_layout(design = design, widths = c(11, 5), heights = c(6, 11))
 ggsave(plot = comparison, file = "../results/comparison.pdf", width = 16 / cm(1), height = 17 / cm(1))
 ggsave(plot = comparison, file = "../results/comparison.png", width = 16 / cm(1), height = 17 / cm(1))
+ggsave(plot = comparison, file = "../results/comparison.tiff", width = 16 / cm(1), height = 17 / cm(1))
 ```
